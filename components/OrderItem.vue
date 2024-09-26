@@ -1,0 +1,112 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { OrderStatus, toDisplayString, toColorCode } from '~/server/utils/OrderStatus'
+
+const props = defineProps<{
+  bonusApplied: boolean
+  bonusReceived?: number
+  originalPrice: number
+  currentPrice: number
+  orderStatus: OrderStatus
+  balanceIsSufficient: (bonus: number) => boolean
+  applyBonus: (bonus: number) => void
+}>()
+
+const showBonusInput = ref(false)
+const bonusApplied = ref(props.bonusApplied)
+const bonusToggleChecked = ref(false)
+const bonus = ref(0)
+const currentPrice = ref(props.currentPrice)
+
+const bonusOrderLimitExceededToastVisible = ref(false)
+
+function toggleShowBonusInput(event: Event) {
+  showBonusInput.value = bonusToggleChecked.value
+}
+
+function closeBonusInput() {
+  showBonusInput.value = false
+  bonusToggleChecked.value = false
+  bonus.value = 0
+}
+
+function applyBonus() {
+  if (!props.balanceIsSufficient(bonus.value)) {
+    return
+  }
+
+  const bonusLimit = props.originalPrice / 2
+
+  if (bonus.value > bonusLimit) {
+    showBonusOrderLimitExceededToast()
+  } else {
+    props.applyBonus(bonus.value)
+    currentPrice.value = props.originalPrice - bonus.value
+    bonusApplied.value = true
+    closeBonusInput()
+  }
+}
+
+function showBonusOrderLimitExceededToast() {
+  bonusOrderLimitExceededToastVisible.value = true
+
+  setTimeout(() => {
+    bonusOrderLimitExceededToastVisible.value = false
+  }, 3000)
+}
+</script>
+
+<template>
+  <div class="card card-compact bg-neutral mb-3">
+    <div class="card-body">
+      <div class="flex flex-row justify-between">
+        <div :class="['badge', `badge-${toColorCode(orderStatus)}`]">{{ toDisplayString(orderStatus) }}</div>
+        <div v-if="bonusReceived && bonusReceived > 0" class="badge">+ {{ bonusReceived }}</div>
+      </div>
+      <div class="flex flex-row justify-between">
+        <div class="flex flex-col">
+          <p class="font-bold text-lg leading-none">Заказ #127767</p>
+          <p class="font-thin opacity-50 leading-none">22 сентября 2024</p>
+        </div>
+        <div>
+          <span
+            v-if="bonusApplied"
+            class="font-semibold text-2xl leading-none mr-2 line-through decoration-2 opacity-50"
+            >{{ originalPrice }}</span
+          >
+          <span class="font-semibold text-2xl leading-none">{{ currentPrice }} ₾</span>
+        </div>
+      </div>
+      <div class="divider opacity-50 m-0"></div>
+      <div class="flex flex-row justify-between">
+        <span class="font-bold">Использовать бонусы</span>
+        <input
+          v-if="!bonusApplied && orderStatus == OrderStatus.WaitingForPayment"
+          type="checkbox"
+          class="toggle toggle-primary"
+          @change="toggleShowBonusInput"
+          v-model="bonusToggleChecked"
+        />
+        <ion-icon v-else-if="bonusApplied" name="checkmark-circle-outline" class="text-2xl text-success"></ion-icon>
+        <ion-icon v-else name="lock-closed-outline" class="text-2xl text-error"></ion-icon>
+      </div>
+      <div class="mt-3 collapse rounded-none" :class="{ 'collapse-open': showBonusInput }">
+        <div class="collapse-content p-0">
+          <label class="input input-bordered flex items-center">
+            <span>₾</span>
+            <input type="number" class="grow ml-2" placeholder="0" v-model="bonus" />
+          </label>
+          <div class="flex flex-row justify-between">
+            <button class="btn btn-ghost text-error" @click="closeBonusInput">Отменить</button>
+            <button class="btn btn-ghost text-primary" @click="applyBonus">Сохранить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="bonusOrderLimitExceededToastVisible" class="toast toast-top whitespace-normal z-10">
+      <div class="alert alert-error">
+        <span>Можно списать не более 50% от суммы заказа</span>
+      </div>
+    </div>
+  </div>
+</template>
