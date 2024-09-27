@@ -78,30 +78,32 @@ function applyBonus(bonus: number) {
     <div role="tablist" class="tabs tabs-bordered grid-cols-3">
       <input type="radio" name="tab" role="tab" class="tab" aria-label="Баланс" checked />
       <div role="tabpanel" class="tab-content p-5">
-        <div class="relative">
-          <img src="./public/balance-card.svg" class="rounded-3xl" />
-          <div class="absolute top-1/2 w-full px-5">
-            <div class="flex flex-col">
-              <div class="flex flex-row justify-between">
-                <div>
-                  <p class="leading-none text-sm">Владелец карты</p>
-                  <p class="font-bold">Николаенко Ольга</p>
+        <div class="flex justify-center">
+          <div class="relative">
+            <img src="./public/balance-card.svg" class="rounded-3xl" />
+            <div class="absolute top-1/2 w-full px-5">
+              <div class="flex flex-col">
+                <div class="flex flex-row justify-between">
+                  <div>
+                    <p class="leading-none text-sm">Владелец карты</p>
+                    <p class="font-bold">Николаенко Ольга</p>
+                  </div>
+                  <div>
+                    <p class="leading-none text-sm">Бонусы</p>
+                    <p class="font-bold">12 ₾</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="leading-none text-sm">Бонусы</p>
-                  <p class="font-bold">12 ₾</p>
+                <div class="flex flex-row mt-3">
+                  <div>
+                    <p class="leading-none text-sm">Номер телефона</p>
+                    <p class="font-bold">+123456789</p>
+                  </div>
                 </div>
-              </div>
-              <div class="flex flex-row mt-3">
-                <div>
-                  <p class="leading-none text-sm">Номер телефона</p>
-                  <p class="font-bold">+123456789</p>
-                </div>
-              </div>
-              <div class="flex flex-row mt-3">
-                <div>
-                  <p class="leading-none text-sm">Telegram</p>
-                  <p class="font-bold">@username</p>
+                <div class="flex flex-row mt-3">
+                  <div>
+                    <p class="leading-none text-sm">Telegram</p>
+                    <p class="font-bold">@username</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -169,32 +171,34 @@ function applyBonus(bonus: number) {
             <ion-icon name="copy-outline"></ion-icon>
           </button>
         </div>
-        <ul class="steps steps-vertical mt-5 gap-3">
-          <li class="step">
-            <div>
-              <p class="font-semibold text-sm text-left">Отправляете промокод</p>
-              <p class="font-thin text-sm text-left">
-                Скопируйте свой промокод и отправьте его другу любым удобным способом
-              </p>
-            </div>
-          </li>
-          <li class="step">
-            <div>
-              <p class="font-semibold text-sm text-left">Друг регистрируется</p>
-              <p class="font-thin text-sm text-left">
-                Вводит ваш промокод при заполнении формы приема заказа и получает свой заказ в Грузии
-              </p>
-            </div>
-          </li>
-          <li class="step" data-content="🎉">
-            <div>
-              <p class="font-semibold text-sm text-left">Получаете бонусы</p>
-              <p class="font-thin text-sm text-left">
-                Вам на баланс вернется 5% от стоимости первого заказа вашего друга
-              </p>
-            </div>
-          </li>
-        </ul>
+        <div class="flex justify-center">
+          <ul class="steps steps-vertical mt-5 gap-3">
+            <li class="step">
+              <div>
+                <p class="font-semibold text-sm text-left">Отправляете промокод</p>
+                <p class="font-thin text-sm text-left">
+                  Скопируйте свой промокод и отправьте его другу любым удобным способом
+                </p>
+              </div>
+            </li>
+            <li class="step">
+              <div>
+                <p class="font-semibold text-sm text-left">Друг регистрируется</p>
+                <p class="font-thin text-sm text-left">
+                  Вводит ваш промокод при заполнении формы приема заказа и получает свой заказ в Грузии
+                </p>
+              </div>
+            </li>
+            <li class="step" data-content="🎉">
+              <div>
+                <p class="font-semibold text-sm text-left">Получаете бонусы</p>
+                <p class="font-thin text-sm text-left">
+                  Вам на баланс вернется 5% от стоимости первого заказа вашего друга
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
     <div v-if="copyToastVisible" class="toast toast-center">
