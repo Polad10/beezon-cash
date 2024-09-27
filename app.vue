@@ -76,8 +76,38 @@ function applyBonus(bonus: number) {
       <p class="text-3xl">Beezon Cash</p>
     </div>
     <div role="tablist" class="tabs tabs-bordered grid-cols-3">
-      <input type="radio" name="tab" role="tab" class="tab" aria-label="Баланс" />
-      <div role="tabpanel" class="tab-content p-5">Tab content 1</div>
+      <input type="radio" name="tab" role="tab" class="tab" aria-label="Баланс" checked />
+      <div role="tabpanel" class="tab-content p-5">
+        <div class="relative">
+          <img src="./public/balance-card.svg" class="rounded-3xl" />
+          <div class="absolute top-1/2 w-full px-5">
+            <div class="flex flex-col">
+              <div class="flex flex-row justify-between">
+                <div>
+                  <p class="leading-none text-sm">Владелец карты</p>
+                  <p class="font-bold">Николаенко Ольга</p>
+                </div>
+                <div>
+                  <p class="leading-none text-sm">Бонусы</p>
+                  <p class="font-bold">12 ₾</p>
+                </div>
+              </div>
+              <div class="flex flex-row mt-3">
+                <div>
+                  <p class="leading-none text-sm">Номер телефона</p>
+                  <p class="font-bold">+123456789</p>
+                </div>
+              </div>
+              <div class="flex flex-row mt-3">
+                <div>
+                  <p class="leading-none text-sm">Telegram</p>
+                  <p class="font-bold">@username</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <input type="radio" name="tab" role="tab" class="tab" aria-label="Заказы" />
       <div role="tabpanel" class="tab-content p-5">
         <OrderItem
