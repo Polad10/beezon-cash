@@ -213,3 +213,11 @@ function applyBonus(bonus: number) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.tab:is(.tab-active, [aria-selected='true']):not(.tab-disabled):not([disabled]),
+.tab:is(input:checked) {
+  color: #93c5fd;
+  border-color: #93c5fd;
+}
+</style>
