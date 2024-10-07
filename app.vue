@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { retrieveLaunchParams, type InitDataParsed } from '@telegram-apps/sdk'
+import { mockTelegramEnv, retrieveLaunchParams } from '@telegram-apps/sdk'
 
 useHead({
   title: 'Test',
@@ -25,20 +25,85 @@ useHead({
   ],
 })
 
-// let initDataRaw: InitDataParsed | undefined = undefined
+onMounted(async () => {
+  try {
+    mockTelegramEnv({
+      themeParams: {
+        accentTextColor: '#6ab2f2',
+        bgColor: '#17212b',
+        buttonColor: '#5288c1',
+        buttonTextColor: '#ffffff',
+        destructiveTextColor: '#ec3942',
+        headerBgColor: '#17212b',
+        hintColor: '#708499',
+        linkColor: '#6ab3f3',
+        secondaryBgColor: '#232e3c',
+        sectionBgColor: '#17212b',
+        sectionHeaderTextColor: '#6ab3f3',
+        subtitleTextColor: '#708499',
+        textColor: '#f5f5f5',
+      },
+      initData: {
+        user: {
+          id: 99281932,
+          firstName: 'Andrew',
+          lastName: 'Rogue',
+          username: 'rogue',
+          languageCode: 'en',
+          isPremium: true,
+          allowsWriteToPm: true,
+        },
+        hash: '89d6079ad6762351f38c6dbbc41bb53048019256a9443988af7a48bcad16ba31',
+        authDate: new Date(1716922846000),
+        startParam: 'debug',
+        chatType: 'sender',
+        chatInstance: '8428209589180549439',
+      },
+      initDataRaw: new URLSearchParams([
+        [
+          'user',
+          JSON.stringify({
+            id: 99281932,
+            first_name: 'Andrew',
+            last_name: 'Rogue',
+            username: 'rogue',
+            language_code: 'en',
+            is_premium: true,
+            allows_write_to_pm: true,
+          }),
+        ],
+        ['hash', '89d6079ad6762351f38c6dbbc41bb53048019256a9443988af7a48bcad16ba31'],
+        ['auth_date', Date.now().toString()],
+        ['start_param', 'debug'],
+        ['chat_type', 'sender'],
+        ['chat_instance', '8428209589180549439'],
+      ]).toString(),
+      version: '7.2',
+      platform: 'tdesktop',
+    })
 
-// if (process.client) {
-//   const launchParams = retrieveLaunchParams()
-//   initDataRaw = launchParams.initData
-// }
+    const { initDataRaw } = retrieveLaunchParams()
+
+    const me = (
+      await axios.get<User>('http://10.0.0.199:3001/api/me', {
+        headers: { Authorization: `tma ${initDataRaw}` },
+      })
+    ).data
+
+    user.value = me
+  } catch (ex) {
+    console.log(ex)
+  }
+})
 
 import { ref } from 'vue'
 import { OrderStatus } from './server/utils/OrderStatus'
+import axios from 'axios'
+import type { User } from './models/User'
 
 const copyToastVisible = ref(false)
 const bonusBalanceExceededToastVisible = ref(false)
-
-let balance = 50
+const user = ref<User | null>(null)
 
 function showBonusBalanceExceededToast() {
   showToast(bonusBalanceExceededToastVisible)
@@ -57,7 +122,7 @@ function showToast(toastVisible: Ref<boolean>) {
 }
 
 function balanceIsSufficient(bonus: number) {
-  if (bonus <= balance) {
+  if (bonus <= user.value!.balance) {
     return true
   }
 
@@ -66,150 +131,155 @@ function balanceIsSufficient(bonus: number) {
 }
 
 function applyBonus(bonus: number) {
-  balance -= bonus
+  user.value!.balance -= bonus
 }
 </script>
 
 <template>
   <div>
-    <div class="flex justify-center py-4">
-      <p class="text-3xl">Beezon Cash</p>
-    </div>
-    <div role="tablist" class="tabs tabs-bordered grid-cols-3">
-      <input type="radio" name="tab" role="tab" class="tab" aria-label="Баланс" checked />
-      <div role="tabpanel" class="tab-content p-5">
-        <div class="flex justify-center">
-          <div class="relative">
-            <img src="./public/balance-card.svg" class="rounded-3xl" />
-            <div class="absolute top-1/2 w-full px-5">
-              <div class="flex flex-col">
-                <div class="flex flex-row justify-between">
-                  <div>
-                    <p class="leading-none text-sm">Владелец карты</p>
-                    <p class="font-bold">Николаенко Ольга</p>
+    <div v-if="user">
+      <div class="flex justify-center py-4">
+        <p class="text-3xl">Beezon Cash</p>
+      </div>
+      <div role="tablist" class="tabs tabs-bordered grid-cols-3">
+        <input type="radio" name="tab" role="tab" class="tab" aria-label="Баланс" checked />
+        <div role="tabpanel" class="tab-content p-5">
+          <div class="flex justify-center">
+            <div class="relative">
+              <img src="./public/balance-card.svg" class="rounded-3xl" />
+              <div class="absolute top-1/2 w-full px-5">
+                <div class="flex flex-col">
+                  <div class="flex flex-row justify-between">
+                    <div>
+                      <p class="leading-none text-sm">Владелец карты</p>
+                      <p class="font-bold">{{ user.first_name }} {{ user.last_name }}</p>
+                    </div>
+                    <div>
+                      <p class="leading-none text-sm">Бонусы</p>
+                      <p class="font-bold">{{ user.balance }} ₾</p>
+                    </div>
                   </div>
-                  <div>
-                    <p class="leading-none text-sm">Бонусы</p>
-                    <p class="font-bold">12 ₾</p>
+                  <div class="flex flex-row mt-3">
+                    <div>
+                      <p class="leading-none text-sm">Номер телефона</p>
+                      <p class="font-bold">{{ user.phone_nr }}</p>
+                    </div>
                   </div>
-                </div>
-                <div class="flex flex-row mt-3">
-                  <div>
-                    <p class="leading-none text-sm">Номер телефона</p>
-                    <p class="font-bold">+123456789</p>
-                  </div>
-                </div>
-                <div class="flex flex-row mt-3">
-                  <div>
-                    <p class="leading-none text-sm">Telegram</p>
-                    <p class="font-bold">@username</p>
+                  <div class="flex flex-row mt-3">
+                    <div>
+                      <p class="leading-none text-sm">Telegram</p>
+                      <p class="font-bold">@{{ user.tg_username }}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <input type="radio" name="tab" role="tab" class="tab" aria-label="Заказы" />
-      <div role="tabpanel" class="tab-content p-5">
-        <OrderItem
-          :bonusApplied="false"
-          :bonusReceived="1.62"
-          :originalPrice="54"
-          :currentPrice="54"
-          :order-status="OrderStatus.Delivered"
-          :balance-is-sufficient="balanceIsSufficient"
-          :apply-bonus="applyBonus"
-        />
-        <OrderItem
-          :bonusApplied="true"
-          :originalPrice="54"
-          :currentPrice="43"
-          :order-status="OrderStatus.Delivered"
-          :balance-is-sufficient="balanceIsSufficient"
-          :apply-bonus="applyBonus"
-        />
-        <OrderItem
-          :bonusApplied="false"
-          :originalPrice="54"
-          :currentPrice="54"
-          :order-status="OrderStatus.WaitingForPayment"
-          :balance-is-sufficient="balanceIsSufficient"
-          :apply-bonus="applyBonus"
-        />
-        <OrderItem
-          :bonusApplied="false"
-          :originalPrice="0"
-          :currentPrice="0"
-          :order-status="OrderStatus.ArrivedInDestinationCountry"
-          :balance-is-sufficient="balanceIsSufficient"
-          :apply-bonus="applyBonus"
-        />
-        <OrderItem
-          :bonusApplied="false"
-          :originalPrice="0"
-          :currentPrice="0"
-          :order-status="OrderStatus.OnTheWay"
-          :balance-is-sufficient="balanceIsSufficient"
-          :apply-bonus="applyBonus"
-        />
-        <OrderItem
-          :bonusApplied="false"
-          :originalPrice="0"
-          :currentPrice="0"
-          :order-status="OrderStatus.New"
-          :balance-is-sufficient="balanceIsSufficient"
-          :apply-bonus="applyBonus"
-        />
-      </div>
-      <input type="radio" name="tab" role="tab" class="tab" aria-label="Поделись" />
-      <div role="tabpanel" class="tab-content p-5">
-        <div class="flex flex-col items-center">
-          <p class="text-2xl text-center">Ваш промокод</p>
-          <button class="btn btn-wide text-xl mt-2 px-5" @click="showCopyToast">
-            <div class="mx-auto">RFID76564434</div>
-            <ion-icon name="copy-outline"></ion-icon>
-          </button>
+        <input type="radio" name="tab" role="tab" class="tab" aria-label="Заказы" />
+        <div role="tabpanel" class="tab-content p-5">
+          <OrderItem
+            :bonusApplied="false"
+            :bonusReceived="1.62"
+            :originalPrice="54"
+            :currentPrice="54"
+            :order-status="OrderStatus.Delivered"
+            :balance-is-sufficient="balanceIsSufficient"
+            :apply-bonus="applyBonus"
+          />
+          <OrderItem
+            :bonusApplied="true"
+            :originalPrice="54"
+            :currentPrice="43"
+            :order-status="OrderStatus.Delivered"
+            :balance-is-sufficient="balanceIsSufficient"
+            :apply-bonus="applyBonus"
+          />
+          <OrderItem
+            :bonusApplied="false"
+            :originalPrice="54"
+            :currentPrice="54"
+            :order-status="OrderStatus.WaitingForPayment"
+            :balance-is-sufficient="balanceIsSufficient"
+            :apply-bonus="applyBonus"
+          />
+          <OrderItem
+            :bonusApplied="false"
+            :originalPrice="0"
+            :currentPrice="0"
+            :order-status="OrderStatus.ArrivedInDestinationCountry"
+            :balance-is-sufficient="balanceIsSufficient"
+            :apply-bonus="applyBonus"
+          />
+          <OrderItem
+            :bonusApplied="false"
+            :originalPrice="0"
+            :currentPrice="0"
+            :order-status="OrderStatus.OnTheWay"
+            :balance-is-sufficient="balanceIsSufficient"
+            :apply-bonus="applyBonus"
+          />
+          <OrderItem
+            :bonusApplied="false"
+            :originalPrice="0"
+            :currentPrice="0"
+            :order-status="OrderStatus.New"
+            :balance-is-sufficient="balanceIsSufficient"
+            :apply-bonus="applyBonus"
+          />
         </div>
-        <div class="flex justify-center">
-          <ul class="steps steps-vertical mt-5 gap-3">
-            <li class="step">
-              <div>
-                <p class="font-semibold text-sm text-left">Отправляете промокод</p>
-                <p class="font-thin text-sm text-left">
-                  Скопируйте свой промокод и отправьте его другу любым удобным способом
-                </p>
-              </div>
-            </li>
-            <li class="step">
-              <div>
-                <p class="font-semibold text-sm text-left">Друг регистрируется</p>
-                <p class="font-thin text-sm text-left">
-                  Вводит ваш промокод при заполнении формы приема заказа и получает свой заказ в Грузии
-                </p>
-              </div>
-            </li>
-            <li class="step" data-content="🎉">
-              <div>
-                <p class="font-semibold text-sm text-left">Получаете бонусы</p>
-                <p class="font-thin text-sm text-left">
-                  Вам на баланс вернется 5% от стоимости первого заказа вашего друга
-                </p>
-              </div>
-            </li>
-          </ul>
+        <input type="radio" name="tab" role="tab" class="tab" aria-label="Поделись" />
+        <div role="tabpanel" class="tab-content p-5">
+          <div class="flex flex-col items-center">
+            <p class="text-2xl text-center">Ваш промокод</p>
+            <button class="btn btn-wide text-xl mt-2 px-5" @click="showCopyToast">
+              <div class="mx-auto">RFID76564434</div>
+              <ion-icon name="copy-outline"></ion-icon>
+            </button>
+          </div>
+          <div class="flex justify-center">
+            <ul class="steps steps-vertical mt-5 gap-3">
+              <li class="step">
+                <div>
+                  <p class="font-semibold text-sm text-left">Отправляете промокод</p>
+                  <p class="font-thin text-sm text-left">
+                    Скопируйте свой промокод и отправьте его другу любым удобным способом
+                  </p>
+                </div>
+              </li>
+              <li class="step">
+                <div>
+                  <p class="font-semibold text-sm text-left">Друг регистрируется</p>
+                  <p class="font-thin text-sm text-left">
+                    Вводит ваш промокод при заполнении формы приема заказа и получает свой заказ в Грузии
+                  </p>
+                </div>
+              </li>
+              <li class="step" data-content="🎉">
+                <div>
+                  <p class="font-semibold text-sm text-left">Получаете бонусы</p>
+                  <p class="font-thin text-sm text-left">
+                    Вам на баланс вернется 5% от стоимости первого заказа вашего друга
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div v-if="copyToastVisible" class="toast toast-center">
+        <div class="alert alert-success">
+          <span>Скопировано</span>
+        </div>
+      </div>
+      <div v-if="bonusBalanceExceededToastVisible" class="toast toast-top whitespace-normal">
+        <div class="alert alert-warning">
+          <span>Вы списываете больше бонусов, чем есть на балансе</span>
         </div>
       </div>
     </div>
-    <div v-if="copyToastVisible" class="toast toast-center">
-      <div class="alert alert-success">
-        <span>Скопировано</span>
-      </div>
-    </div>
-    <div v-if="bonusBalanceExceededToastVisible" class="toast toast-top whitespace-normal">
-      <div class="alert alert-warning">
-        <span>Вы списываете больше бонусов, чем есть на балансе</span>
-      </div>
+    <div v-else>
+      <p class="text-3xl">User not found</p>
     </div>
   </div>
 </template>
