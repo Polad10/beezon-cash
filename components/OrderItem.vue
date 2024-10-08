@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { OrderStatus, toDisplayString, toColorCode } from '~/server/utils/OrderStatus'
+import type { Order } from '~/models/Order'
+import { OrderStatus, toDisplayString, toColorCode } from '~/models/OrderStatus'
 
 const props = defineProps<{
-  bonusApplied: boolean
-  bonusReceived?: number
-  originalPrice: number
-  currentPrice: number
-  orderStatus: OrderStatus
+  order: Order
   balanceIsSufficient: (bonus: number) => boolean
   applyBonus: (bonus: number) => void
 }>()
 
 const showBonusInput = ref(false)
-const bonusApplied = ref(props.bonusApplied)
+const bonusApplied = ref(props.order.current_price != props.order.original_price)
 const bonusToggleChecked = ref(false)
 const bonus = ref(0)
-const currentPrice = ref(props.currentPrice)
+const currentPrice = ref(props.order.current_price)
 
 const bonusOrderLimitExceededToastVisible = ref(false)
 
@@ -35,13 +32,13 @@ function applyBonus() {
     return
   }
 
-  const bonusLimit = props.originalPrice / 2
+  const bonusLimit = props.order.original_price / 2
 
   if (bonus.value > bonusLimit) {
     showBonusOrderLimitExceededToast()
   } else {
     props.applyBonus(bonus.value)
-    currentPrice.value = props.originalPrice - bonus.value
+    currentPrice.value = props.order.original_price - bonus.value
     bonusApplied.value = true
     closeBonusInput()
   }
@@ -60,19 +57,21 @@ function showBonusOrderLimitExceededToast() {
   <div class="card card-compact bg-neutral mb-3">
     <div class="card-body">
       <div class="flex flex-row justify-between">
-        <div :class="['badge', `badge-${toColorCode(orderStatus)}`]">{{ toDisplayString(orderStatus) }}</div>
-        <div v-if="bonusReceived && bonusReceived > 0" class="badge">+ {{ bonusReceived }}</div>
+        <div :class="['badge', `badge-${toColorCode(order.status)}`]">{{ toDisplayString(order.status) }}</div>
+        <div v-if="order.bonus_received && order.bonus_received > 0" class="badge">+ {{ order.bonus_received }}</div>
       </div>
       <div class="flex flex-row justify-between">
         <div class="flex flex-col">
-          <p class="font-bold text-lg leading-none">Заказ #127767</p>
-          <p class="font-thin opacity-50 leading-none">22 сентября 2024</p>
+          <p class="font-bold text-lg leading-none">Заказ #{{ order.code }}</p>
+          <p class="font-thin opacity-50 leading-none">
+            {{ order.date.toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' }) }}
+          </p>
         </div>
         <div>
           <span
             v-if="bonusApplied"
             class="font-semibold text-2xl leading-none mr-2 line-through decoration-2 opacity-50"
-            >{{ originalPrice }}</span
+            >{{ order.original_price }}</span
           >
           <span class="font-semibold text-2xl leading-none">{{ currentPrice }} ₾</span>
         </div>
@@ -81,7 +80,7 @@ function showBonusOrderLimitExceededToast() {
       <div class="flex flex-row justify-between">
         <span class="font-bold">Использовать бонусы</span>
         <input
-          v-if="!bonusApplied && orderStatus == OrderStatus.WaitingForPayment"
+          v-if="!bonusApplied && order.status == OrderStatus.WaitingForPayment"
           type="checkbox"
           class="toggle toggle-primary"
           @change="toggleShowBonusInput"

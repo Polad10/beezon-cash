@@ -84,26 +84,35 @@ onMounted(async () => {
 
     const { initDataRaw } = retrieveLaunchParams()
 
-    const me = (
-      await axios.get<User>('http://10.0.0.199:3001/api/me', {
-        headers: { Authorization: `tma ${initDataRaw}` },
-      })
-    ).data
+    const apiUrl = 'http://10.0.0.199:3001/api'
+    const headers = {
+      headers: { Authorization: `tma ${initDataRaw}` },
+    }
+
+    const me = (await axios.get<User>(`${apiUrl}/me`, headers)).data
+    const ordersData = (await axios.get<Order[]>(`${apiUrl}/orders`, headers)).data
+
+    ordersData.forEach((order) => (order.date = new Date(order.date)))
+    ordersData.sort((a, b) => {
+      return b.date.getTime() - a.date.getTime()
+    })
 
     user.value = me
+    orders.value = ordersData
   } catch (ex) {
     console.log(ex)
   }
 })
 
 import { ref } from 'vue'
-import { OrderStatus } from './server/utils/OrderStatus'
 import axios from 'axios'
 import type { User } from './models/User'
+import type { Order } from './models/Order'
 
 const copyToastVisible = ref(false)
 const bonusBalanceExceededToastVisible = ref(false)
 const user = ref<User | null>(null)
+const orders = ref<Order[]>([])
 
 function showBonusBalanceExceededToast() {
   showToast(bonusBalanceExceededToastVisible)
@@ -179,51 +188,9 @@ function applyBonus(bonus: number) {
         <input type="radio" name="tab" role="tab" class="tab" aria-label="Заказы" />
         <div role="tabpanel" class="tab-content p-5">
           <OrderItem
-            :bonusApplied="false"
-            :bonusReceived="1.62"
-            :originalPrice="54"
-            :currentPrice="54"
-            :order-status="OrderStatus.Delivered"
-            :balance-is-sufficient="balanceIsSufficient"
-            :apply-bonus="applyBonus"
-          />
-          <OrderItem
-            :bonusApplied="true"
-            :originalPrice="54"
-            :currentPrice="43"
-            :order-status="OrderStatus.Delivered"
-            :balance-is-sufficient="balanceIsSufficient"
-            :apply-bonus="applyBonus"
-          />
-          <OrderItem
-            :bonusApplied="false"
-            :originalPrice="54"
-            :currentPrice="54"
-            :order-status="OrderStatus.WaitingForPayment"
-            :balance-is-sufficient="balanceIsSufficient"
-            :apply-bonus="applyBonus"
-          />
-          <OrderItem
-            :bonusApplied="false"
-            :originalPrice="0"
-            :currentPrice="0"
-            :order-status="OrderStatus.ArrivedInDestinationCountry"
-            :balance-is-sufficient="balanceIsSufficient"
-            :apply-bonus="applyBonus"
-          />
-          <OrderItem
-            :bonusApplied="false"
-            :originalPrice="0"
-            :currentPrice="0"
-            :order-status="OrderStatus.OnTheWay"
-            :balance-is-sufficient="balanceIsSufficient"
-            :apply-bonus="applyBonus"
-          />
-          <OrderItem
-            :bonusApplied="false"
-            :originalPrice="0"
-            :currentPrice="0"
-            :order-status="OrderStatus.New"
+            v-for="order in orders"
+            :key="order.id"
+            :order="order"
             :balance-is-sufficient="balanceIsSufficient"
             :apply-bonus="applyBonus"
           />
