@@ -118,7 +118,8 @@ function showBonusBalanceExceededToast() {
   showToast(bonusBalanceExceededToastVisible)
 }
 
-function showCopyToast() {
+async function copyReferralCode() {
+  await navigator.clipboard.writeText(user.value!.referral_code)
   showToast(copyToastVisible)
 }
 
@@ -199,8 +200,8 @@ function applyBonus(bonus: number) {
         <div role="tabpanel" class="tab-content p-5">
           <div class="flex flex-col items-center">
             <p class="text-2xl text-center">Ваш промокод</p>
-            <button class="btn btn-wide text-xl mt-2 px-5" @click="showCopyToast">
-              <div class="mx-auto">RFID76564434</div>
+            <button class="btn btn-wide text-xl mt-2 px-5" @click="copyReferralCode">
+              <div class="mx-auto">{{ user.referral_code }}</div>
               <ion-icon name="copy-outline"></ion-icon>
             </button>
           </div>
