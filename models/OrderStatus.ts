@@ -26,7 +26,7 @@ export function toColorCode(orderStatus: OrderStatus) {
     case OrderStatus.New:
       return 'primary'
     case OrderStatus.OnTheWay:
-      return 'info'
+      return 'accent'
     case OrderStatus.ArrivedInDestinationCountry:
       return 'warning'
     case OrderStatus.WaitingForPayment:

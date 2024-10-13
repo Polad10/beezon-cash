@@ -28,21 +28,7 @@ useHead({
 onMounted(async () => {
   try {
     mockTelegramEnv({
-      themeParams: {
-        accentTextColor: '#6ab2f2',
-        bgColor: '#17212b',
-        buttonColor: '#5288c1',
-        buttonTextColor: '#ffffff',
-        destructiveTextColor: '#ec3942',
-        headerBgColor: '#17212b',
-        hintColor: '#708499',
-        linkColor: '#6ab3f3',
-        secondaryBgColor: '#232e3c',
-        sectionBgColor: '#17212b',
-        sectionHeaderTextColor: '#6ab3f3',
-        subtitleTextColor: '#708499',
-        textColor: '#f5f5f5',
-      },
+      themeParams: {},
       initData: {
         user: {
           id: 99281932,
@@ -147,102 +133,136 @@ function applyBonus(bonus: number) {
 
 <template>
   <div>
-    <div v-if="user">
-      <div class="flex justify-center py-4">
-        <p class="text-3xl">Beezon Cash</p>
-      </div>
-      <div role="tablist" class="tabs tabs-bordered grid-cols-3">
-        <input type="radio" name="tab" role="tab" class="tab" aria-label="Баланс" checked />
-        <div role="tabpanel" class="tab-content p-5">
-          <div class="flex justify-center">
-            <div class="relative">
-              <img src="./public/balance-card.svg" class="rounded-3xl" />
-              <div class="absolute top-1/2 w-full px-5">
-                <div class="flex flex-col">
-                  <div class="flex flex-row justify-between">
-                    <div>
-                      <p class="leading-none text-sm">Владелец карты</p>
-                      <p class="font-bold">{{ user.first_name }} {{ user.last_name }}</p>
-                    </div>
-                    <div>
-                      <p class="leading-none text-sm">Бонусы</p>
-                      <p class="font-bold">{{ user.balance }} ₾</p>
-                    </div>
-                  </div>
-                  <div class="flex flex-row mt-3">
-                    <div>
-                      <p class="leading-none text-sm">Номер телефона</p>
-                      <p class="font-bold">{{ user.phone_nr }}</p>
-                    </div>
-                  </div>
-                  <div class="flex flex-row mt-3">
-                    <div>
-                      <p class="leading-none text-sm">Telegram</p>
-                      <p class="font-bold">@{{ user.tg_username }}</p>
+    <div v-if="user" class="max-w-screen-sm">
+      <div class="text-black">
+        <div class="flex justify-center py-4 bg-zinc-100">
+          <p class="text-3xl font-bold">BEEZON CASH</p>
+        </div>
+        <div class="bg-white min-h-screen">
+          <div role="tablist" class="tabs tabs-bordered grid-cols-3 py-7">
+            <input
+              type="radio"
+              name="tab"
+              role="tab"
+              class="tab text-lg font-medium content-end leading-tight pb-1.5"
+              aria-label="Баланс аккаунта"
+              checked
+            />
+            <div role="tabpanel" class="tab-content pt-7">
+              <div class="flex justify-center">
+                <div class="relative">
+                  <img src="./public/balance-card.svg" class="rounded-3xl" />
+                  <div class="absolute top-1/2 w-full px-5">
+                    <div class="flex flex-col">
+                      <div class="flex flex-row justify-between">
+                        <div>
+                          <p class="leading-none text-lg text-slate-300 font-light">Владелец карты</p>
+                          <p class="text-lg text-white font-bold">{{ user.first_name }} {{ user.last_name }}</p>
+                        </div>
+                        <div>
+                          <p class="leading-none text-lg text-slate-300 font-light">Бонусы</p>
+                          <p class="text-xl text-white font-bold text-center">{{ user.balance }} ₾</p>
+                        </div>
+                      </div>
+                      <div class="flex flex-row mt-3">
+                        <div>
+                          <p class="leading-none text-lg text-slate-300 font-light">Номер телефона</p>
+                          <p class="text-lg text-white font-bold">{{ user.phone_nr }}</p>
+                        </div>
+                      </div>
+                      <div class="flex flex-row mt-3">
+                        <div>
+                          <p class="leading-none text-lg text-slate-300 font-light">Telegram</p>
+                          <p class="text-lg text-white font-bold">@{{ user.tg_username }}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+            <input
+              type="radio"
+              name="tab"
+              role="tab"
+              class="tab text-lg font-light content-end leading-tight pb-1.5 text-black"
+              aria-label="Список заказов"
+            />
+            <div role="tabpanel" class="tab-content p-5">
+              <OrderItem
+                v-for="order in orders"
+                :key="order.id"
+                :order="order"
+                :balance-is-sufficient="balanceIsSufficient"
+                :apply-bonus="applyBonus"
+              />
+            </div>
+            <input
+              type="radio"
+              name="tab"
+              role="tab"
+              class="tab text-lg font-light content-end leading-tight pb-1.5 text-black"
+              aria-label="Пригласи друга"
+            />
+            <div role="tabpanel" class="tab-content p-5">
+              <div class="flex flex-col items-center">
+                <p class="text-xl font-regular text-center">Ваш промокод</p>
+                <button
+                  class="btn btn-wide bg-accent text-xl mt-2 px-5 rounded-2xl hover:bg-accent-content"
+                  @click="copyReferralCode"
+                >
+                  <div class="mx-auto text-white">{{ user.referral_code }}</div>
+                  <ion-icon name="copy-outline" class="text-white z-10"></ion-icon>
+                </button>
+              </div>
+              <div class="flex justify-center">
+                <ul class="steps steps-vertical mt-5 gap-3">
+                  <li class="step step-secondary">
+                    <div>
+                      <p class="font-semibold text-lg text-left">Отправляете промокод</p>
+                      <p class="font-thin text-base text-left leading-none">
+                        Скопируйте свой промокод и отправьте его другу любым удобным способом
+                      </p>
+                    </div>
+                  </li>
+                  <li class="step step-secondary">
+                    <div>
+                      <p class="font-semibold text-lg text-left">Друг регистрируется</p>
+                      <p class="font-thin text-base text-left leading-none">
+                        Вводит ваш промокод при заполнении формы приема заказа и получает свой заказ в Грузии
+                      </p>
+                    </div>
+                  </li>
+                  <li class="step step-secondary" data-content="🎉">
+                    <div>
+                      <p class="font-semibold text-lg text-left">Получаете бонусы</p>
+                      <p class="font-thin text-base text-left leading-none">
+                        Вам на баланс вернется 5% от стоимости первого заказа вашего друга
+                      </p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
-        </div>
-        <input type="radio" name="tab" role="tab" class="tab" aria-label="Заказы" />
-        <div role="tabpanel" class="tab-content p-5">
-          <OrderItem
-            v-for="order in orders"
-            :key="order.id"
-            :order="order"
-            :balance-is-sufficient="balanceIsSufficient"
-            :apply-bonus="applyBonus"
-          />
-        </div>
-        <input type="radio" name="tab" role="tab" class="tab" aria-label="Поделись" />
-        <div role="tabpanel" class="tab-content p-5">
-          <div class="flex flex-col items-center">
-            <p class="text-2xl text-center">Ваш промокод</p>
-            <button class="btn btn-wide text-xl mt-2 px-5" @click="copyReferralCode">
-              <div class="mx-auto">{{ user.referral_code }}</div>
-              <ion-icon name="copy-outline"></ion-icon>
-            </button>
+          <div v-if="copyToastVisible" class="toast toast-center">
+            <div
+              class="alert bg-secondary text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-primary object-center"
+            >
+              <span>Скопировано</span>
+            </div>
           </div>
-          <div class="flex justify-center">
-            <ul class="steps steps-vertical mt-5 gap-3">
-              <li class="step">
-                <div>
-                  <p class="font-semibold text-sm text-left">Отправляете промокод</p>
-                  <p class="font-thin text-sm text-left">
-                    Скопируйте свой промокод и отправьте его другу любым удобным способом
-                  </p>
-                </div>
-              </li>
-              <li class="step">
-                <div>
-                  <p class="font-semibold text-sm text-left">Друг регистрируется</p>
-                  <p class="font-thin text-sm text-left">
-                    Вводит ваш промокод при заполнении формы приема заказа и получает свой заказ в Грузии
-                  </p>
-                </div>
-              </li>
-              <li class="step" data-content="🎉">
-                <div>
-                  <p class="font-semibold text-sm text-left">Получаете бонусы</p>
-                  <p class="font-thin text-sm text-left">
-                    Вам на баланс вернется 5% от стоимости первого заказа вашего друга
-                  </p>
-                </div>
-              </li>
-            </ul>
+          <div
+            v-if="bonusBalanceExceededToastVisible"
+            class="toast toast-top whitespace-normal z-10 flex-row justify-between mt-4 mx-4"
+          >
+            <div
+              class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
+            >
+              <ion-icon name="alert-circle" class="text-warning text-5xl ml-px"></ion-icon>
+              <span>Вы списываете больше бонусов, чем есть на балансе</span>
+            </div>
           </div>
-        </div>
-      </div>
-      <div v-if="copyToastVisible" class="toast toast-center">
-        <div class="alert alert-success">
-          <span>Скопировано</span>
-        </div>
-      </div>
-      <div v-if="bonusBalanceExceededToastVisible" class="toast toast-top whitespace-normal">
-        <div class="alert alert-warning">
-          <span>Вы списываете больше бонусов, чем есть на балансе</span>
         </div>
       </div>
     </div>
@@ -255,7 +275,7 @@ function applyBonus(bonus: number) {
 <style scoped>
 .tab:is(.tab-active, [aria-selected='true']):not(.tab-disabled):not([disabled]),
 .tab:is(input:checked) {
-  color: #93c5fd;
-  border-color: #93c5fd;
+  color: theme('colors.accent');
+  border-color: theme('colors.accent');
 }
 </style>
