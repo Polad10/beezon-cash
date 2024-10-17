@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { mockTelegramEnv, retrieveLaunchParams } from '@telegram-apps/sdk'
+import { ref } from 'vue'
+import axios from 'axios'
+import type { User } from './models/User'
+import type { Order } from './models/Order'
+import Decimal from 'decimal.js'
 
 useHead({
   title: 'Test',
@@ -24,6 +29,9 @@ useHead({
     },
   ],
 })
+
+const apiUrl = 'http://10.0.0.199:3001/api'
+let headers = {}
 
 onMounted(async () => {
   try {
@@ -70,15 +78,25 @@ onMounted(async () => {
 
     const { initDataRaw } = retrieveLaunchParams()
 
-    const apiUrl = 'http://10.0.0.199:3001/api'
-    const headers = {
+    headers = {
       headers: { Authorization: `tma ${initDataRaw}` },
     }
 
     const me = (await axios.get<User>(`${apiUrl}/me`, headers)).data
     const ordersData = (await axios.get<Order[]>(`${apiUrl}/orders`, headers)).data
 
-    ordersData.forEach((order) => (order.date = new Date(order.date)))
+    me.balance = new Decimal(me.balance)
+
+    ordersData.forEach((order) => {
+      order.date = new Date(order.date)
+      order.current_price = new Decimal(order.current_price)
+      order.original_price = new Decimal(order.original_price)
+
+      if (order.bonus_received) {
+        order.bonus_received = new Decimal(order.bonus_received)
+      }
+    })
+
     ordersData.sort((a, b) => {
       return b.date.getTime() - a.date.getTime()
     })
@@ -90,18 +108,24 @@ onMounted(async () => {
   }
 })
 
-import { ref } from 'vue'
-import axios from 'axios'
-import type { User } from './models/User'
-import type { Order } from './models/Order'
-
 const copyToastVisible = ref(false)
 const bonusBalanceExceededToastVisible = ref(false)
+const maxDiscountAmountExceededToastVisible = ref(false)
+const bonusIsZeroToastVisible = ref(false)
+
 const user = ref<User | null>(null)
 const orders = ref<Order[]>([])
 
 function showBonusBalanceExceededToast() {
   showToast(bonusBalanceExceededToastVisible)
+}
+
+function showMaxDiscountAmountExceededToast() {
+  showToast(maxDiscountAmountExceededToastVisible)
+}
+
+function showBonusIsZeroToast() {
+  showToast(bonusIsZeroToastVisible)
 }
 
 async function copyReferralCode() {
@@ -117,17 +141,38 @@ function showToast(toastVisible: Ref<boolean>) {
   }, 3000)
 }
 
-function balanceIsSufficient(bonus: number) {
-  if (bonus <= user.value!.balance) {
-    return true
+async function applyBonus(orderId: string, bonus: Decimal) {
+  if (!bonus.greaterThan(0)) {
+    showBonusIsZeroToast()
+    return false
   }
 
-  showBonusBalanceExceededToast()
-  return false
-}
+  if (bonus.greaterThan(user.value!.balance)) {
+    showBonusBalanceExceededToast()
+    return false
+  }
 
-function applyBonus(bonus: number) {
-  user.value!.balance -= bonus
+  const order = orders.value.find((o) => o.id === orderId)
+
+  if (!order) {
+    return false
+  }
+
+  const maxDiscountAmount = order.current_price.dividedBy(2)
+
+  if (bonus.greaterThan(maxDiscountAmount)) {
+    showMaxDiscountAmountExceededToast()
+    return false
+  }
+
+  const result = (
+    await axios.post<{ user: User; order: Order }>(`${apiUrl}/orders/${orderId}/bonus`, { amount: bonus }, headers)
+  ).data
+
+  user.value!.balance = new Decimal(result.user.balance)
+  order.current_price = new Decimal(result.order.current_price)
+
+  return true
 }
 </script>
 
@@ -189,13 +234,7 @@ function applyBonus(bonus: number) {
               aria-label="Список заказов"
             />
             <div role="tabpanel" class="tab-content p-5">
-              <OrderItem
-                v-for="order in orders"
-                :key="order.id"
-                :order="order"
-                :balance-is-sufficient="balanceIsSufficient"
-                :apply-bonus="applyBonus"
-              />
+              <OrderItem v-for="order in orders" :key="order.id" :order="order" :apply-bonus="applyBonus" />
             </div>
             <input
               type="radio"
@@ -254,13 +293,35 @@ function applyBonus(bonus: number) {
           </div>
           <div
             v-if="bonusBalanceExceededToastVisible"
-            class="toast toast-top whitespace-normal z-10 flex-row justify-between mt-4 mx-4"
+            class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full"
           >
             <div
               class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
             >
               <ion-icon name="alert-circle" class="text-warning text-5xl ml-px"></ion-icon>
               <span>Вы списываете больше бонусов, чем есть на балансе</span>
+            </div>
+          </div>
+          <div
+            v-if="maxDiscountAmountExceededToastVisible"
+            class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full"
+          >
+            <div
+              class="alert alert-info text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-red-300 object-center"
+            >
+              <ion-icon name="close-circle-outline" class="text-error text-5xl ml-px"></ion-icon>
+              <span>Можно списать не более 50% от суммы заказа</span>
+            </div>
+          </div>
+          <div
+            v-if="bonusIsZeroToastVisible"
+            class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full"
+          >
+            <div
+              class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
+            >
+              <ion-icon name="alert-circle" class="text-warning text-5xl ml-px"></ion-icon>
+              <span>Сумма должна быть > 0</span>
             </div>
           </div>
         </div>

@@ -1,3 +1,5 @@
+import type Decimal from 'decimal.js'
+
 export interface User {
   id: string
   first_name: string
@@ -5,5 +7,5 @@ export interface User {
   phone_nr: string
   tg_username: string
   referral_code: string
-  balance: number
+  balance: Decimal
 }
