@@ -12,7 +12,15 @@ const props = defineProps<{
 const order = props.order
 const showBonusInput = ref(false)
 const bonusToggleChecked = ref(false)
-const bonus = ref(new Decimal(0))
+const bonus = ref<number | null>(null)
+
+const bonusDecimal = computed(() => {
+  if (bonus.value === null) {
+    return null
+  }
+
+  return new Decimal(bonus.value)
+})
 
 const bonusApplied = computed(() => {
   return !order.current_price.equals(order.original_price)
@@ -25,11 +33,11 @@ function toggleShowBonusInput(event: Event) {
 function closeBonusInput() {
   showBonusInput.value = false
   bonusToggleChecked.value = false
-  bonus.value = new Decimal(0)
+  bonus.value = 0
 }
 
 async function applyBonus() {
-  if (await props.applyBonus(order.id, new Decimal(bonus.value))) {
+  if (await props.applyBonus(order.id, bonusDecimal.value!)) {
     closeBonusInput()
   }
 }
@@ -83,7 +91,13 @@ async function applyBonus() {
           </label>
           <div class="flex flex-row justify-between mt-2 mx-4">
             <button class="btn btn-ghost text-error text-base font-medium" @click="closeBonusInput">Отменить</button>
-            <button class="btn btn-ghost text-accent text-base font-medium" @click="applyBonus">Сохранить</button>
+            <button
+              :disabled="!bonus"
+              class="btn btn-ghost text-accent text-base font-medium disabled:bg-transparent"
+              @click="applyBonus"
+            >
+              Сохранить
+            </button>
           </div>
         </div>
       </div>
