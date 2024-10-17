@@ -77,14 +77,9 @@ async function applyBonus() {
       </div>
       <div class="mt-3 collapse rounded-none" :class="{ 'collapse-open': showBonusInput }">
         <div class="collapse-content p-0">
-          <label class="input input-bordered flex items-center border-gray-300 rounded-xl bg-white p-2">
+          <label class="input input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center">
             <span>₾</span>
-            <input
-              type="number"
-              class="grow ml-2 bg-transparent border-none outline-none"
-              placeholder="0"
-              v-model="bonus"
-            />
+            <input type="number" class="grow ml-2" placeholder="0" v-model="bonus" />
           </label>
           <div class="flex flex-row justify-between mt-2 mx-4">
             <button class="btn btn-ghost text-error text-base font-medium" @click="closeBonusInput">Отменить</button>
