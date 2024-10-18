@@ -93,27 +93,30 @@ onMounted(async () => {
       headers: { Authorization: `tma ${initDataRaw}` },
     }
 
-    const me = (await axios.get<User>(`${apiUrl}/me`, headers)).data
-    const ordersData = (await axios.get<Order[]>(`${apiUrl}/orders`, headers)).data
+    const me = (await axios.get<User | null>(`${apiUrl}/me`, headers)).data
 
-    me.balance = new Decimal(me.balance)
+    if (me) {
+      const ordersData = (await axios.get<Order[]>(`${apiUrl}/orders`, headers)).data
+      me.balance = new Decimal(me.balance)
 
-    ordersData.forEach((order) => {
-      order.date = new Date(order.date)
-      order.current_price = new Decimal(order.current_price)
-      order.original_price = new Decimal(order.original_price)
+      ordersData.forEach((order) => {
+        order.date = new Date(order.date)
+        order.current_price = new Decimal(order.current_price)
+        order.original_price = new Decimal(order.original_price)
 
-      if (order.bonus_received) {
-        order.bonus_received = new Decimal(order.bonus_received)
-      }
-    })
+        if (order.bonus_received) {
+          order.bonus_received = new Decimal(order.bonus_received)
+        }
+      })
 
-    ordersData.sort((a, b) => {
-      return b.date.getTime() - a.date.getTime()
-    })
+      ordersData.sort((a, b) => {
+        return b.date.getTime() - a.date.getTime()
+      })
 
-    user.value = me
-    orders.value = ordersData
+      user.value = me
+      orders.value = ordersData
+    }
+
     loading.value = false
   } catch (ex) {
     console.log(ex)
@@ -182,11 +185,11 @@ async function applyBonus(orderId: string, bonus: Decimal) {
 
 <template>
   <div class="h-full">
-    <div v-if="loading" class="h-full flex justify-center">
+    <div v-if="loading" class="h-full flex flex-col justify-center items-center">
       <span class="loading loading-spinner text-accent"></span>
     </div>
-    <div v-if="!user">
-      <p class="text-3xl">User not found</p>
+    <div v-if="!user" class="h-full flex flex-col justify-center items-center">
+      <span class="text-3xl">Пользователь не найден</span>
     </div>
     <div v-if="user">
       <div class="text-black">
