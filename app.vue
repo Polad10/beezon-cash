@@ -33,7 +33,18 @@ useHead({
 const apiUrl = 'http://10.0.0.199:3001/api'
 let headers = {}
 
+const copyToastVisible = ref(false)
+const bonusBalanceExceededToastVisible = ref(false)
+const maxDiscountAmountExceededToastVisible = ref(false)
+const bonusIsZeroToastVisible = ref(false)
+const loading = ref(true)
+
+const user = ref<User | null>(null)
+const orders = ref<Order[]>([])
+
 onMounted(async () => {
+  loading.value = true
+
   try {
     mockTelegramEnv({
       themeParams: {},
@@ -103,18 +114,11 @@ onMounted(async () => {
 
     user.value = me
     orders.value = ordersData
+    loading.value = false
   } catch (ex) {
     console.log(ex)
   }
 })
-
-const copyToastVisible = ref(false)
-const bonusBalanceExceededToastVisible = ref(false)
-const maxDiscountAmountExceededToastVisible = ref(false)
-const bonusIsZeroToastVisible = ref(false)
-
-const user = ref<User | null>(null)
-const orders = ref<Order[]>([])
 
 function showBonusBalanceExceededToast() {
   showToast(bonusBalanceExceededToastVisible)
@@ -177,8 +181,14 @@ async function applyBonus(orderId: string, bonus: Decimal) {
 </script>
 
 <template>
-  <div>
-    <div v-if="user" class="max-w-screen-sm">
+  <div class="h-full">
+    <div v-if="loading" class="h-full flex justify-center">
+      <span class="loading loading-spinner text-accent"></span>
+    </div>
+    <div v-if="!user">
+      <p class="text-3xl">User not found</p>
+    </div>
+    <div v-if="user">
       <div class="text-black">
         <div class="flex justify-center py-4 bg-zinc-100">
           <p class="text-3xl font-bold">BEEZON CASH</p>
@@ -326,9 +336,6 @@ async function applyBonus(orderId: string, bonus: Decimal) {
           </div>
         </div>
       </div>
-    </div>
-    <div v-else>
-      <p class="text-3xl">User not found</p>
     </div>
   </div>
 </template>
