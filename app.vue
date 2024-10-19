@@ -37,7 +37,9 @@ const copyToastVisible = ref(false)
 const bonusBalanceExceededToastVisible = ref(false)
 const maxDiscountAmountExceededToastVisible = ref(false)
 const bonusIsZeroToastVisible = ref(false)
+const errorToastVisible = ref(false)
 const loading = ref(true)
+const loadingError = ref(false)
 
 const user = ref<User | null>(null)
 const orders = ref<Order[]>([])
@@ -116,10 +118,10 @@ onMounted(async () => {
       user.value = me
       orders.value = ordersData
     }
-
+  } catch (err) {
+    loadingError.value = true
+  } finally {
     loading.value = false
-  } catch (ex) {
-    console.log(ex)
   }
 })
 
@@ -133,6 +135,10 @@ function showMaxDiscountAmountExceededToast() {
 
 function showBonusIsZeroToast() {
   showToast(bonusIsZeroToastVisible)
+}
+
+function showErrorToast() {
+  showToast(errorToastVisible)
 }
 
 async function copyReferralCode() {
@@ -149,49 +155,57 @@ function showToast(toastVisible: Ref<boolean>) {
 }
 
 async function applyBonus(orderId: string, bonus: Decimal) {
-  if (!bonus.greaterThan(0)) {
-    showBonusIsZeroToast()
+  try {
+    if (!bonus.greaterThan(0)) {
+      showBonusIsZeroToast()
+      return false
+    }
+
+    if (bonus.greaterThan(user.value!.balance)) {
+      showBonusBalanceExceededToast()
+      return false
+    }
+
+    const order = orders.value.find((o) => o.id === orderId)
+
+    if (!order) {
+      return false
+    }
+
+    const maxDiscountAmount = order.current_price.dividedBy(2)
+
+    if (bonus.greaterThan(maxDiscountAmount)) {
+      showMaxDiscountAmountExceededToast()
+      return false
+    }
+
+    const result = (
+      await axios.post<{ user: User; order: Order }>(`${apiUrl}/orders/${orderId}/bonus`, { amount: bonus }, headers)
+    ).data
+
+    user.value!.balance = new Decimal(result.user.balance)
+    order.current_price = new Decimal(result.order.current_price)
+
+    return true
+  } catch (err) {
+    showErrorToast()
     return false
   }
-
-  if (bonus.greaterThan(user.value!.balance)) {
-    showBonusBalanceExceededToast()
-    return false
-  }
-
-  const order = orders.value.find((o) => o.id === orderId)
-
-  if (!order) {
-    return false
-  }
-
-  const maxDiscountAmount = order.current_price.dividedBy(2)
-
-  if (bonus.greaterThan(maxDiscountAmount)) {
-    showMaxDiscountAmountExceededToast()
-    return false
-  }
-
-  const result = (
-    await axios.post<{ user: User; order: Order }>(`${apiUrl}/orders/${orderId}/bonus`, { amount: bonus }, headers)
-  ).data
-
-  user.value!.balance = new Decimal(result.user.balance)
-  order.current_price = new Decimal(result.order.current_price)
-
-  return true
 }
 </script>
 
 <template>
   <div class="h-full">
-    <div v-if="loading" class="h-full flex flex-col justify-center items-center">
+    <div v-if="loadingError" class="h-full flex flex-col justify-center items-center">
+      <p class="text-2xl p-2">Что-то пошло не так. Пожалуйста, попробуйте чуть позже.</p>
+    </div>
+    <div v-else-if="loading" class="h-full flex flex-col justify-center items-center">
       <span class="loading loading-spinner text-accent"></span>
     </div>
-    <div v-if="!user" class="h-full flex flex-col justify-center items-center">
-      <span class="text-3xl">Пользователь не найден</span>
+    <div v-else-if="!user" class="h-full flex flex-col justify-center items-center">
+      <p class="text-2xl">Пользователь не найден</p>
     </div>
-    <div v-if="user">
+    <div v-else>
       <div class="text-black">
         <div class="flex justify-center py-4 bg-zinc-100">
           <p class="text-3xl font-bold">BEEZON CASH</p>
@@ -311,7 +325,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
             <div
               class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
             >
-              <ion-icon name="alert-circle" class="text-warning text-5xl ml-px"></ion-icon>
+              <ion-icon name="alert-circle-outline" class="text-warning text-5xl ml-px"></ion-icon>
               <span>Вы списываете больше бонусов, чем есть на балансе</span>
             </div>
           </div>
@@ -320,9 +334,9 @@ async function applyBonus(orderId: string, bonus: Decimal) {
             class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full"
           >
             <div
-              class="alert alert-info text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-red-300 object-center"
+              class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
             >
-              <ion-icon name="close-circle-outline" class="text-error text-5xl ml-px"></ion-icon>
+              <ion-icon name="alert-circle-outline" class="text-warning text-5xl ml-px"></ion-icon>
               <span>Можно списать не более 50% от суммы заказа</span>
             </div>
           </div>
@@ -333,8 +347,16 @@ async function applyBonus(orderId: string, bonus: Decimal) {
             <div
               class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
             >
-              <ion-icon name="alert-circle" class="text-warning text-5xl ml-px"></ion-icon>
+              <ion-icon name="alert-circle-outline" class="text-warning text-5xl ml-px"></ion-icon>
               <span>Сумма должна быть > 0</span>
+            </div>
+          </div>
+          <div v-if="errorToastVisible" class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full">
+            <div
+              class="alert alert-info text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-red-300 object-center"
+            >
+              <ion-icon name="close-circle-outline" class="text-error text-5xl ml-px"></ion-icon>
+              <span>Что-то пошло не так. Пожалуйста, попробуйте чуть позже.</span>
             </div>
           </div>
         </div>
