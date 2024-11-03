@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import axios from 'axios'
+import Decimal from 'decimal.js'
+import type { Order } from '~/models/Order'
 import { OrderStatus } from '~/models/OrderStatus'
 import type { User } from '~/models/User'
 
@@ -12,10 +13,24 @@ enum VisibleTab {
 
 const apiUrl = 'http://localhost:3001/admin/api'
 
-const initialUsers = (await useFetch(`${apiUrl}/users`)).data
+const users = (await useFetch<User[]>(`${apiUrl}/users`)).data
+const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
+
+onMounted(async () => {
+  orders.value?.forEach((order) => {
+    order.date = new Date(order.date)
+    order.current_price = new Decimal(order.current_price)
+    order.original_price = new Decimal(order.original_price)
+
+    if (order.bonus_received) {
+      order.bonus_received = new Decimal(order.bonus_received)
+    }
+  })
+
+  orders.value?.sort((a, b) => b.date.getTime() - a.date.getTime())
+})
 
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
-const users = ref(initialUsers)
 
 function setVisibleTab(tab: VisibleTab) {
   visibleTab.value = tab
@@ -119,75 +134,15 @@ function setVisibleTab(tab: VisibleTab) {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>2024-10-08</td>
-                <td>54.00</td>
-                <td>43.00</td>
-                <td>{{ OrderStatus.Delivered }}</td>
-                <td>1.62</td>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>666666</td>
-                <td>
-                  <div class="flex flex-row gap-2">
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="pencil"></ion-icon>
-                    </button>
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="trash"></ion-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>2024-10-08</td>
-                <td>54.00</td>
-                <td>43.00</td>
-                <td>{{ OrderStatus.Delivered }}</td>
-                <td>1.62</td>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>666666</td>
-                <td>
-                  <div class="flex flex-row gap-2">
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="pencil"></ion-icon>
-                    </button>
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="trash"></ion-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>2024-10-08</td>
-                <td>54.00</td>
-                <td>43.00</td>
-                <td>{{ OrderStatus.Delivered }}</td>
-                <td>1.62</td>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>666666</td>
-                <td>
-                  <div class="flex flex-row gap-2">
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="pencil"></ion-icon>
-                    </button>
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="trash"></ion-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>2024-10-08</td>
-                <td>54.00</td>
-                <td>43.00</td>
-                <td>{{ OrderStatus.Delivered }}</td>
-                <td>1.62</td>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>666666</td>
+              <tr v-for="order in orders" :key="order.id">
+                <td>{{ order.id }}</td>
+                <td>{{ order.date.toLocaleDateString() }}</td>
+                <td>{{ order.original_price }}</td>
+                <td>{{ order.current_price }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.bonus_received }}</td>
+                <td>{{ order.user_id }}</td>
+                <td>{{ order.code }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
                     <button class="btn btn-sm text-gray-500 btn-square btn-outline">
