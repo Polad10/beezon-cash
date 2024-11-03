@@ -13,7 +13,7 @@ enum VisibleTab {
 const apiUrl = 'http://localhost:3001/admin/api'
 
 const initialUsers = (await useFetch(`${apiUrl}/users`)).data
-console.log(initialUsers)
+
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 const users = ref(initialUsers)
 
