@@ -38,14 +38,26 @@ function setVisibleTab(tab: VisibleTab) {
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col w-full h-full">
     <div class="navbar">
       <p class="text-2xl font-bold">BEEZON CASH</p>
     </div>
-    <div class="flex flex-col bg-zinc-100">
-      <div class="flex flex-row my-3 pr-3">
-        <div class="w-32"></div>
-        <div v-if="visibleTab == VisibleTab.Users" class="flex flex-row justify-between grow">
+    <div class="flex flex-row my-3 pr-3 bg-zinc-100 grow overflow-auto">
+      <div class="flex flex-col w-32">
+        <div class="h-12"></div>
+        <ul class="menu w-32 rounded-box py-0">
+          <li>
+            <button :class="{ focus: visibleTab == VisibleTab.Users }" @click="setVisibleTab(VisibleTab.Users)">
+              Users
+            </button>
+          </li>
+          <li><button @click="setVisibleTab(VisibleTab.Orders)">Orders</button></li>
+          <li @click="setVisibleTab(VisibleTab.Messages)"><button>Messages</button></li>
+          <li @click="setVisibleTab(VisibleTab.Integration)"><button>Integration</button></li>
+        </ul>
+      </div>
+      <div class="flex flex-col grow">
+        <div v-if="visibleTab == VisibleTab.Users" class="flex flex-row h-12 mr-3 justify-between items-center">
           <span class="text-2xl font-bold">Users</span>
           <div class="flex flex-row gap-5">
             <label
@@ -57,7 +69,7 @@ function setVisibleTab(tab: VisibleTab) {
             <button class="btn btn-sm btn-outline">Add user</button>
           </div>
         </div>
-        <div v-if="visibleTab == VisibleTab.Orders" class="flex flex-row justify-between grow">
+        <div v-if="visibleTab == VisibleTab.Orders" class="flex flex-row h-12 mr-3 justify-between items-center">
           <span class="text-2xl font-bold">Orders</span>
           <div class="flex flex-row gap-5">
             <label
@@ -69,21 +81,7 @@ function setVisibleTab(tab: VisibleTab) {
             <button class="btn btn-sm btn-outline">Add order</button>
           </div>
         </div>
-      </div>
-      <div class="flex flex-row">
-        <div class="flex flex-col w-32">
-          <ul class="menu w-32 rounded-box py-0">
-            <li>
-              <button :class="{ focus: visibleTab == VisibleTab.Users }" @click="setVisibleTab(VisibleTab.Users)">
-                Users
-              </button>
-            </li>
-            <li><button @click="setVisibleTab(VisibleTab.Orders)">Orders</button></li>
-            <li @click="setVisibleTab(VisibleTab.Messages)"><button>Messages</button></li>
-            <li @click="setVisibleTab(VisibleTab.Integration)"><button>Integration</button></li>
-          </ul>
-        </div>
-        <div class="overflow-x-auto grow">
+        <div class="bg-white mr-3 mb-5 grow">
           <table v-if="visibleTab == VisibleTab.Users" class="table table-sm">
             <thead>
               <tr class="bg-base-200">
