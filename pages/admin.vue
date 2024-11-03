@@ -6,6 +6,8 @@ import type { User } from '~/models/User'
 enum VisibleTab {
   Users,
   Orders,
+  Messages,
+  Integration,
 }
 
 const apiUrl = 'http://localhost:3001/admin/api'
@@ -55,11 +57,15 @@ function setVisibleTab(tab: VisibleTab) {
       </div>
       <div class="flex flex-row">
         <div class="flex flex-col w-32">
-          <ul class="menu rounded-box py-0">
-            <li><button @click="setVisibleTab(VisibleTab.Users)">Users</button></li>
+          <ul class="menu w-32 rounded-box py-0">
+            <li>
+              <button :class="{ focus: visibleTab == VisibleTab.Users }" @click="setVisibleTab(VisibleTab.Users)">
+                Users
+              </button>
+            </li>
             <li><button @click="setVisibleTab(VisibleTab.Orders)">Orders</button></li>
-            <li><button>Messages</button></li>
-            <li><button>Integration</button></li>
+            <li @click="setVisibleTab(VisibleTab.Messages)"><button>Messages</button></li>
+            <li @click="setVisibleTab(VisibleTab.Integration)"><button>Integration</button></li>
           </ul>
         </div>
         <div class="overflow-x-auto grow">
