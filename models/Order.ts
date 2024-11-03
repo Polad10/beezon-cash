@@ -8,5 +8,6 @@ export interface Order {
   current_price: Decimal
   status: OrderStatus
   bonus_received: Decimal | null | undefined
+  user_id: string
   code: number
 }
