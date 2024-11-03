@@ -6,7 +6,7 @@ import type { User } from '~/models/User'
 import type { Order } from '~/models/Order'
 import Decimal from 'decimal.js'
 
-const apiUrl = 'http://10.0.0.199:3001/api'
+const apiUrl = 'http://localhost:3001/api'
 let headers = {}
 
 const copyToastVisible = ref(false)

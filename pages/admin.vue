@@ -1,12 +1,19 @@
 <script setup lang="ts">
+import axios from 'axios'
 import { OrderStatus } from '~/models/OrderStatus'
+import type { User } from '~/models/User'
 
 enum VisibleTab {
   Users,
   Orders,
 }
 
+const apiUrl = 'http://localhost:3001/admin/api'
+
+const initialUsers = (await useFetch(`${apiUrl}/users`)).data
+console.log(initialUsers)
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
+const users = ref(initialUsers)
 
 function setVisibleTab(tab: VisibleTab) {
   visibleTab.value = tab
@@ -70,71 +77,14 @@ function setVisibleTab(tab: VisibleTab) {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>First Last</td>
-                <td>+31612345678</td>
-                <td>rogue</td>
-                <td>AKDJAK546510351</td>
-                <td>-</td>
-                <td>148</td>
-                <td>
-                  <div class="flex flex-row gap-2">
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="pencil"></ion-icon>
-                    </button>
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="trash"></ion-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>First Last</td>
-                <td>+31612345678</td>
-                <td>rogue</td>
-                <td>AKDJAK546510351</td>
-                <td>-</td>
-                <td>148</td>
-                <td>
-                  <div class="flex flex-row gap-2">
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="pencil"></ion-icon>
-                    </button>
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="trash"></ion-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>First Last</td>
-                <td>+31612345678</td>
-                <td>rogue</td>
-                <td>AKDJAK546510351</td>
-                <td>-</td>
-                <td>148</td>
-                <td>
-                  <div class="flex flex-row gap-2">
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="pencil"></ion-icon>
-                    </button>
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="trash"></ion-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>753d40af-1683-48d5-88d6-c221e31708f6</td>
-                <td>First Last</td>
-                <td>+31612345678</td>
-                <td>rogue</td>
-                <td>AKDJAK546510351</td>
-                <td>-</td>
-                <td>148</td>
+              <tr v-for="user in users" :key="user.id">
+                <td>{{ user.id }}</td>
+                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                <td>{{ user.phone_nr }}</td>
+                <td>{{ user.tg_username }}</td>
+                <td>{{ user.referral_code }}</td>
+                <td>{{ user.invited_by }}</td>
+                <td>{{ user.balance }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
                     <button class="btn btn-sm text-gray-500 btn-square btn-outline">

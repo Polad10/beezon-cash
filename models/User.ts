@@ -7,5 +7,6 @@ export interface User {
   phone_nr: string
   tg_username: string
   referral_code: string
+  invited_by: string
   balance: Decimal
 }
