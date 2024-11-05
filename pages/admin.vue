@@ -259,7 +259,9 @@ function pageNrIsInBetween(pageNr: number) {
 }
 
 button.active,
-.btn-active {
-  background-color: theme('colors.primary') !important;
+.btn-active,
+button:focus {
+  background-color: theme('colors.accent') !important;
+  color: theme('colors.white') !important;
 }
 </style>
