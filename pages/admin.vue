@@ -67,7 +67,7 @@ function pageNrIsInBetween(pageNr: number) {
 </script>
 
 <template>
-  <div class="flex flex-col w-full h-full">
+  <div data-theme="cmyk" class="flex flex-col w-full h-full">
     <div class="navbar">
       <p class="text-2xl font-bold">BEEZON CASH</p>
     </div>
@@ -311,9 +311,9 @@ function pageNrIsInBetween(pageNr: number) {
         </div>
         <div class="modal-action">
           <form method="dialog">
-            <button class="btn">Cancel</button>
+            <button class="btn btn-warning btn-outline">Cancel</button>
           </form>
-          <button class="btn">Add</button>
+          <button class="btn btn-success">Add</button>
         </div>
       </div>
     </dialog>
