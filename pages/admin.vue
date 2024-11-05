@@ -12,11 +12,13 @@ enum VisibleTab {
 }
 
 const apiUrl = 'http://localhost:3001/admin/api'
+const rowsPerPage = 15
 
 const users = (await useFetch<User[]>(`${apiUrl}/users`)).data
 const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
+
+const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 const pageNr = ref(1)
-const maxPageNr = ref(10)
 
 onMounted(async () => {
   orders.value?.forEach((order) => {
@@ -32,9 +34,26 @@ onMounted(async () => {
   orders.value?.sort((a, b) => b.date.getTime() - a.date.getTime())
 })
 
-const visibleTab = ref<VisibleTab>(VisibleTab.Users)
+const pageOrders = computed(() => {
+  return orders.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
+})
+
+const pageUsers = computed(() => {
+  return users.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
+})
+
+const maxPageNr = computed(() => {
+  if (visibleTab.value == VisibleTab.Users) {
+    return Math.ceil(users.value!.length / rowsPerPage)
+  } else if (visibleTab.value == VisibleTab.Orders) {
+    return Math.ceil(orders.value!.length / rowsPerPage)
+  }
+
+  return 0
+})
 
 function setVisibleTab(tab: VisibleTab) {
+  pageNr.value = 1
   visibleTab.value = tab
 }
 
@@ -106,7 +125,7 @@ function pageNrIsInBetween(pageNr: number) {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in users" :key="user.id">
+              <tr v-for="user in pageUsers" :key="user.id">
                 <td>{{ user.id }}</td>
                 <td>{{ user.first_name }} {{ user.last_name }}</td>
                 <td>{{ user.phone_nr }}</td>
@@ -142,7 +161,7 @@ function pageNrIsInBetween(pageNr: number) {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="order in orders" :key="order.id">
+              <tr v-for="order in pageOrders" :key="order.id">
                 <td>{{ order.id }}</td>
                 <td>{{ order.date.toLocaleDateString() }}</td>
                 <td>{{ order.original_price }}</td>
@@ -198,6 +217,7 @@ function pageNrIsInBetween(pageNr: number) {
               ...
             </button>
             <button
+              v-if="pageNr > 1"
               class="join-item btn btn-ghost"
               @click="setPageNr(maxPageNr)"
               :class="{ 'btn-active': pageNr == maxPageNr }"
