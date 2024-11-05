@@ -76,13 +76,28 @@ function pageNrIsInBetween(pageNr: number) {
         <div class="h-12"></div>
         <ul class="menu w-32 rounded-box py-0">
           <li>
-            <button :class="{ focus: visibleTab == VisibleTab.Users }" @click="setVisibleTab(VisibleTab.Users)">
+            <button :class="{ active: visibleTab == VisibleTab.Users }" @click="setVisibleTab(VisibleTab.Users)">
               Users
             </button>
           </li>
-          <li><button @click="setVisibleTab(VisibleTab.Orders)">Orders</button></li>
-          <li @click="setVisibleTab(VisibleTab.Messages)"><button>Messages</button></li>
-          <li @click="setVisibleTab(VisibleTab.Integration)"><button>Integration</button></li>
+          <li>
+            <button :class="{ active: visibleTab == VisibleTab.Orders }" @click="setVisibleTab(VisibleTab.Orders)">
+              Orders
+            </button>
+          </li>
+          <li>
+            <button :class="{ active: visibleTab == VisibleTab.Messages }" @click="setVisibleTab(VisibleTab.Messages)">
+              Messages
+            </button>
+          </li>
+          <li>
+            <button
+              :class="{ active: visibleTab == VisibleTab.Integration }"
+              @click="setVisibleTab(VisibleTab.Integration)"
+            >
+              Integration
+            </button>
+          </li>
         </ul>
       </div>
       <div class="flex flex-col grow">
@@ -240,6 +255,11 @@ function pageNrIsInBetween(pageNr: number) {
 
 <style scoped>
 .btn.btn-disabled {
-  background-color: white;
+  background-color: theme('colors.transparent');
+}
+
+button.active,
+.btn-active {
+  background-color: theme('colors.primary') !important;
 }
 </style>
