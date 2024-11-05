@@ -15,6 +15,8 @@ const apiUrl = 'http://localhost:3001/admin/api'
 
 const users = (await useFetch<User[]>(`${apiUrl}/users`)).data
 const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
+const pageNr = ref(1)
+const maxPageNr = ref(10)
 
 onMounted(async () => {
   orders.value?.forEach((order) => {
@@ -34,6 +36,14 @@ const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 
 function setVisibleTab(tab: VisibleTab) {
   visibleTab.value = tab
+}
+
+function setPageNr(newPageNr: number) {
+  pageNr.value = newPageNr
+}
+
+function pageNrIsInBetween(pageNr: number) {
+  return pageNr > 1 && pageNr < maxPageNr.value
 }
 </script>
 
@@ -155,14 +165,61 @@ function setVisibleTab(tab: VisibleTab) {
             </tbody>
           </table>
           <div class="mt-auto mb-5 self-center join">
-            <button class="join-item btn btn-ghost btn-active">1</button>
-            <button class="join-item btn btn-ghost">2</button>
-            <button class="join-item btn btn-ghost btn-disabled bg-white">...</button>
-            <button class="join-item btn btn-ghost">99</button>
-            <button class="join-item btn btn-ghost">100</button>
+            <button
+              class="join-item btn btn-ghost"
+              :class="{ 'btn-disabled': pageNr == 1 }"
+              @click="setPageNr(pageNr - 1)"
+            >
+              {{ '«' }}
+            </button>
+            <button class="join-item btn btn-ghost" :class="{ 'btn-active': pageNr == 1 }" @click="setPageNr(1)">
+              1
+            </button>
+            <button
+              v-if="pageNrIsInBetween(pageNr - 2)"
+              class="join-item btn btn-ghost btn-disabled disabled: bg-black"
+            >
+              ...
+            </button>
+            <button v-if="pageNrIsInBetween(pageNr - 1)" class="join-item btn btn-ghost" @click="setPageNr(pageNr - 1)">
+              {{ pageNr - 1 }}
+            </button>
+            <button
+              v-if="pageNrIsInBetween(pageNr)"
+              class="join-item btn btn-ghost btn-active bg-white"
+              @click="setPageNr(pageNr)"
+            >
+              {{ pageNr }}
+            </button>
+            <button v-if="pageNrIsInBetween(pageNr + 1)" class="join-item btn btn-ghost" @click="setPageNr(pageNr + 1)">
+              {{ pageNr + 1 }}
+            </button>
+            <button v-if="pageNrIsInBetween(pageNr + 2)" class="join-item btn btn-ghost btn-disabled bg-white">
+              ...
+            </button>
+            <button
+              class="join-item btn btn-ghost"
+              @click="setPageNr(maxPageNr)"
+              :class="{ 'btn-active': pageNr == maxPageNr }"
+            >
+              {{ maxPageNr }}
+            </button>
+            <button
+              class="join-item btn btn-ghost"
+              :class="{ 'btn-disabled': pageNr == maxPageNr }"
+              @click="setPageNr(pageNr + 1)"
+            >
+              {{ '»' }}
+            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.btn.btn-disabled {
+  background-color: white;
+}
+</style>
