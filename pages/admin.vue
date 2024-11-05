@@ -81,7 +81,7 @@ function setVisibleTab(tab: VisibleTab) {
             <button class="btn btn-sm btn-outline">Add order</button>
           </div>
         </div>
-        <div class="bg-white mr-3 mb-5 grow">
+        <div class="flex flex-col bg-white mr-3 mb-5 grow">
           <table v-if="visibleTab == VisibleTab.Users" class="table table-sm">
             <thead>
               <tr class="bg-base-200">
@@ -154,6 +154,13 @@ function setVisibleTab(tab: VisibleTab) {
               </tr>
             </tbody>
           </table>
+          <div class="mt-auto mb-5 self-center join">
+            <button class="join-item btn btn-ghost btn-active">1</button>
+            <button class="join-item btn btn-ghost">2</button>
+            <button class="join-item btn btn-ghost btn-disabled bg-white">...</button>
+            <button class="join-item btn btn-ghost">99</button>
+            <button class="join-item btn btn-ghost">100</button>
+          </div>
         </div>
       </div>
     </div>
