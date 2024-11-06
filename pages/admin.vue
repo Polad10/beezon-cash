@@ -258,56 +258,11 @@ function pageNrIsInBetween(pageNr: number) {
         <p class="text-2xl text-center">New User</p>
         <div class="divider"></div>
         <div class="flex flex-col gap-2">
-          <label class="form-control">
-            <div class="label">
-              <span class="label-text">First name</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Alex"
-              class="input input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
-            />
-          </label>
-          <label class="form-control">
-            <div class="label">
-              <span class="label-text">Last name</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Smith"
-              class="input input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
-            />
-          </label>
-          <label class="form-control">
-            <div class="label">
-              <span class="label-text">Phone number</span>
-            </div>
-            <input
-              type="text"
-              placeholder="+995 599 12 34 56"
-              class="input input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
-            />
-          </label>
-          <label class="form-control">
-            <div class="label">
-              <span class="label-text">Telegram username</span>
-            </div>
-            <input
-              type="text"
-              placeholder="username"
-              class="input input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
-            />
-          </label>
-          <label class="form-control">
-            <div class="label">
-              <span class="label-text">Invited by</span>
-            </div>
-            <input
-              type="text"
-              placeholder="550e8400-e29b-41d4-a716-446655440000"
-              class="input input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
-            />
-          </label>
+          <Input type="text" label="First name" placeholder="Alex" />
+          <Input type="text" label="Last name" placeholder="Smith" />
+          <Input type="text" label="Phone number" placeholder="+995 599 12 34 56" />
+          <Input type="text" label="Telegram username" placeholder="username" />
+          <Input type="text" label="Invited by" placeholder="550e8400-e29b-41d4-a716-446655440000" />
         </div>
         <div class="modal-action">
           <form method="dialog">
