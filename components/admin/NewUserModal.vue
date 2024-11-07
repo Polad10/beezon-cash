@@ -96,35 +96,35 @@ function resetFieldErrors() {
       <div class="flex flex-col gap-2">
         <AdminInput
           type="text"
-          label="First name"
+          label="First name *"
           placeholder="Alex"
           v-model="firstName"
           :class="{ 'input-error': showFirstNameInputError }"
         />
         <AdminInput
           type="text"
-          label="Last name"
+          label="Last name *"
           placeholder="Smith"
           v-model="lastName"
           :class="{ 'input-error': showLastNameInputError }"
         />
         <AdminInput
           type="text"
-          label="Phone number"
+          label="Phone number *"
           placeholder="+995 599 12 34 56"
           v-model="phoneNr"
           :class="{ 'input-error': showPhoneNrInputError }"
         />
         <AdminInput
           type="text"
-          label="Telegram username"
+          label="Telegram username *"
           placeholder="username"
           v-model="tgUserName"
           :class="{ 'input-error': showTgUsernameInputError }"
         />
         <AdminInput
           type="text"
-          label="Invited by"
+          label="Invited by *"
           placeholder="550e8400-e29b-41d4-a716-446655440000"
           v-model="invitedBy"
           :class="{ 'input-error': showInvitedByInputError }"
@@ -142,7 +142,7 @@ function resetFieldErrors() {
         class="alert alert-error text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-red-300 object-center"
       >
         <ion-icon name="close-circle-outline" class="text-5xl ml-px"></ion-icon>
-        <span>Что-то пошло не так. Пожалуйста, попробуйте чуть позже.</span>
+        <span>Please fill all the required fields</span>
       </div>
     </div>
   </dialog>
