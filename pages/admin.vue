@@ -258,17 +258,25 @@ function pageNrIsInBetween(pageNr: number) {
         <p class="text-2xl text-center">New User</p>
         <div class="divider"></div>
         <div class="flex flex-col gap-2">
-          <Input type="text" label="First name" placeholder="Alex" />
-          <Input type="text" label="Last name" placeholder="Smith" />
-          <Input type="text" label="Phone number" placeholder="+995 599 12 34 56" />
-          <Input type="text" label="Telegram username" placeholder="username" />
-          <Input type="text" label="Invited by" placeholder="550e8400-e29b-41d4-a716-446655440000" />
+          <AdminInput type="text" label="First name" placeholder="Alex" />
+          <AdminInput type="text" label="Last name" placeholder="Smith" />
+          <AdminInput type="text" label="Phone number" placeholder="+995 599 12 34 56" />
+          <AdminInput type="text" label="Telegram username" placeholder="username" />
+          <AdminInput type="text" label="Invited by" placeholder="550e8400-e29b-41d4-a716-446655440000" />
         </div>
         <div class="modal-action">
           <form method="dialog">
             <button class="btn btn-warning btn-outline">Cancel</button>
           </form>
           <button class="btn btn-success">Add</button>
+        </div>
+      </div>
+      <div class="toast toast-top whitespace-normal z-[9999] inset-x-0 top-0 mx-auto w-[200px]">
+        <div
+          class="alert alert-error text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-red-300 object-center"
+        >
+          <ion-icon name="close-circle-outline" class="text-5xl ml-px"></ion-icon>
+          <span>Что-то пошло не так. Пожалуйста, попробуйте чуть позже.</span>
         </div>
       </div>
     </dialog>
