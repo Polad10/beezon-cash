@@ -17,9 +17,8 @@ const showTgUsernameInputError = ref(false)
 const showInvitedByInputError = ref(false)
 
 function addUser() {
-  if (formIsValid()) {
+  if (validateForm()) {
   } else {
-    showFormInputErrors()
     showToast(showErrorToast)
   }
 }
@@ -32,26 +31,35 @@ function formIsValid() {
   return true
 }
 
-function showFormInputErrors() {
+function validateForm() {
+  let valid = true
+
   if (!firstName.value) {
+    valid = false
     showFirstNameInputError.value = true
   }
 
   if (!lastName.value) {
+    valid = false
     showLastNameInputError.value = true
   }
 
   if (!phoneNr.value) {
+    valid = false
     showPhoneNrInputError.value = true
   }
 
   if (!tgUserName.value) {
+    valid = false
     showTgUsernameInputError.value = true
   }
 
   if (!invitedBy.value) {
+    valid = false
     showInvitedByInputError.value = true
   }
+
+  return valid
 }
 
 function reset() {
