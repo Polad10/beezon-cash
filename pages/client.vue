@@ -122,14 +122,6 @@ async function copyReferralCode() {
   showToast(copyToastVisible)
 }
 
-function showToast(toastVisible: Ref<boolean>) {
-  toastVisible.value = true
-
-  setTimeout(() => {
-    toastVisible.value = false
-  }, 3000)
-}
-
 async function applyBonus(orderId: string, bonus: Decimal) {
   try {
     if (!bonus.greaterThan(0)) {
