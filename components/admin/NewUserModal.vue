@@ -32,6 +32,7 @@ function formIsValid() {
 }
 
 function validateForm() {
+  resetFieldErrors()
   let valid = true
 
   if (!firstName.value) {
@@ -63,12 +64,19 @@ function validateForm() {
 }
 
 function reset() {
+  resetFieldValues()
+  resetFieldErrors()
+}
+
+function resetFieldValues() {
   firstName.value = ''
   lastName.value = ''
   phoneNr.value = ''
   tgUserName.value = ''
   invitedBy.value = ''
+}
 
+function resetFieldErrors() {
   showFirstNameInputError.value = false
   showLastNameInputError.value = false
   showPhoneNrInputError.value = false
