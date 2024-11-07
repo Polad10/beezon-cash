@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Decimal from 'decimal.js'
 import type { Order } from '~/models/Order'
-import { OrderStatus } from '~/models/OrderStatus'
+import { OrderStatus, toDisplayString } from '~/models/OrderStatus'
 import type { User } from '~/models/User'
 
 enum VisibleTab {
@@ -181,7 +181,7 @@ function pageNrIsInBetween(pageNr: number) {
                 <td>{{ order.date.toLocaleDateString() }}</td>
                 <td>{{ order.original_price }}</td>
                 <td>{{ order.current_price }}</td>
-                <td>{{ order.status }}</td>
+                <td>{{ toDisplayString(order.status) }}</td>
                 <td>{{ order.bonus_received }}</td>
                 <td>{{ order.user_id }}</td>
                 <td>{{ order.code }}</td>
