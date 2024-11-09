@@ -64,6 +64,10 @@ function setPageNr(newPageNr: number) {
 function pageNrIsInBetween(pageNr: number) {
   return pageNr > 1 && pageNr < maxPageNr.value
 }
+
+function handleUserCreated(user: User) {
+  users.value?.push(user)
+}
 </script>
 
 <template>
@@ -250,7 +254,7 @@ function pageNrIsInBetween(pageNr: number) {
         </div>
       </div>
     </div>
-    <AdminNewUserModal id="newUserModal" />
+    <AdminNewUserModal id="newUserModal" @user-created="handleUserCreated" />
   </div>
 </template>
 

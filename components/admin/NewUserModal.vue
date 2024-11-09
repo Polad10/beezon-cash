@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-const props = defineProps<{
-  id: string
-}>()
+import axios from 'axios'
+import type { User, UserRequest } from '~/models/User'
+
+const emit = defineEmits(['user-created'])
 
 const firstName = ref('')
 const lastName = ref('')
@@ -14,21 +15,29 @@ const showFirstNameInputError = ref(false)
 const showLastNameInputError = ref(false)
 const showPhoneNrInputError = ref(false)
 const showTgUsernameInputError = ref(false)
-const showInvitedByInputError = ref(false)
 
-function addUser() {
+const modalRef = ref<HTMLDialogElement | null>(null)
+
+async function addUser() {
   if (validateForm()) {
+    const userRequest: UserRequest = {
+      first_name: firstName.value,
+      last_name: lastName.value,
+      phone_nr: phoneNr.value,
+      tg_username: tgUserName.value,
+    }
+
+    if (invitedBy.value) {
+      userRequest.invited_by = invitedBy.value
+    }
+
+    const user: User = (await axios.post('/api/users', userRequest)).data
+    emit('user-created', user)
+
+    close()
   } else {
     showToast(showErrorToast)
   }
-}
-
-function formIsValid() {
-  if (!firstName.value || !lastName.value || !phoneNr.value || !tgUserName.value || !invitedBy.value) {
-    return false
-  }
-
-  return true
 }
 
 function validateForm() {
@@ -55,15 +64,11 @@ function validateForm() {
     showTgUsernameInputError.value = true
   }
 
-  if (!invitedBy.value) {
-    valid = false
-    showInvitedByInputError.value = true
-  }
-
   return valid
 }
 
-function reset() {
+function close() {
+  modalRef.value?.close()
   resetFieldValues()
   resetFieldErrors()
 }
@@ -81,16 +86,13 @@ function resetFieldErrors() {
   showLastNameInputError.value = false
   showPhoneNrInputError.value = false
   showTgUsernameInputError.value = false
-  showInvitedByInputError.value = false
 }
 </script>
 
 <template>
-  <dialog :id="$props.id" class="modal">
+  <dialog class="modal" ref="modalRef">
     <div class="modal-box">
-      <form method="dialog">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="reset">✕</button>
-      </form>
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="close">✕</button>
       <p class="text-2xl text-center">New User</p>
       <div class="divider"></div>
       <div class="flex flex-col gap-2">
@@ -124,16 +126,13 @@ function resetFieldErrors() {
         />
         <AdminInput
           type="text"
-          label="Invited by *"
+          label="Invited by"
           placeholder="550e8400-e29b-41d4-a716-446655440000"
           v-model="invitedBy"
-          :class="{ 'input-error': showInvitedByInputError }"
         />
       </div>
       <div class="modal-action">
-        <form method="dialog">
-          <button class="btn btn-warning btn-outline" @click="reset">Cancel</button>
-        </form>
+        <button class="btn btn-warning btn-outline" @click="close">Cancel</button>
         <button class="btn btn-success" @click="addUser">Add</button>
       </div>
     </div>
