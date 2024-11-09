@@ -3,6 +3,7 @@ import Decimal from 'decimal.js'
 import type { Order } from '~/models/Order'
 import { OrderStatus, toDisplayString } from '~/models/OrderStatus'
 import type { User } from '~/models/User'
+import NewUserModal from '~/components/admin/NewUserModal.vue'
 
 enum VisibleTab {
   Users,
@@ -18,6 +19,7 @@ const users = (await useFetch<User[]>(`${apiUrl}/users`)).data
 const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
 
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
+const newUserModalRef = ref<typeof NewUserModal | null>(null)
 const pageNr = ref(1)
 
 onMounted(async () => {
@@ -114,7 +116,7 @@ function handleUserCreated(user: User) {
               <input type="text" class="grow" placeholder="Search" />
               <ion-icon name="search-outline"></ion-icon>
             </label>
-            <button class="btn btn-sm btn-outline" onclick="newUserModal.showModal()">Add user</button>
+            <button class="btn btn-sm btn-outline" @click="newUserModalRef?.open()"">Add user</button>
           </div>
         </div>
         <div v-if="visibleTab == VisibleTab.Orders" class="flex flex-row h-12 mr-3 justify-between items-center">
@@ -254,7 +256,7 @@ function handleUserCreated(user: User) {
         </div>
       </div>
     </div>
-    <AdminNewUserModal id="newUserModal" @user-created="handleUserCreated" />
+    <AdminNewUserModal ref="newUserModalRef" @user-created="handleUserCreated" />
   </div>
 </template>
 
