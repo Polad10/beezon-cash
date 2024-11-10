@@ -4,6 +4,7 @@ import type { Order } from '~/models/Order'
 import { OrderStatus, toDisplayString } from '~/models/OrderStatus'
 import type { User } from '~/models/User'
 import NewUserModal from '~/components/admin/NewUserModal.vue'
+import NewOrderModal from '~/components/admin/NewOrderModal.vue'
 
 enum VisibleTab {
   Users,
@@ -20,17 +21,12 @@ const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
 
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 const newUserModalRef = ref<typeof NewUserModal | null>(null)
+const newOrderModalRef = ref<typeof NewOrderModal | null>(null)
 const pageNr = ref(1)
 
 onMounted(async () => {
   orders.value?.forEach((order) => {
-    order.date = new Date(order.date)
-    order.current_price = new Decimal(order.current_price)
-    order.original_price = new Decimal(order.original_price)
-
-    if (order.bonus_received) {
-      order.bonus_received = new Decimal(order.bonus_received)
-    }
+    processOrderValues(order)
   })
 
   orders.value?.sort((a, b) => b.date.getTime() - a.date.getTime())
@@ -69,6 +65,21 @@ function pageNrIsInBetween(pageNr: number) {
 
 function handleUserCreated(user: User) {
   users.value?.push(user)
+}
+
+function handleOrderCreated(order: Order) {
+  processOrderValues(order)
+  orders.value?.push(order)
+}
+
+function processOrderValues(order: Order) {
+  order.date = new Date(order.date)
+  order.current_price = new Decimal(order.current_price)
+  order.original_price = new Decimal(order.original_price)
+
+  if (order.bonus_received) {
+    order.bonus_received = new Decimal(order.bonus_received)
+  }
 }
 </script>
 
@@ -116,7 +127,7 @@ function handleUserCreated(user: User) {
               <input type="text" class="grow" placeholder="Search" />
               <ion-icon name="search-outline"></ion-icon>
             </label>
-            <button class="btn btn-sm btn-outline" @click="newUserModalRef?.open()"">Add user</button>
+            <button class="btn btn-sm btn-outline" @click="newUserModalRef?.open()">Add user</button>
           </div>
         </div>
         <div v-if="visibleTab == VisibleTab.Orders" class="flex flex-row h-12 mr-3 justify-between items-center">
@@ -128,7 +139,7 @@ function handleUserCreated(user: User) {
               <input type="text" class="grow" placeholder="Search" />
               <ion-icon name="search-outline"></ion-icon>
             </label>
-            <button class="btn btn-sm btn-outline">Add order</button>
+            <button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
           </div>
         </div>
         <div class="flex flex-col bg-white mr-3 mb-5 grow">
@@ -257,6 +268,7 @@ function handleUserCreated(user: User) {
       </div>
     </div>
     <AdminNewUserModal ref="newUserModalRef" @user-created="handleUserCreated" />
+    <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" />
   </div>
 </template>
 

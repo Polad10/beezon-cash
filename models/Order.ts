@@ -7,7 +7,17 @@ export interface Order {
   original_price: Decimal
   current_price: Decimal
   status: OrderStatus
-  bonus_received: Decimal | null | undefined
+  bonus_received?: Decimal
+  user_id: string
+  code: number
+}
+
+export interface OrderRequest {
+  date: Date
+  original_price: Decimal
+  current_price: Decimal
+  status: OrderStatus
+  bonus_received?: Decimal
   user_id: string
   code: number
 }
