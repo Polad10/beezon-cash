@@ -38,8 +38,6 @@ async function addOrder() {
         code: Number(code.value),
       }
 
-      console.log(orderRequest)
-
       const order: Order = (await axios.post('/api/orders', orderRequest)).data
       emit('order-created', order)
 

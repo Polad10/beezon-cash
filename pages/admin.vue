@@ -5,6 +5,8 @@ import { OrderStatus, toDisplayString } from '~/models/OrderStatus'
 import type { User } from '~/models/User'
 import NewUserModal from '~/components/admin/NewUserModal.vue'
 import NewOrderModal from '~/components/admin/NewOrderModal.vue'
+import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
+import axios from 'axios'
 
 enum VisibleTab {
   Users,
@@ -22,6 +24,7 @@ const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 const newUserModalRef = ref<typeof NewUserModal | null>(null)
 const newOrderModalRef = ref<typeof NewOrderModal | null>(null)
+const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 const pageNr = ref(1)
 
 onMounted(async () => {
@@ -70,6 +73,16 @@ function handleUserCreated(user: User) {
 function handleOrderCreated(order: Order) {
   processOrderValues(order)
   orders.value?.push(order)
+}
+
+async function deleteUser(user: User) {
+  await axios.delete(`/api/users/${user.id}`)
+  users.value = users.value?.filter((u) => u.id !== user.id)!
+}
+
+async function deleteOrder(order: Order) {
+  await axios.delete(`/api/orders/${order.id}`)
+  orders.value = orders.value?.filter((o) => o.id !== order.id)!
 }
 
 function processOrderValues(order: Order) {
@@ -170,7 +183,10 @@ function processOrderValues(order: Order) {
                     <button class="btn btn-sm text-gray-500 btn-square btn-outline">
                       <ion-icon name="pencil"></ion-icon>
                     </button>
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
+                    <button
+                      class="btn btn-sm text-gray-500 btn-square btn-outline"
+                      @click="confirmDeleteModalRef?.open(() => deleteUser(user))"
+                    >
                       <ion-icon name="trash"></ion-icon>
                     </button>
                   </div>
@@ -208,7 +224,7 @@ function processOrderValues(order: Order) {
                       <ion-icon name="pencil"></ion-icon>
                     </button>
                     <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="trash"></ion-icon>
+                      <ion-icon name="trash" @click="confirmDeleteModalRef?.open(() => deleteOrder(order))"></ion-icon>
                     </button>
                   </div>
                 </td>
@@ -269,6 +285,7 @@ function processOrderValues(order: Order) {
     </div>
     <AdminNewUserModal ref="newUserModalRef" @user-created="handleUserCreated" />
     <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" />
+    <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
   </div>
 </template>
 
