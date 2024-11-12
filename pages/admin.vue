@@ -8,6 +8,7 @@ import NewOrderModal from '~/components/admin/NewOrderModal.vue'
 import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
 import axios from 'axios'
 import EditUserModal from '~/components/admin/EditUserModal.vue'
+import EditOrderModal from '~/components/admin/EditOrderModal.vue'
 
 enum VisibleTab {
   Users,
@@ -25,6 +26,7 @@ const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
 const newUserModalRef = ref<typeof NewUserModal | null>(null)
 const editUserModalRef = ref<typeof EditUserModal | null>(null)
 const newOrderModalRef = ref<typeof NewOrderModal | null>(null)
+const editOrderModalRef = ref<typeof EditOrderModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 const pageNr = ref(1)
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
@@ -88,6 +90,15 @@ async function deleteUser(user: User) {
 function handleOrderCreated(order: Order) {
   processOrderValues(order)
   orders.value?.push(order)
+}
+
+function handleOrderEdited(order: Order) {
+  const localOrder = orders.value?.find((o) => o.id === order.id)
+
+  if (localOrder) {
+    processOrderValues(order)
+    Object.assign(localOrder, order)
+  }
 }
 
 async function deleteOrder(order: Order) {
@@ -224,7 +235,7 @@ function processOrderValues(order: Order) {
             <tbody>
               <tr v-for="order in pageOrders" :key="order.id">
                 <td>{{ order.id }}</td>
-                <td>{{ order.date.toLocaleDateString() }}</td>
+                <td>{{ toISODate(order.date) }}</td>
                 <td>{{ order.original_price }}</td>
                 <td>{{ order.current_price }}</td>
                 <td>{{ toDisplayString(order.status) }}</td>
@@ -233,7 +244,10 @@ function processOrderValues(order: Order) {
                 <td>{{ order.code }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
+                    <button
+                      class="btn btn-sm text-gray-500 btn-square btn-outline"
+                      @click="editOrderModalRef?.open(order)"
+                    >
                       <ion-icon name="pencil"></ion-icon>
                     </button>
                     <button class="btn btn-sm text-gray-500 btn-square btn-outline">
@@ -299,6 +313,7 @@ function processOrderValues(order: Order) {
     <AdminNewUserModal ref="newUserModalRef" @user-created="handleUserCreated" />
     <AdminEditUserModal ref="editUserModalRef" @user-edited="handleUserEdited" />
     <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" />
+    <AdminEditOrderModal ref="editOrderModalRef" @order-edited="handleOrderEdited" />
     <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
   </div>
 </template>
