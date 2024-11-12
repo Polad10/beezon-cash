@@ -17,4 +17,5 @@ export interface UserRequest {
   phone_nr: string
   tg_username: string
   invited_by?: string
+  balance?: Decimal
 }

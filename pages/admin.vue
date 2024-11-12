@@ -7,6 +7,7 @@ import NewUserModal from '~/components/admin/NewUserModal.vue'
 import NewOrderModal from '~/components/admin/NewOrderModal.vue'
 import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
 import axios from 'axios'
+import EditUserModal from '~/components/admin/EditUserModal.vue'
 
 enum VisibleTab {
   Users,
@@ -21,11 +22,12 @@ const rowsPerPage = 15
 const users = (await useFetch<User[]>(`${apiUrl}/users`)).data
 const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
 
-const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 const newUserModalRef = ref<typeof NewUserModal | null>(null)
+const editUserModalRef = ref<typeof EditUserModal | null>(null)
 const newOrderModalRef = ref<typeof NewOrderModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 const pageNr = ref(1)
+const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 
 onMounted(async () => {
   orders.value?.forEach((order) => {
@@ -70,14 +72,22 @@ function handleUserCreated(user: User) {
   users.value?.push(user)
 }
 
-function handleOrderCreated(order: Order) {
-  processOrderValues(order)
-  orders.value?.push(order)
+function handleUserEdited(user: User) {
+  const localUser = users.value?.find((u) => u.id === user.id)
+
+  if (localUser) {
+    Object.assign(localUser, user)
+  }
 }
 
 async function deleteUser(user: User) {
   await axios.delete(`/api/users/${user.id}`)
   users.value = users.value?.filter((u) => u.id !== user.id)!
+}
+
+function handleOrderCreated(order: Order) {
+  processOrderValues(order)
+  orders.value?.push(order)
 }
 
 async function deleteOrder(order: Order) {
@@ -180,7 +190,10 @@ function processOrderValues(order: Order) {
                 <td>{{ user.balance }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
+                    <button
+                      class="btn btn-sm text-gray-500 btn-square btn-outline"
+                      @click="editUserModalRef?.open(user)"
+                    >
                       <ion-icon name="pencil"></ion-icon>
                     </button>
                     <button
@@ -284,6 +297,7 @@ function processOrderValues(order: Order) {
       </div>
     </div>
     <AdminNewUserModal ref="newUserModalRef" @user-created="handleUserCreated" />
+    <AdminEditUserModal ref="editUserModalRef" @user-edited="handleUserEdited" />
     <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" />
     <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
   </div>
