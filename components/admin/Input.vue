@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { InputTypeHTMLAttribute } from 'vue'
 
+defineOptions({
+  inheritAttrs: false,
+})
+
 const props = defineProps<{
   type: InputTypeHTMLAttribute
   label: string
@@ -19,8 +23,8 @@ const model = defineModel()
       :type="props.type"
       :placeholder="props.placeholder"
       class="input input-bordered focus-within:outline-0 focus-within:border-gray-500"
-      :class="$attrs.class"
       v-model="model"
+      v-bind="$attrs"
     />
   </label>
 </template>
