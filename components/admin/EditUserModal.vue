@@ -93,14 +93,14 @@ function close() {
   resetFieldErrors()
 }
 
-function open(userToEdit: User) {
-  id.value = userToEdit.id
-  firstName.value = userToEdit.first_name
-  lastName.value = userToEdit.last_name
-  phoneNr.value = userToEdit.phone_nr
-  tgUserName.value = userToEdit.tg_username
-  invitedBy.value = userToEdit.invited_by ?? ''
-  balance.value = userToEdit.balance.toString()
+function open(user: User) {
+  id.value = user.id
+  firstName.value = user.first_name
+  lastName.value = user.last_name
+  phoneNr.value = user.phone_nr
+  tgUserName.value = user.tg_username
+  invitedBy.value = user.invited_by ?? ''
+  balance.value = user.balance.toString()
   bonus.value = ''
 
   modalRef.value?.showModal()
