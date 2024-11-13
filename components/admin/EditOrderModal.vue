@@ -65,12 +65,12 @@ function validateForm() {
     showDateInputError.value = true
   }
 
-  if (!originalPrice.value) {
+  if (originalPrice.value === '') {
     valid = false
     showOriginalPriceInputError.value = true
   }
 
-  if (!currentPrice.value) {
+  if (currentPrice.value === '') {
     valid = false
     showCurrentPriceInputError.value = true
   }
