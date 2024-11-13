@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Decimal from 'decimal.js'
 import type { Order } from '~/models/Order'
+import type { Message } from '~/models/Message'
 import { OrderStatus, toDisplayString } from '~/models/OrderStatus'
 import type { User } from '~/models/User'
 import NewUserModal from '~/components/admin/NewUserModal.vue'
@@ -22,6 +23,7 @@ const rowsPerPage = 15
 
 const users = (await useFetch<User[]>(`${apiUrl}/users`)).data
 const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
+const messages = (await useFetch<Message[]>(`${apiUrl}/messages`)).data
 
 const newUserModalRef = ref<typeof NewUserModal | null>(null)
 const editUserModalRef = ref<typeof EditUserModal | null>(null)
@@ -39,12 +41,16 @@ onMounted(async () => {
   orders.value?.sort((a, b) => b.date.getTime() - a.date.getTime())
 })
 
+const pageUsers = computed(() => {
+  return users.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
+})
+
 const pageOrders = computed(() => {
   return orders.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
 })
 
-const pageUsers = computed(() => {
-  return users.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
+const pageMessages = computed(() => {
+  return messages.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
 })
 
 const maxPageNr = computed(() => {
@@ -52,6 +58,8 @@ const maxPageNr = computed(() => {
     return Math.ceil(users.value!.length / rowsPerPage)
   } else if (visibleTab.value == VisibleTab.Orders) {
     return Math.ceil(orders.value!.length / rowsPerPage)
+  } else if (visibleTab.value == VisibleTab.Messages) {
+    return Math.ceil(messages.value!.length / rowsPerPage)
   }
 
   return 0
@@ -176,6 +184,12 @@ function processOrderValues(order: Order) {
             <button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
           </div>
         </div>
+        <div v-if="visibleTab == VisibleTab.Messages" class="flex flex-row h-12 mr-3 justify-between items-center">
+          <span class="text-2xl font-bold">Messages</span>
+          <div class="flex flex-row gap-5">
+            <button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add message</button>
+          </div>
+        </div>
         <div class="flex flex-col bg-white mr-3 mb-5 grow">
           <table v-if="visibleTab == VisibleTab.Users" class="table table-sm">
             <thead>
@@ -252,6 +266,35 @@ function processOrderValues(order: Order) {
                     </button>
                     <button class="btn btn-sm text-gray-500 btn-square btn-outline">
                       <ion-icon name="trash" @click="confirmDeleteModalRef?.open(() => deleteOrder(order))"></ion-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table v-if="visibleTab == VisibleTab.Messages" class="table table-sm">
+            <thead>
+              <tr class="bg-base-200">
+                <th>ID</th>
+                <th>NAME</th>
+                <th>TEXT</th>
+                <th>ORDER STATUS</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="message in pageMessages" :key="message.id">
+                <td>{{ message.id }}</td>
+                <td>{{ message.name }}</td>
+                <td>{{ message.text }}</td>
+                <td>{{ toDisplayString(message.order_status) }}</td>
+                <td>
+                  <div class="flex flex-row gap-2">
+                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
+                      <ion-icon name="pencil"></ion-icon>
+                    </button>
+                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
+                      <ion-icon name="trash"></ion-icon>
                     </button>
                   </div>
                 </td>
