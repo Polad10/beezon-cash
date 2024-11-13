@@ -152,27 +152,7 @@ defineExpose({ open })
             v-model="currentPrice"
             :class="{ 'input-error': showCurrentPriceInputError }"
           />
-          <label class="form-control">
-            <div class="label">
-              <span class="label-text">Status *</span>
-            </div>
-            <select
-              class="select select-bordered focus-within:outline-0 focus-within:border-gray-500"
-              :class="{ 'select-error': showStatusInputError }"
-              v-model="status"
-            >
-              <option value="null" disabled>Select a status</option>
-              <option :value="OrderStatus.New">{{ toDisplayString(OrderStatus.New) }}</option>
-              <option :value="OrderStatus.OnTheWay">{{ toDisplayString(OrderStatus.OnTheWay) }}</option>
-              <option :value="OrderStatus.ArrivedInDestinationCountry">
-                {{ toDisplayString(OrderStatus.ArrivedInDestinationCountry) }}
-              </option>
-              <option :value="OrderStatus.WaitingForPayment">
-                {{ toDisplayString(OrderStatus.WaitingForPayment) }}
-              </option>
-              <option :value="OrderStatus.Delivered">{{ toDisplayString(OrderStatus.Delivered) }}</option>
-            </select>
-          </label>
+          <AdminStatusDropdown :class="{ 'select-error': showStatusInputError }" v-model="status" />
           <AdminInput
             type="text"
             label="User id *"
