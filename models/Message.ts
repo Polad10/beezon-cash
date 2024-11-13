@@ -6,3 +6,9 @@ export interface Message {
   text: string
   order_status: OrderStatus
 }
+
+export interface MessageRequest {
+  name: string
+  text: string
+  order_status: OrderStatus
+}
