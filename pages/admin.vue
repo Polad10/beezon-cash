@@ -275,8 +275,11 @@ function processOrderValues(order: Order) {
                     >
                       <ion-icon name="pencil"></ion-icon>
                     </button>
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="trash" @click="confirmDeleteModalRef?.open(() => deleteOrder(order))"></ion-icon>
+                    <button
+                      class="btn btn-sm text-gray-500 btn-square btn-outline"
+                      @click="confirmDeleteModalRef?.open(() => deleteOrder(order))"
+                    >
+                      <ion-icon name="trash"></ion-icon>
                     </button>
                   </div>
                 </td>
@@ -304,11 +307,11 @@ function processOrderValues(order: Order) {
                     <button class="btn btn-sm text-gray-500 btn-square btn-outline">
                       <ion-icon name="pencil"></ion-icon>
                     </button>
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon
-                        name="trash"
-                        @click="confirmDeleteModalRef?.open(() => deleteMessage(message))"
-                      ></ion-icon>
+                    <button
+                      class="btn btn-sm text-gray-500 btn-square btn-outline"
+                      @click="confirmDeleteModalRef?.open(() => deleteMessage(message))"
+                    >
+                      <ion-icon name="trash"></ion-icon>
                     </button>
                   </div>
                 </td>
