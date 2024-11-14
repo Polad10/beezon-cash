@@ -5,10 +5,22 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   css: ['@/assets/css/tailwind.css'],
+
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
     },
+  },
+
+  modules: ['@kgierke/nuxt-basic-auth'],
+  basicAuth: {
+    enabled: true,
+    users: [
+      {
+        username: process.env.ADMIN_USERNAME!,
+        password: process.env.ADMIN_PASSWORD!,
+      },
+    ],
   },
 })
