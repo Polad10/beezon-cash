@@ -111,13 +111,18 @@ function handleOrderEdited(order: Order) {
   }
 }
 
+async function deleteOrder(order: Order) {
+  await axios.delete(`/api/orders/${order.id}`)
+  orders.value = orders.value?.filter((o) => o.id !== order.id)!
+}
+
 function handleMessageCreated(message: Message) {
   messages.value?.push(message)
 }
 
-async function deleteOrder(order: Order) {
-  await axios.delete(`/api/orders/${order.id}`)
-  orders.value = orders.value?.filter((o) => o.id !== order.id)!
+async function deleteMessage(message: Message) {
+  await axios.delete(`/api/messages/${message.id}`)
+  messages.value = messages.value?.filter((m) => m.id !== message.id)!
 }
 
 function processOrderValues(order: Order) {
@@ -300,7 +305,10 @@ function processOrderValues(order: Order) {
                       <ion-icon name="pencil"></ion-icon>
                     </button>
                     <button class="btn btn-sm text-gray-500 btn-square btn-outline">
-                      <ion-icon name="trash"></ion-icon>
+                      <ion-icon
+                        name="trash"
+                        @click="confirmDeleteModalRef?.open(() => deleteMessage(message))"
+                      ></ion-icon>
                     </button>
                   </div>
                 </td>
