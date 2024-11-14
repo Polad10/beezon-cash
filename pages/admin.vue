@@ -11,6 +11,7 @@ import axios from 'axios'
 import EditUserModal from '~/components/admin/EditUserModal.vue'
 import EditOrderModal from '~/components/admin/EditOrderModal.vue'
 import NewMessageModal from '~/components/admin/NewMessageModal.vue'
+import EditMessageModal from '~/components/admin/EditMessageModal.vue'
 
 enum VisibleTab {
   Users,
@@ -31,6 +32,7 @@ const editUserModalRef = ref<typeof EditUserModal | null>(null)
 const newOrderModalRef = ref<typeof NewOrderModal | null>(null)
 const editOrderModalRef = ref<typeof EditOrderModal | null>(null)
 const newMessageModalRef = ref<typeof NewMessageModal | null>(null)
+const editMessageModalRef = ref<typeof EditMessageModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 const pageNr = ref(1)
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
@@ -118,6 +120,14 @@ async function deleteOrder(order: Order) {
 
 function handleMessageCreated(message: Message) {
   messages.value?.push(message)
+}
+
+function handleMessageEdited(message: Message) {
+  const localMessage = messages.value?.find((m) => m.id === message.id)
+
+  if (localMessage) {
+    Object.assign(localMessage, message)
+  }
 }
 
 async function deleteMessage(message: Message) {
@@ -304,7 +314,10 @@ function processOrderValues(order: Order) {
                 <td>{{ toDisplayString(message.order_status) }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
-                    <button class="btn btn-sm text-gray-500 btn-square btn-outline">
+                    <button
+                      class="btn btn-sm text-gray-500 btn-square btn-outline"
+                      @click="editMessageModalRef?.open(message)"
+                    >
                       <ion-icon name="pencil"></ion-icon>
                     </button>
                     <button
@@ -375,6 +388,7 @@ function processOrderValues(order: Order) {
     <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" />
     <AdminEditOrderModal ref="editOrderModalRef" @order-edited="handleOrderEdited" />
     <AdminNewMessageModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
+    <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" />
     <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
   </div>
 </template>
