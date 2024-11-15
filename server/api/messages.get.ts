@@ -1,7 +1,18 @@
 import axios from 'axios'
 
 export default defineEventHandler(async (event) => {
-  const messages = (await axios.get('http://localhost:3001/admin/api/messages')).data
+  try {
+    const messages = (await axios.get('http://localhost:3001/admin/api/messages')).data
+    return messages
+  } catch (ex) {
+    const error = ex as Error
 
-  return messages
+    const logExtra = {
+      cause: error.cause,
+      stack: error.stack,
+    }
+
+    log(event.context.correlationId, LogLevel.ERROR, error.message, logExtra)
+    throw ex
+  }
 })

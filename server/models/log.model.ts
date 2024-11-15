@@ -7,10 +7,14 @@ export enum LogLevel {
 }
 
 const LogSchema = new Schema({
+  correlationId: {
+    type: String,
+    required: true,
+  },
   level: {
     type: String,
     enum: Object.values(LogLevel),
-    default: 'info',
+    required: true,
   },
   message: {
     type: String,

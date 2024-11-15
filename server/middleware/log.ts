@@ -1,6 +1,9 @@
-import { HTTPMethod } from 'h3'
+import { randomUUID } from 'crypto'
 
 export default defineEventHandler(async (event) => {
+  const correlationId = randomUUID()
+  event.context.correlationId = correlationId
+
   let extra = {
     headers: getHeaders(event),
     ip: getRequestIP(event),
@@ -11,5 +14,5 @@ export default defineEventHandler(async (event) => {
     extra.body = await readBody(event)
   }
 
-  log(LogLevel.INFO, event.toString(), extra)
+  await log(correlationId, LogLevel.INFO, event.toString(), extra)
 })
