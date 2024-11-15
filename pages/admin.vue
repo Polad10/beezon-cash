@@ -20,12 +20,11 @@ enum VisibleTab {
   Integration,
 }
 
-const apiUrl = 'http://localhost:3001/admin/api'
 const rowsPerPage = 15
 
-const users = (await useFetch<User[]>(`${apiUrl}/users`)).data
-const orders = (await useFetch<Order[]>(`${apiUrl}/orders`)).data
-const messages = (await useFetch<Message[]>(`${apiUrl}/messages`)).data
+const users = (await useFetch<User[]>('/api/users')).data
+const orders = (await useFetch<Order[]>('/api/orders')).data
+const messages = (await useFetch<Message[]>('/api/messages')).data
 
 const newUserModalRef = ref<typeof NewUserModal | null>(null)
 const editUserModalRef = ref<typeof EditUserModal | null>(null)
