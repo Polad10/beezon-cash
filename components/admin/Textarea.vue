@@ -18,7 +18,7 @@ const model = defineModel<string>()
     </div>
     <textarea
       :placeholder="props.placeholder"
-      class="textarea textarea-bordered focus-within:outline-0 focus-within:border-gray-500"
+      class="textarea textarea-bordered focus-within:outline-0 focus-within:border-gray-500 h-36"
       v-model="model"
       v-bind="$attrs"
     ></textarea>
