@@ -17,7 +17,6 @@ enum VisibleTab {
   Users,
   Orders,
   Messages,
-  Integration,
 }
 
 const rowsPerPage = 15
@@ -167,14 +166,6 @@ function processOrderValues(order: Order) {
           <li>
             <button :class="{ active: visibleTab == VisibleTab.Messages }" @click="setVisibleTab(VisibleTab.Messages)">
               Messages
-            </button>
-          </li>
-          <li>
-            <button
-              :class="{ active: visibleTab == VisibleTab.Integration }"
-              @click="setVisibleTab(VisibleTab.Integration)"
-            >
-              Integration
             </button>
           </li>
         </ul>
