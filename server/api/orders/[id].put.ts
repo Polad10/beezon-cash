@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const id = getRouterParam(event, 'id')
 
-    const order = (await axios.put(`http://localhost:3001/admin/api/orders/${id}`, body)).data
+    const order = (await axios.put(`${process.env.BEEZON_ADMIN_API_URL}/orders/${id}`, body)).data
 
     return order
   } catch (ex) {

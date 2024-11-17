@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const id = getRouterParam(event, 'id')
 
-    const user = (await axios.put(`http://localhost:3001/admin/api/users/${id}`, body)).data
+    const user = (await axios.put(`${process.env.BEEZON_ADMIN_API_URL}/users/${id}`, body)).data
 
     return user
   } catch (ex) {

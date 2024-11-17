@@ -6,7 +6,7 @@ import type { User } from '~/models/User'
 import type { Order } from '~/models/Order'
 import Decimal from 'decimal.js'
 
-const apiUrl = 'http://localhost:3001/api'
+const apiUrl = process.env.BEEZON_API_URL
 let headers = {}
 
 const copyToastVisible = ref(false)

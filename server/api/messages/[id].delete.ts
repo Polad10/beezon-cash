@@ -3,7 +3,7 @@ import axios from 'axios'
 export default defineEventHandler(async (event) => {
   try {
     const id = getRouterParam(event, 'id')
-    await axios.delete(`http://localhost:3001/admin/api/messages/${id}`)
+    await axios.delete(`${process.env.BEEZON_ADMIN_API_URL}/messages/${id}`)
   } catch (ex) {
     const error = ex as Error
 

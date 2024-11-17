@@ -3,7 +3,7 @@ import axios from 'axios'
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
-    const message = (await axios.post('http://localhost:3001/admin/api/messages', body)).data
+    const message = (await axios.post(`${process.env.BEEZON_ADMIN_API_URL}/messages`, body)).data
 
     return message
   } catch (ex) {
