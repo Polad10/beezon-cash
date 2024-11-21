@@ -248,27 +248,25 @@ function processOrderValues(order: Order) {
           <table v-if="visibleTab == VisibleTab.Orders" class="table table-sm">
             <thead>
               <tr class="bg-base-200">
-                <th>ID</th>
+                <th>ORDER CODE</th>
                 <th>DATE</th>
                 <th>ORIGINAL PRICE</th>
                 <th>CURRENT PRICE</th>
                 <th>STATUS</th>
                 <th>BONUS RECEIVED</th>
                 <th>USER ID</th>
-                <th>ORDER CODE</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="order in pageOrders" :key="order.id">
-                <td>{{ order.id }}</td>
+                <td>{{ order.code }}</td>
                 <td>{{ toISODate(order.date) }}</td>
                 <td>{{ order.original_price }}</td>
                 <td>{{ order.current_price }}</td>
                 <td>{{ toDisplayString(order.status) }}</td>
                 <td>{{ order.bonus_received }}</td>
                 <td>{{ order.user_id }}</td>
-                <td>{{ order.code }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
                     <button
