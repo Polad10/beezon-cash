@@ -56,15 +56,17 @@ const pageMessages = computed(() => {
 })
 
 const maxPageNr = computed(() => {
+  let totalRows = 0
+
   if (visibleTab.value == VisibleTab.Users) {
-    return Math.ceil(users.value!.length / rowsPerPage)
+    totalRows = users.value!.length
   } else if (visibleTab.value == VisibleTab.Orders) {
-    return Math.ceil(orders.value!.length / rowsPerPage)
+    totalRows = orders.value!.length
   } else if (visibleTab.value == VisibleTab.Messages) {
-    return Math.ceil(messages.value!.length / rowsPerPage)
+    totalRows = messages.value!.length
   }
 
-  return 0
+  return Math.max(Math.ceil(totalRows / rowsPerPage), 1)
 })
 
 function setVisibleTab(tab: VisibleTab) {
