@@ -19,5 +19,4 @@ export interface OrderRequest {
   status: OrderStatus
   bonus_received?: Decimal
   user_id: string
-  code: number
 }
