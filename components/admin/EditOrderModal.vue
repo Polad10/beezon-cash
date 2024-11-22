@@ -12,7 +12,6 @@ const originalPrice = ref('')
 const currentPrice = ref('')
 const status = ref<OrderStatus | null>(null)
 const userId = ref('')
-const code = ref('')
 
 const showErrorToast = ref(false)
 const showSuccessToast = ref(false)
@@ -21,7 +20,6 @@ const showOriginalPriceInputError = ref(false)
 const showCurrentPriceInputError = ref(false)
 const showStatusInputError = ref(false)
 const showUserIdInputError = ref(false)
-const showCodeInputError = ref(false)
 
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -36,7 +34,6 @@ async function editOrder() {
         current_price: new Decimal(currentPrice.value),
         status: status.value!,
         user_id: userId.value,
-        code: Number(code.value),
       }
 
       const order: Order = (await axios.put(`/api/orders/${id.value}`, orderRequest)).data
@@ -85,11 +82,6 @@ function validateForm() {
     showUserIdInputError.value = true
   }
 
-  if (!code.value) {
-    valid = false
-    showCodeInputError.value = true
-  }
-
   return valid
 }
 
@@ -105,7 +97,6 @@ function open(order: Order) {
   currentPrice.value = order.current_price.toString()
   status.value = order.status
   userId.value = order.user_id
-  code.value = order.code.toString()
 
   modalRef.value?.showModal()
 }
@@ -116,7 +107,6 @@ function resetFieldErrors() {
   showCurrentPriceInputError.value = false
   showStatusInputError.value = false
   showUserIdInputError.value = false
-  showCodeInputError.value = false
 }
 
 defineExpose({ open })
@@ -178,13 +168,6 @@ defineExpose({ open })
             placeholder="550e8400-e29b-41d4-a716-446655440000"
             v-model="userId"
             :class="{ 'input-error': showUserIdInputError }"
-          />
-          <AdminInput
-            type="text"
-            label="Order code *"
-            placeholder="123456"
-            v-model="code"
-            :class="{ 'input-error': showCodeInputError }"
           />
         </div>
         <div class="modal-action">
