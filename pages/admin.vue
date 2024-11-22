@@ -150,6 +150,12 @@ function getUserFullName(order: Order) {
 
   return `${user?.first_name} ${user?.last_name}`
 }
+
+function getUserTelegram(order: Order) {
+  const user = users.value?.find((u) => u.id === order.user_id)
+
+  return user?.tg_username
+}
 </script>
 
 <template>
@@ -259,6 +265,7 @@ function getUserFullName(order: Order) {
                 <th>CURRENT PRICE</th>
                 <th>STATUS</th>
                 <th>USER</th>
+                <th>TELEGRAM</th>
                 <th></th>
               </tr>
             </thead>
@@ -269,6 +276,7 @@ function getUserFullName(order: Order) {
                 <td>{{ order.current_price }}</td>
                 <td>{{ toDisplayString(order.status) }}</td>
                 <td>{{ getUserFullName(order) }}</td>
+                <td>{{ getUserTelegram(order) }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
                     <button
