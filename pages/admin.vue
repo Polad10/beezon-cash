@@ -144,6 +144,12 @@ function processOrderValues(order: Order) {
     order.bonus_received = new Decimal(order.bonus_received)
   }
 }
+
+function getUserFullName(order: Order) {
+  const user = users.value?.find((u) => u.id === order.user_id)
+
+  return `${user?.first_name} ${user?.last_name}`
+}
 </script>
 
 <template>
@@ -210,7 +216,7 @@ function processOrderValues(order: Order) {
                 <th>ID</th>
                 <th>NAME</th>
                 <th>PHONE NUMBER</th>
-                <th>TG USERNAME</th>
+                <th>TELEGRAM</th>
                 <th>REFERRAL CODE</th>
                 <th>INVITED BY</th>
                 <th>BALANCE</th>
@@ -252,7 +258,7 @@ function processOrderValues(order: Order) {
                 <th>ORIGINAL PRICE</th>
                 <th>CURRENT PRICE</th>
                 <th>STATUS</th>
-                <th>USER ID</th>
+                <th>USER</th>
                 <th></th>
               </tr>
             </thead>
@@ -262,7 +268,7 @@ function processOrderValues(order: Order) {
                 <td>{{ order.original_price }}</td>
                 <td>{{ order.current_price }}</td>
                 <td>{{ toDisplayString(order.status) }}</td>
-                <td>{{ order.user_id }}</td>
+                <td>{{ getUserFullName(order) }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
                     <button

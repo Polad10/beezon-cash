@@ -147,7 +147,7 @@ defineExpose({ open })
           />
           <AdminInput
             type="text"
-            label="Telegram username *"
+            label="Telegram *"
             placeholder="username"
             v-model="tgUserName"
             :class="{ 'input-error': showTgUsernameInputError }"
