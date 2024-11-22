@@ -263,7 +263,6 @@ function processOrderValues(order: Order) {
                 <td>{{ order.original_price }}</td>
                 <td>{{ order.current_price }}</td>
                 <td>{{ toDisplayString(order.status) }}</td>
-                <td>{{ order.bonus_received }}</td>
                 <td>{{ order.user_id }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
