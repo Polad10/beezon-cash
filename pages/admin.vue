@@ -249,7 +249,6 @@ function processOrderValues(order: Order) {
             <thead>
               <tr class="bg-base-200">
                 <th>ORDER CODE</th>
-                <th>DATE</th>
                 <th>ORIGINAL PRICE</th>
                 <th>CURRENT PRICE</th>
                 <th>STATUS</th>
@@ -261,7 +260,6 @@ function processOrderValues(order: Order) {
             <tbody>
               <tr v-for="order in pageOrders" :key="order.id">
                 <td>{{ order.code }}</td>
-                <td>{{ toISODate(order.date) }}</td>
                 <td>{{ order.original_price }}</td>
                 <td>{{ order.current_price }}</td>
                 <td>{{ toDisplayString(order.status) }}</td>

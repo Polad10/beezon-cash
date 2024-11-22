@@ -6,7 +6,6 @@ import { OrderStatus, toDisplayString } from '~/models/OrderStatus'
 
 const emit = defineEmits(['order-created'])
 
-const date = ref('')
 const originalPrice = ref('')
 const currentPrice = ref('')
 const status = ref<OrderStatus | null>(null)
@@ -14,7 +13,6 @@ const userId = ref('')
 
 const showErrorToast = ref(false)
 const showSuccessToast = ref(false)
-const showDateInputError = ref(false)
 const showOriginalPriceInputError = ref(false)
 const showCurrentPriceInputError = ref(false)
 const showStatusInputError = ref(false)
@@ -28,7 +26,7 @@ async function addOrder() {
   if (validateForm()) {
     try {
       const orderRequest: OrderRequest = {
-        date: new Date(date.value),
+        date: new Date(),
         original_price: new Decimal(originalPrice.value),
         current_price: new Decimal(currentPrice.value),
         status: status.value!,
@@ -55,11 +53,6 @@ async function addOrder() {
 function validateForm() {
   resetFieldErrors()
   let valid = true
-
-  if (!date.value) {
-    valid = false
-    showDateInputError.value = true
-  }
 
   if (originalPrice.value === '') {
     valid = false
@@ -95,7 +88,6 @@ function open() {
 }
 
 function resetFieldValues() {
-  date.value = ''
   originalPrice.value = ''
   currentPrice.value = ''
   status.value = null
@@ -103,7 +95,6 @@ function resetFieldValues() {
 }
 
 function resetFieldErrors() {
-  showDateInputError.value = false
   showOriginalPriceInputError.value = false
   showCurrentPriceInputError.value = false
   showStatusInputError.value = false
@@ -121,13 +112,6 @@ defineExpose({ open })
         <p class="text-2xl text-center">New Order</p>
         <div class="divider"></div>
         <div class="flex flex-col gap-2">
-          <AdminInput
-            type="text"
-            label="Date *"
-            placeholder="2024-01-20"
-            v-model="date"
-            :class="{ 'input-error': showDateInputError }"
-          />
           <AdminInput
             type="number"
             label="Original price *"
