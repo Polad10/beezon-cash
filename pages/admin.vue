@@ -252,7 +252,6 @@ function processOrderValues(order: Order) {
                 <th>ORIGINAL PRICE</th>
                 <th>CURRENT PRICE</th>
                 <th>STATUS</th>
-                <th>BONUS RECEIVED</th>
                 <th>USER ID</th>
                 <th></th>
               </tr>
