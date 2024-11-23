@@ -2,7 +2,8 @@
 import Decimal from 'decimal.js'
 import type { Order } from '~/models/Order'
 import type { Message } from '~/models/Message'
-import { OrderStatus, toDisplayString } from '~/models/OrderStatus'
+import { toDisplayString as orderStatusToDisplayString } from '~/models/OrderStatus'
+import { toDisplayString as cityToDisplayString } from '~/models/City'
 import type { User } from '~/models/User'
 import NewUserModal from '~/components/admin/NewUserModal.vue'
 import NewOrderModal from '~/components/admin/NewOrderModal.vue'
@@ -139,10 +140,10 @@ function processOrderValues(order: Order) {
   order.date = new Date(order.date)
   order.current_price = new Decimal(order.current_price)
   order.original_price = new Decimal(order.original_price)
-
-  if (order.bonus_received) {
-    order.bonus_received = new Decimal(order.bonus_received)
-  }
+  order.bonus_received = new Decimal(order.bonus_received)
+  order.weight = new Decimal(order.weight)
+  order.additional_cost = new Decimal(order.additional_cost)
+  order.partner_cost = new Decimal(order.partner_cost)
 }
 
 function getUserFullName(order: Order) {
@@ -261,22 +262,26 @@ function getUserTelegram(order: Order) {
             <thead>
               <tr class="bg-base-200">
                 <th>ORDER CODE</th>
-                <th>ORIGINAL PRICE</th>
-                <th>CURRENT PRICE</th>
                 <th>STATUS</th>
                 <th>USER</th>
                 <th>TELEGRAM</th>
+                <th>WEIGHT</th>
+                <th>ORIGINAL PRICE</th>
+                <th>CURRENT PRICE</th>
+                <th>CITY</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="order in pageOrders" :key="order.id">
                 <td>{{ order.code }}</td>
-                <td>{{ order.original_price }}</td>
-                <td>{{ order.current_price }}</td>
-                <td>{{ toDisplayString(order.status) }}</td>
+                <td>{{ orderStatusToDisplayString(order.status) }}</td>
                 <td>{{ getUserFullName(order) }}</td>
                 <td>{{ getUserTelegram(order) }}</td>
+                <td>{{ order.weight }}</td>
+                <td>{{ order.original_price }}</td>
+                <td>{{ order.current_price }}</td>
+                <td>{{ cityToDisplayString(order.city) }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
                     <button
@@ -311,7 +316,7 @@ function getUserTelegram(order: Order) {
                 <td>{{ message.id }}</td>
                 <td>{{ message.name }}</td>
                 <td>{{ message.text }}</td>
-                <td>{{ toDisplayString(message.order_status) }}</td>
+                <td>{{ orderStatusToDisplayString(message.order_status) }}</td>
                 <td>
                   <div class="flex flex-row gap-2">
                     <button

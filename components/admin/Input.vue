@@ -15,7 +15,7 @@ const model = defineModel()
 </script>
 
 <template>
-  <label class="form-control">
+  <label class="form-control grow">
     <div class="label">
       <span class="label-text">{{ props.label }}</span>
     </div>
