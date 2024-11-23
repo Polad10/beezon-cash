@@ -151,6 +151,17 @@ function resetFieldValues() {
   currentPrice.value = ''
   status.value = null
   userId.value = ''
+  city.value = null
+  weight.value = ''
+  weightRounded.value = false
+  additionalCost.value = ''
+  partnerCost.value = ''
+  description.value = ''
+  orderTypes.value = []
+  cdekTrackNumber.value = ''
+  postTrackNumber.value = ''
+  boxberryTrackNumber.value = ''
+  post5TrackNumber.value = ''
 }
 
 function resetFieldErrors() {
