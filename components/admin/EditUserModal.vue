@@ -36,10 +36,6 @@ async function editUser() {
         invited_by: invitedBy.value || null,
       }
 
-      if (invitedBy.value) {
-        userRequest.invited_by = invitedBy.value
-      }
-
       if (bonus.value) {
         const newBalance = new Decimal(balance.value).add(new Decimal(bonus.value))
         userRequest.balance = newBalance

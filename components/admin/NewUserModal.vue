@@ -29,10 +29,7 @@ async function addUser() {
         last_name: lastName.value,
         phone_nr: phoneNr.value,
         tg_username: tgUserName.value,
-      }
-
-      if (invitedBy.value) {
-        userRequest.invited_by = invitedBy.value
+        invited_by: invitedBy.value || undefined,
       }
 
       const user: User = (await axios.post('/api/users', userRequest)).data
