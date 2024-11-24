@@ -62,7 +62,7 @@ async function addOrder() {
 
       if (postTrackNumber.value) {
         orderRequest.order_tracks.push({
-          delivery_provider: DeliveryProvider.Post,
+          delivery_provider: DeliveryProvider.PostRussia,
           track_number: postTrackNumber.value,
         })
       }
@@ -186,7 +186,7 @@ defineExpose({ open })
         <p class="text-2xl text-center">New Order</p>
         <div class="divider"></div>
         <div class="flex flex-col gap-2">
-          <AdminInput
+          <Input
             type="text"
             label="User id *"
             placeholder="550e8400-e29b-41d4-a716-446655440000"
@@ -195,7 +195,7 @@ defineExpose({ open })
           />
           <AdminStatusDropdown :class="{ 'select-error': showStatusInputError }" v-model="status" />
           <div>
-            <AdminInput type="number" label="Weight" placeholder="0" v-model="weight" />
+            <Input type="number" label="Weight" placeholder="0" v-model="weight" />
             <label class="label cursor-pointer justify-normal gap-2">
               <input type="checkbox" class="checkbox checkbox-xs" v-model="weightRounded" />
               <span
@@ -204,58 +204,68 @@ defineExpose({ open })
               ></span>
             </label>
           </div>
-          <AdminInput type="number" label="Additional cost" placeholder="0" v-model="additionalCost" />
+          <Input type="number" label="Additional cost" placeholder="0" v-model="additionalCost" />
           <div class="flex flex-row items-end gap-2">
-            <AdminInput type="number" label="Original price" placeholder="50.25" v-model="originalPrice" />
+            <Input type="number" label="Original price" placeholder="50.25" v-model="originalPrice" />
             <button class="btn text-2xl btn-square btn-outline" @click="calculatePrice">
               <ion-icon name="calculator-outline"></ion-icon>
             </button>
           </div>
-          <AdminInput type="number" label="Current price" placeholder="50.25" v-model="currentPrice" />
-          <AdminCityDropdown v-model="city" />
-          <AdminInput type="number" label="Partner cost" placeholder="0" v-model="partnerCost" />
+          <Input type="number" label="Current price" placeholder="50.25" v-model="currentPrice" />
+          <CityDropdown v-model="city" />
+          <Input type="number" label="Partner cost" placeholder="0" v-model="partnerCost" />
           <div class="collapse collapse-arrow">
             <input type="checkbox" />
             <div class="collapse-title text-lg font-medium pl-0">Additional info</div>
             <div class="collapse-content pl-0 flex flex-col gap-2">
               <div class="flex flex-row gap-3">
                 <label class="label cursor-pointer justify-normal gap-2">
+                  <input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Drugs" v-model="orderTypes" />
                   <span class="label-text">{{ orderTypeToDisplayString(OrderType.Drugs) }}</span>
-                  <input type="checkbox" class="checkbox" :value="OrderType.Drugs" v-model="orderTypes" />
                 </label>
                 <label class="label cursor-pointer justify-normal gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="OrderType.Electronics"
+                    v-model="orderTypes"
+                  />
                   <span class="label-text">{{ orderTypeToDisplayString(OrderType.Electronics) }}</span>
-                  <input type="checkbox" class="checkbox" :value="OrderType.Electronics" v-model="orderTypes" />
                 </label>
                 <label class="label cursor-pointer justify-normal gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="OrderType.Commercial"
+                    v-model="orderTypes"
+                  />
                   <span class="label-text">{{ orderTypeToDisplayString(OrderType.Commercial) }}</span>
-                  <input type="checkbox" class="checkbox" :value="OrderType.Commercial" v-model="orderTypes" />
                 </label>
               </div>
-              <AdminTextarea
+              <Textarea
                 label="Description"
                 placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
                 v-model="description"
               />
-              <AdminInput
+              <Input
                 type="text"
                 :label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.CDEK)}`"
                 placeholder="123456789"
                 v-model="cdekTrackNumber"
               />
-              <AdminInput
+              <Input
                 type="text"
-                :label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.Post)}`"
+                :label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.PostRussia)}`"
                 placeholder="123456789"
                 v-model="postTrackNumber"
               />
-              <AdminInput
+              <Input
                 type="text"
                 :label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.Boxberry)}`"
                 placeholder="123456789"
                 v-model="boxberryTrackNumber"
               />
-              <AdminInput
+              <Input
                 type="text"
                 :label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.POST5)}`"
                 placeholder="123456789"

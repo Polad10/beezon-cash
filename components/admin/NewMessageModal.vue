@@ -100,14 +100,14 @@ defineExpose({ open })
         <p class="text-2xl text-center">New Message</p>
         <div class="divider"></div>
         <div class="flex flex-col gap-2">
-          <AdminInput
+          <Input
             type="text"
             label="Name *"
             placeholder="Some short name"
             v-model="name"
             :class="{ 'input-error': showNameInputError }"
           />
-          <AdminTextarea
+          <Textarea
             label="Text *"
             placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
             v-model="text"

@@ -20,6 +20,7 @@ export default defineNuxtConfig({
         password: process.env.ADMIN_PASSWORD!,
       },
     ],
+    allowedRoutes: ['/neworder'],
   },
   vue: {
     compilerOptions: {

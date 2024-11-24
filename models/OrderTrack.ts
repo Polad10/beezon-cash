@@ -11,18 +11,24 @@ export interface OrderTrackRequest {
 }
 
 export enum DeliveryProvider {
+  Ozon,
+  Wilbderries,
   CDEK,
-  Post,
+  PostRussia,
   Boxberry,
   POST5,
 }
 
 export function toDisplayString(deliveryProvider: DeliveryProvider) {
   switch (deliveryProvider) {
+    case DeliveryProvider.Ozon:
+      return 'Ozon'
+    case DeliveryProvider.Wilbderries:
+      return 'Wildberries'
     case DeliveryProvider.CDEK:
       return 'CDEK'
-    case DeliveryProvider.Post:
-      return 'Post'
+    case DeliveryProvider.PostRussia:
+      return 'Почта России'
     case DeliveryProvider.Boxberry:
       return 'Boxberry'
     case DeliveryProvider.POST5:

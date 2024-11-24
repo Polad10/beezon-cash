@@ -7,7 +7,7 @@ defineOptions({
 
 const props = defineProps<{
   type: InputTypeHTMLAttribute
-  label: string
+  label?: string
   placeholder: string
 }>()
 
@@ -16,7 +16,7 @@ const model = defineModel()
 
 <template>
   <label class="form-control grow">
-    <div class="label">
+    <div class="label" v-if="props.label">
       <span class="label-text">{{ props.label }}</span>
     </div>
     <input

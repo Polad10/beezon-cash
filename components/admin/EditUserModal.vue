@@ -121,42 +121,42 @@ defineExpose({ open })
         <p class="text-2xl text-center">Edit User</p>
         <div class="divider"></div>
         <div class="flex flex-col gap-2">
-          <AdminInput
+          <Input
             type="text"
             label="First name *"
             placeholder="Alex"
             v-model="firstName"
             :class="{ 'input-error': showFirstNameInputError }"
           />
-          <AdminInput
+          <Input
             type="text"
             label="Last name *"
             placeholder="Smith"
             v-model="lastName"
             :class="{ 'input-error': showLastNameInputError }"
           />
-          <AdminInput
+          <Input
             type="text"
             label="Phone number *"
             placeholder="+995 599 12 34 56"
             v-model="phoneNr"
             :class="{ 'input-error': showPhoneNrInputError }"
           />
-          <AdminInput
+          <Input
             type="text"
             label="Telegram *"
             placeholder="username"
             v-model="tgUserName"
             :class="{ 'input-error': showTgUsernameInputError }"
           />
-          <AdminInput
+          <Input
             type="text"
             label="Invited by"
             placeholder="550e8400-e29b-41d4-a716-446655440000"
             v-model="invitedBy"
           />
-          <AdminInput type="number" label="Balance" placeholder="0" v-model="balance" disabled />
-          <AdminInput type="number" label="Add bonus" placeholder="0" v-model="bonus" />
+          <Input type="number" label="Balance" placeholder="0" v-model="balance" disabled />
+          <Input type="number" label="Add bonus" placeholder="0" v-model="bonus" />
         </div>
         <div class="modal-action">
           <button class="btn btn-warning btn-outline" @click="close">Cancel</button>
