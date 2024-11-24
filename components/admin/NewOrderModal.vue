@@ -42,36 +42,15 @@ async function addOrder() {
         status: status.value!,
         user_id: userId.value,
         weight_rounded: weightRounded.value,
+        original_price: originalPrice.value ? new Decimal(originalPrice.value) : undefined,
+        current_price: currentPrice.value ? new Decimal(currentPrice.value) : undefined,
+        city: city.value || undefined,
+        weight: weight.value ? new Decimal(weight.value) : undefined,
+        additional_cost: additionalCost.value ? new Decimal(additionalCost.value) : undefined,
+        partner_cost: partnerCost.value ? new Decimal(partnerCost.value) : undefined,
+        description: description.value || undefined,
         order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
         order_tracks: [],
-      }
-
-      if (originalPrice.value !== '') {
-        orderRequest.original_price = new Decimal(originalPrice.value)
-      }
-
-      if (currentPrice.value !== '') {
-        orderRequest.current_price = new Decimal(currentPrice.value)
-      }
-
-      if (city.value) {
-        orderRequest.city = city.value
-      }
-
-      if (weight.value !== '') {
-        orderRequest.weight = new Decimal(weight.value)
-      }
-
-      if (additionalCost.value !== '') {
-        orderRequest.additional_cost = new Decimal(additionalCost.value)
-      }
-
-      if (partnerCost.value !== '') {
-        orderRequest.partner_cost = new Decimal(partnerCost.value)
-      }
-
-      if (description.value) {
-        orderRequest.description = description.value
       }
 
       if (cdekTrackNumber.value) {

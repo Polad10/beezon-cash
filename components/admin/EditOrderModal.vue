@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import axios from 'axios'
 import Decimal from 'decimal.js'
-import type { City } from '~/models/City'
+import { City } from '~/models/City'
 import type { Order, OrderRequest } from '~/models/Order'
 import { OrderStatus } from '~/models/OrderStatus'
 import { OrderType, toDisplayString as orderTypeToDisplayString } from '~/models/OrderTypeMapping'
@@ -43,36 +43,15 @@ async function editOrder() {
         status: status.value!,
         user_id: userId.value,
         weight_rounded: weightRounded.value,
+        original_price: originalPrice.value ? new Decimal(originalPrice.value) : new Decimal(0),
+        current_price: currentPrice.value ? new Decimal(currentPrice.value) : new Decimal(0),
+        city: city.value || City.Other,
+        weight: weight.value ? new Decimal(weight.value) : new Decimal(0),
+        additional_cost: additionalCost.value ? new Decimal(additionalCost.value) : new Decimal(0),
+        partner_cost: partnerCost.value ? new Decimal(partnerCost.value) : new Decimal(0),
+        description: description.value,
         order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
         order_tracks: [],
-      }
-
-      if (originalPrice.value !== '') {
-        orderRequest.original_price = new Decimal(originalPrice.value)
-      }
-
-      if (currentPrice.value !== '') {
-        orderRequest.current_price = new Decimal(currentPrice.value)
-      }
-
-      if (city.value) {
-        orderRequest.city = city.value
-      }
-
-      if (weight.value !== '') {
-        orderRequest.weight = new Decimal(weight.value)
-      }
-
-      if (additionalCost.value !== '') {
-        orderRequest.additional_cost = new Decimal(additionalCost.value)
-      }
-
-      if (partnerCost.value !== '') {
-        orderRequest.partner_cost = new Decimal(partnerCost.value)
-      }
-
-      if (description.value) {
-        orderRequest.description = description.value
       }
 
       if (cdekTrackNumber.value) {
