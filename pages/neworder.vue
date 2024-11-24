@@ -58,7 +58,7 @@ const orderTypes = ref<OrderType[]>()
             v-model="tgUserName"
             :class="{ 'input-error': showTgUsernameInputError }"
           />
-          <CityDropdown v-model="city" />
+          <CityDropdown label="В какой город Грузии требуется доставка?" placeholder="Выберите город" v-model="city" />
           <div>
             <div class="label">
               <span class="label-text">Где нам нужно будет получить заказ? *</span>

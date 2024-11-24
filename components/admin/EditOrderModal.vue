@@ -215,7 +215,7 @@ defineExpose({ open })
             </button>
           </div>
           <Input type="number" label="Current price" placeholder="50.25" v-model="currentPrice" />
-          <CityDropdown v-model="city" />
+          <CityDropdown label="City" placeholder="Select a city" v-model="city" />
           <Input type="number" label="Partner cost" placeholder="0" v-model="partnerCost" />
           <div class="collapse collapse-arrow">
             <input type="checkbox" />

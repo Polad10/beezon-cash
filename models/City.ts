@@ -11,18 +11,18 @@ export enum City {
 export function toDisplayString(city: City) {
   switch (city) {
     case City.Other:
-      return 'Other'
+      return 'Другой'
     case City.Tbilisi:
-      return 'Tbilisi'
+      return 'Тбилиси'
     case City.Batumi:
-      return 'Batumi'
+      return 'Батуми'
     case City.Borjomi:
-      return 'Borjomi'
+      return 'Боржоми'
     case City.Rustavi:
-      return 'Rustavi'
+      return 'Рустави'
     case City.Mtskheta:
-      return 'Mtskheta'
+      return 'Мцхета'
     case City.Kobuleti:
-      return 'Kobuleti'
+      return 'Кобулети'
   }
 }
