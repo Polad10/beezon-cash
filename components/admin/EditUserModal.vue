@@ -33,6 +33,7 @@ async function editUser() {
         last_name: lastName.value,
         phone_nr: phoneNr.value,
         tg_username: tgUserName.value,
+        invited_by: invitedBy.value || null,
       }
 
       if (invitedBy.value) {
