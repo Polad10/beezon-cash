@@ -59,6 +59,18 @@ async function registerOrder() {
         order_tracks: [],
       }
 
+      if (deliveryProviders.value.includes(DeliveryProvider.Ozon)) {
+        userOrderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.Ozon,
+        })
+      }
+
+      if (deliveryProviders.value.includes(DeliveryProvider.Wilbderries)) {
+        userOrderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.Wilbderries,
+        })
+      }
+
       if (cdekTrackNumber.value) {
         userOrderRequest.order_tracks.push({
           delivery_provider: DeliveryProvider.CDEK,
