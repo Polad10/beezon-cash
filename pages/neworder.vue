@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import axios from 'axios'
 import type { City } from '~/models/City'
 import { DeliveryProvider, toDisplayString as deliveryProviderToDisplayString } from '~/models/OrderTrack'
 import { OrderType } from '~/models/OrderTypeMapping'
+import type { UserOrderRequest } from '~/models/UserOrder'
 
 const modalRef = ref<HTMLDialogElement | null>(null)
 
@@ -14,30 +16,162 @@ const cdekTrackNumber = ref('')
 const postTrackNumber = ref('')
 const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
-const hasPromoCode = ref(false)
-const done = ref(false)
+const inviteCode = ref('')
+const city = ref<City | null>(null)
+const deliveryProviders = ref<DeliveryProvider[]>([])
+const orderTypes = ref<OrderType[]>([])
+const hasReferralCode = ref(false)
+const orderRegistered = ref(false)
 const loading = ref(false)
+const errorMessage = ref('')
 
 const showFirstNameInputError = ref(false)
 const showLastNameInputError = ref(false)
 const showPhoneNrInputError = ref(false)
 const showTgUsernameInputError = ref(false)
-const city = ref<City | null>(null)
-const deliveryProviders = ref<DeliveryProvider[]>([])
-const orderTypes = ref<OrderType[]>()
-
-function registerOrder() {
-  loading.value = true
-
-  // register order
-
-  done.value = true
-  modalRef.value?.close()
-}
+const showDescriptionInputError = ref(false)
+const showCdekTrackNumberInputError = ref(false)
+const showPostTrackNumberInputError = ref(false)
+const showBoxberryTrackNumberInputError = ref(false)
+const showPost5TrackNumberInputError = ref(false)
+const showDeliveryProviderInputError = ref(false)
+const showErrorToast = ref(false)
 
 onMounted(() => {
   modalRef.value?.showModal()
 })
+
+async function registerOrder() {
+  if (validateForm()) {
+    try {
+      loading.value = true
+
+      const userOrderRequest: UserOrderRequest = {
+        first_name: firstName.value,
+        last_name: lastName.value,
+        phone_nr: phoneNr.value,
+        tg_username: tgUserName.value,
+        invite_code: inviteCode.value || undefined,
+        date: new Date(),
+        description: description.value,
+        city: city.value || undefined,
+        order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
+        order_tracks: [],
+      }
+
+      if (cdekTrackNumber.value) {
+        userOrderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.CDEK,
+          track_number: cdekTrackNumber.value,
+        })
+      }
+
+      if (postTrackNumber.value) {
+        userOrderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.PostRussia,
+          track_number: postTrackNumber.value,
+        })
+      }
+
+      if (boxberryTrackNumber.value) {
+        userOrderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.Boxberry,
+          track_number: boxberryTrackNumber.value,
+        })
+      }
+
+      if (post5TrackNumber.value) {
+        userOrderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.POST5,
+          track_number: post5TrackNumber.value,
+        })
+      }
+
+      await axios.post('api/public/orders', userOrderRequest)
+
+      orderRegistered.value = true
+      modalRef.value?.close()
+    } catch (ex) {
+      errorMessage.value = 'Что-то пошло не так. Пожалуйста, попробуйте чуть позже.'
+      showToast(showErrorToast)
+    } finally {
+      loading.value = false
+    }
+  } else {
+    errorMessage.value = 'Пожалуйста заполните все необходимые поля.'
+    showToast(showErrorToast)
+  }
+}
+
+function validateForm() {
+  resetFieldErrors()
+  let valid = true
+
+  if (!firstName.value) {
+    valid = false
+    showFirstNameInputError.value = true
+  }
+
+  if (!lastName.value) {
+    valid = false
+    showLastNameInputError.value = true
+  }
+
+  if (!phoneNr.value) {
+    valid = false
+    showPhoneNrInputError.value = true
+  }
+
+  if (!tgUserName.value) {
+    valid = false
+    showTgUsernameInputError.value = true
+  }
+
+  if (!description.value) {
+    valid = false
+    showDescriptionInputError.value = true
+  }
+
+  if (deliveryProviders.value.length === 0) {
+    showDeliveryProviderInputError.value = true
+    valid = false
+  }
+
+  if (deliveryProviders.value.includes(DeliveryProvider.CDEK) && !cdekTrackNumber.value) {
+    valid = false
+    showCdekTrackNumberInputError.value = true
+  }
+
+  if (deliveryProviders.value.includes(DeliveryProvider.PostRussia) && !postTrackNumber.value) {
+    valid = false
+    showPostTrackNumberInputError.value = true
+  }
+
+  if (deliveryProviders.value.includes(DeliveryProvider.POST5) && !post5TrackNumber.value) {
+    valid = false
+    showPost5TrackNumberInputError.value = true
+  }
+
+  if (deliveryProviders.value.includes(DeliveryProvider.Boxberry) && !boxberryTrackNumber.value) {
+    valid = false
+    showBoxberryTrackNumberInputError.value = true
+  }
+
+  return valid
+}
+
+function resetFieldErrors() {
+  showFirstNameInputError.value = false
+  showLastNameInputError.value = false
+  showPhoneNrInputError.value = false
+  showTgUsernameInputError.value = false
+  showDescriptionInputError.value = false
+  showCdekTrackNumberInputError.value = false
+  showPostTrackNumberInputError.value = false
+  showBoxberryTrackNumberInputError.value = false
+  showPost5TrackNumberInputError.value = false
+  showDeliveryProviderInputError.value = false
+}
 </script>
 
 <template>
@@ -80,105 +214,112 @@ onMounted(() => {
             <div class="label">
               <span class="label-text">Где нам нужно будет получить заказ? *</span>
             </div>
-            <div class="flex flex-row gap-3">
-              <label class="label cursor-pointer justify-normal gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-sm"
-                  :value="DeliveryProvider.Ozon"
-                  v-model="deliveryProviders"
-                />
-                <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Ozon) }}</span>
-              </label>
-              <label class="label cursor-pointer justify-normal gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-sm"
-                  :value="DeliveryProvider.Wilbderries"
-                  v-model="deliveryProviders"
-                />
-                <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Wilbderries) }}</span>
-              </label>
-              <label class="label cursor-pointer justify-normal gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-sm"
-                  :value="DeliveryProvider.CDEK"
-                  v-model="deliveryProviders"
-                />
-                <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.CDEK) }}</span>
-              </label>
-              <label class="label cursor-pointer justify-normal gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-sm"
-                  :value="DeliveryProvider.PostRussia"
-                  v-model="deliveryProviders"
-                />
-                <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.PostRussia) }}</span>
-              </label>
-            </div>
-            <div class="flex flex-row gap-3">
-              <label class="label cursor-pointer justify-normal gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-sm"
-                  :value="DeliveryProvider.POST5"
-                  v-model="deliveryProviders"
-                />
-                <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.POST5) }}</span>
-              </label>
-              <label class="label cursor-pointer justify-normal gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-sm"
-                  :value="DeliveryProvider.Boxberry"
-                  v-model="deliveryProviders"
-                />
-                <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Boxberry) }}</span>
-              </label>
+            <div :class="{ 'border rounded-lg border-[red]': showDeliveryProviderInputError }">
+              <div class="flex flex-row gap-3">
+                <label class="label cursor-pointer justify-normal gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="DeliveryProvider.Ozon"
+                    v-model="deliveryProviders"
+                  />
+                  <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Ozon) }}</span>
+                </label>
+                <label class="label cursor-pointer justify-normal gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="DeliveryProvider.Wilbderries"
+                    v-model="deliveryProviders"
+                  />
+                  <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Wilbderries) }}</span>
+                </label>
+                <label class="label cursor-pointer justify-normal gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="DeliveryProvider.CDEK"
+                    v-model="deliveryProviders"
+                  />
+                  <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.CDEK) }}</span>
+                </label>
+                <label class="label cursor-pointer justify-normal gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="DeliveryProvider.PostRussia"
+                    v-model="deliveryProviders"
+                  />
+                  <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.PostRussia) }}</span>
+                </label>
+              </div>
+              <div class="flex flex-row gap-3">
+                <label class="label cursor-pointer justify-normal gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="DeliveryProvider.POST5"
+                    v-model="deliveryProviders"
+                  />
+                  <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.POST5) }}</span>
+                </label>
+                <label class="label cursor-pointer justify-normal gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="DeliveryProvider.Boxberry"
+                    v-model="deliveryProviders"
+                  />
+                  <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Boxberry) }}</span>
+                </label>
+              </div>
             </div>
           </div>
           <Input
             v-if="deliveryProviders.includes(DeliveryProvider.CDEK)"
-            label="Трек-номер CDEK"
+            label="Трек-номер CDEK *"
             type="text"
             placeholder="123456789"
             v-model="cdekTrackNumber"
+            :class="{ 'input-error': showCdekTrackNumberInputError }"
           />
           <Input
             v-if="deliveryProviders.includes(DeliveryProvider.PostRussia)"
-            label="Трек-номер Почты России"
+            label="Трек-номер Почты России *"
             type="text"
             placeholder="123456789"
             v-model="postTrackNumber"
+            :class="{ 'input-error': showPostTrackNumberInputError }"
           />
           <Input
             v-if="deliveryProviders.includes(DeliveryProvider.POST5)"
-            label="Трек-номер 5POST"
+            label="Трек-номер 5POST *"
             type="text"
             placeholder="123456789"
             v-model="post5TrackNumber"
+            :class="{ 'input-error': showPost5TrackNumberInputError }"
           />
           <Input
             v-if="deliveryProviders.includes(DeliveryProvider.Boxberry)"
-            label="Трек-номер Boxberry"
+            label="Трек-номер Boxberry *"
             type="text"
             placeholder="123456789"
             v-model="boxberryTrackNumber"
+            :class="{ 'input-error': showBoxberryTrackNumberInputError }"
           />
           <Textarea
             label="Краткая опись заказа *"
             placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
             v-model="description"
+            :class="{ 'textarea-error': showDescriptionInputError }"
           />
           <div>
             <div>
               <label class="label cursor-pointer justify-normal gap-2">
-                <input type="checkbox" class="checkbox checkbox-sm" v-model="hasPromoCode" />
+                <input type="checkbox" class="checkbox checkbox-sm" v-model="hasReferralCode" />
                 <span class="label-text">У меня есть промокод друга</span>
               </label>
-              <Input v-if="hasPromoCode" type="text" placeholder="Введите промокод" v-model="tgUserName" />
+              <Input v-if="hasReferralCode" type="text" placeholder="Введите промокод" v-model="inviteCode" />
             </div>
             <label class="label cursor-pointer justify-normal gap-2">
               <input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Drugs" v-model="orderTypes" />
@@ -202,8 +343,16 @@ onMounted(() => {
           </button>
         </div>
       </div>
+      <div v-if="showErrorToast" class="toast toast-top whitespace-normal z-[9999] inset-x-0 top-0 mx-auto w-[200px]">
+        <div
+          class="alert alert-error text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-red-300 object-center"
+        >
+          <ion-icon name="close-circle-outline" class="text-xl ml-px"></ion-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+      </div>
     </dialog>
-    <div :class="['transition-opacity duration-[3000ms]', done ? 'opacity-100' : 'opacity-0']">
+    <div :class="['transition-opacity duration-[3000ms]', orderRegistered ? 'opacity-100' : 'opacity-0']">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="250"
