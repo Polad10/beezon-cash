@@ -19,6 +19,7 @@
     "axios": "^1.7.7",
     "daisyui": "^4.12.12",
     "decimal.js": "^10.4.3",
+    "fuse.js": "^6.6.2",
     "nuxt": "^3.13.0",
     "nuxt-mongoose": "^1.0.6",
     "postcss": "^8.4.47",

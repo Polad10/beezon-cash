@@ -13,6 +13,7 @@ import EditUserModal from '~/components/admin/EditUserModal.vue'
 import EditOrderModal from '~/components/admin/EditOrderModal.vue'
 import NewMessageModal from '~/components/admin/NewMessageModal.vue'
 import EditMessageModal from '~/components/admin/EditMessageModal.vue'
+import Fuse from 'fuse.js'
 
 enum VisibleTab {
   Users,
@@ -22,9 +23,14 @@ enum VisibleTab {
 
 const rowsPerPage = 15
 
-const users = (await useFetch<User[]>('/api/users')).data
+const allUsers = (await useFetch<User[]>('/api/users')).data
 const orders = (await useFetch<Order[]>('/api/orders')).data
 const messages = (await useFetch<Message[]>('/api/messages')).data
+
+const users = ref<User[] | null>([...allUsers.value!])
+const search = ref('')
+const currentPageNr = ref(1)
+const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 
 const newUserModalRef = ref<typeof NewUserModal | null>(null)
 const editUserModalRef = ref<typeof EditUserModal | null>(null)
@@ -33,8 +39,14 @@ const editOrderModalRef = ref<typeof EditOrderModal | null>(null)
 const newMessageModalRef = ref<typeof NewMessageModal | null>(null)
 const editMessageModalRef = ref<typeof EditMessageModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
-const pageNr = ref(1)
-const visibleTab = ref<VisibleTab>(VisibleTab.Users)
+
+const fuseOptions = {
+  keys: ['tg_username', 'last_name', 'first_name', 'phone_nr'],
+}
+
+let fuseUsers = computed(() => {
+  return new Fuse(allUsers.value!, fuseOptions)
+})
 
 onMounted(async () => {
   orders.value?.forEach((order) => {
@@ -56,6 +68,11 @@ const pageMessages = computed(() => {
   return messages.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
 })
 
+const pageNr = computed(() => {
+  currentPageNr.value = Math.min(currentPageNr.value, maxPageNr.value)
+  return currentPageNr.value
+})
+
 const maxPageNr = computed(() => {
   let totalRows = 0
 
@@ -71,12 +88,12 @@ const maxPageNr = computed(() => {
 })
 
 function setVisibleTab(tab: VisibleTab) {
-  pageNr.value = 1
+  reset()
   visibleTab.value = tab
 }
 
 function setPageNr(newPageNr: number) {
-  pageNr.value = newPageNr
+  currentPageNr.value = newPageNr
 }
 
 function pageNrIsInBetween(pageNr: number) {
@@ -84,20 +101,26 @@ function pageNrIsInBetween(pageNr: number) {
 }
 
 function handleUserCreated(user: User) {
-  users.value?.push(user)
+  allUsers.value?.push(user)
+
+  searchUser()
 }
 
 function handleUserEdited(user: User) {
-  const localUser = users.value?.find((u) => u.id === user.id)
+  const localUser = allUsers.value?.find((u) => u.id === user.id)
 
   if (localUser) {
     Object.assign(localUser, user)
   }
+
+  searchUser()
 }
 
 async function deleteUser(user: User) {
   await axios.delete(`/api/users/${user.id}`)
-  users.value = users.value?.filter((u) => u.id !== user.id)!
+  allUsers.value = allUsers.value?.filter((u) => u.id !== user.id)!
+
+  searchUser()
 }
 
 function handleOrderCreated(order: Order) {
@@ -157,6 +180,21 @@ function getUserTelegram(order: Order) {
 
   return user?.tg_username
 }
+
+function searchUser() {
+  if (!search.value) {
+    users.value = [...allUsers.value!]
+    return
+  }
+
+  users.value = fuseUsers.value.search(search.value).map((result) => result.item)
+}
+
+function reset() {
+  currentPageNr.value = 1
+  search.value = ''
+  users.value = [...allUsers.value!]
+}
 </script>
 
 <template>
@@ -192,7 +230,7 @@ function getUserTelegram(order: Order) {
             <label
               class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
             >
-              <input type="text" class="grow" placeholder="Search" />
+              <input type="text" class="grow" placeholder="Search" @input="searchUser" v-model="search" />
               <ion-icon name="search-outline"></ion-icon>
             </label>
             <button class="btn btn-sm btn-outline" @click="newUserModalRef?.open()">Add user</button>
