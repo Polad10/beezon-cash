@@ -3,6 +3,7 @@ import type { OrderStatus } from './OrderStatus'
 import type { City } from './City'
 import type { OrderTypeMapping, OrderTypeMappingRequest } from './OrderTypeMapping'
 import type { OrderTrack, OrderTrackRequest } from './OrderTrack'
+import type { User } from './User'
 
 export interface Order {
   id: string
@@ -19,6 +20,7 @@ export interface Order {
   additional_cost: Decimal
   partner_cost: Decimal
   description: string
+  user?: User
   order_type_mappings: OrderTypeMapping[]
   order_tracks: OrderTrack[]
 }

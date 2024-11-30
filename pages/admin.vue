@@ -24,10 +24,11 @@ enum VisibleTab {
 const rowsPerPage = 15
 
 const allUsers = (await useFetch<User[]>('/api/users')).data
-const orders = (await useFetch<Order[]>('/api/orders')).data
+const allOrders = (await useFetch<Order[]>('/api/orders')).data
 const messages = (await useFetch<Message[]>('/api/messages')).data
 
 const users = ref<User[] | null>([...allUsers.value!])
+const orders = ref<Order[] | null>([])
 const search = ref('')
 const currentPageNr = ref(1)
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
@@ -40,20 +41,29 @@ const newMessageModalRef = ref<typeof NewMessageModal | null>(null)
 const editMessageModalRef = ref<typeof EditMessageModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 
-const fuseOptions = {
+const fuseUsersOptions = {
   keys: ['tg_username', 'last_name', 'first_name', 'phone_nr'],
 }
 
+const fuseOrdersOptions = {
+  keys: ['user.tg_username', 'user.last_name', 'user.first_name'],
+}
+
 let fuseUsers = computed(() => {
-  return new Fuse(allUsers.value!, fuseOptions)
+  return new Fuse(allUsers.value!, fuseUsersOptions)
+})
+
+let fuseOrders = computed(() => {
+  return new Fuse(allOrders.value!, fuseOrdersOptions)
 })
 
 onMounted(async () => {
-  orders.value?.forEach((order) => {
+  allOrders.value?.forEach((order) => {
     processOrderValues(order)
   })
 
-  orders.value?.sort((a, b) => b.date.getTime() - a.date.getTime())
+  allOrders.value?.sort((a, b) => b.date.getTime() - a.date.getTime())
+  orders.value = [...allOrders.value!]
 })
 
 const pageUsers = computed(() => {
@@ -125,21 +135,27 @@ async function deleteUser(user: User) {
 
 function handleOrderCreated(order: Order) {
   processOrderValues(order)
-  orders.value?.push(order)
+  allOrders.value?.push(order)
+
+  searchOrder()
 }
 
 function handleOrderEdited(order: Order) {
-  const localOrder = orders.value?.find((o) => o.id === order.id)
+  const localOrder = allOrders.value?.find((o) => o.id === order.id)
 
   if (localOrder) {
     processOrderValues(order)
     Object.assign(localOrder, order)
   }
+
+  searchOrder()
 }
 
 async function deleteOrder(order: Order) {
   await axios.delete(`/api/orders/${order.id}`)
-  orders.value = orders.value?.filter((o) => o.id !== order.id)!
+  allOrders.value = allOrders.value?.filter((o) => o.id !== order.id)!
+
+  searchOrder()
 }
 
 function handleMessageCreated(message: Message) {
@@ -167,18 +183,7 @@ function processOrderValues(order: Order) {
   order.weight = new Decimal(order.weight)
   order.additional_cost = new Decimal(order.additional_cost)
   order.partner_cost = new Decimal(order.partner_cost)
-}
-
-function getUserFullName(order: Order) {
-  const user = users.value?.find((u) => u.id === order.user_id)
-
-  return `${user?.first_name} ${user?.last_name}`
-}
-
-function getUserTelegram(order: Order) {
-  const user = users.value?.find((u) => u.id === order.user_id)
-
-  return user?.tg_username
+  order.user = users.value?.find((u) => u.id === order.user_id)
 }
 
 function searchUser() {
@@ -190,10 +195,24 @@ function searchUser() {
   users.value = fuseUsers.value.search(search.value).map((result) => result.item)
 }
 
+function searchOrder() {
+  if (!search.value) {
+    orders.value = [...allOrders.value!]
+    return
+  }
+
+  orders.value = fuseOrders.value.search(search.value).map((result) => result.item)
+}
+
 function reset() {
   currentPageNr.value = 1
   search.value = ''
-  users.value = [...allUsers.value!]
+
+  if (visibleTab.value == VisibleTab.Users) {
+    users.value = [...allUsers.value!]
+  } else if (visibleTab.value == VisibleTab.Orders) {
+    orders.value = [...allOrders.value!]
+  }
 }
 </script>
 
@@ -242,7 +261,7 @@ function reset() {
             <label
               class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
             >
-              <input type="text" class="grow" placeholder="Search" />
+              <input type="text" class="grow" placeholder="Search" @input="searchOrder" v-model="search" />
               <ion-icon name="search-outline"></ion-icon>
             </label>
             <button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
@@ -314,8 +333,8 @@ function reset() {
               <tr v-for="order in pageOrders" :key="order.id">
                 <td>{{ order.code }}</td>
                 <td>{{ orderStatusToDisplayString(order.status) }}</td>
-                <td>{{ getUserFullName(order) }}</td>
-                <td>{{ getUserTelegram(order) }}</td>
+                <td>{{ order.user?.first_name }} {{ order.user?.last_name }}</td>
+                <td>{{ order.user?.tg_username }}</td>
                 <td>{{ order.weight }}</td>
                 <td>{{ order.original_price }}</td>
                 <td>{{ order.current_price }}</td>
