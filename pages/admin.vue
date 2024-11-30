@@ -46,7 +46,7 @@ const fuseUsersOptions = {
 }
 
 const fuseOrdersOptions = {
-  keys: ['user.tg_username', 'user.last_name', 'user.first_name'],
+  keys: ['user.tg_username', 'user.last_name', 'user.first_name', 'code'],
 }
 
 let fuseUsers = computed(() => {
