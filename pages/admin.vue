@@ -62,7 +62,7 @@ onMounted(async () => {
     processOrderValues(order)
   })
 
-  allOrders.value?.sort((a, b) => b.date.getTime() - a.date.getTime())
+  allOrders.value?.sort((a, b) => a.status - b.status)
   orders.value = [...allOrders.value!]
 })
 
