@@ -5,22 +5,24 @@ import { DeliveryProvider, toDisplayString as deliveryProviderToDisplayString } 
 import { OrderType } from '~/models/OrderTypeMapping'
 import type { UserOrderRequest } from '~/models/UserOrder'
 
+const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie')
 const modalRef = ref<HTMLDialogElement | null>(null)
 
-const firstName = ref('')
-const lastName = ref('')
-const phoneNr = ref('')
-const tgUserName = ref('')
-const description = ref('')
+const firstName = ref(userOrderCookie.value?.first_name || '')
+const lastName = ref(userOrderCookie.value?.last_name || '')
+const phoneNr = ref(userOrderCookie.value?.phone_nr || '')
+const tgUserName = ref(userOrderCookie.value?.tg_username || '')
+const description = ref(userOrderCookie.value?.description || '')
 const cdekTrackNumber = ref('')
 const postTrackNumber = ref('')
 const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
-const inviteCode = ref('')
-const city = ref<City | null>(null)
+const inviteCode = ref(userOrderCookie.value?.invite_code || '')
+const city = ref<City | null>(userOrderCookie.value?.city || null)
 const deliveryProviders = ref<DeliveryProvider[]>([])
 const orderTypes = ref<OrderType[]>([])
-const hasReferralCode = ref(false)
+const hasReferralCode = ref(userOrderCookie.value?.invite_code ? true : false)
+
 const orderRegistered = ref(false)
 const loading = ref(false)
 const errorMessage = ref('')
@@ -102,6 +104,7 @@ async function registerOrder() {
       await axios.post('api/public/orders', userOrderRequest)
 
       orderRegistered.value = true
+      userOrderCookie.value = userOrderRequest
       modalRef.value?.close()
     } catch (ex) {
       errorMessage.value = 'Что-то пошло не так. Пожалуйста, попробуйте чуть позже.'
