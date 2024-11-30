@@ -21,7 +21,7 @@ enum VisibleTab {
   Messages,
 }
 
-const rowsPerPage = 15
+const rowsPerPage = 30
 
 const allUsers = (await useFetch<User[]>('/api/users')).data
 const allOrders = (await useFetch<Order[]>('/api/orders')).data
