@@ -20,6 +20,7 @@ const showFirstNameInputError = ref(false)
 const showLastNameInputError = ref(false)
 const showPhoneNrInputError = ref(false)
 const showTgUsernameInputError = ref(false)
+const showBonusInputError = ref(false)
 
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -82,6 +83,11 @@ function validateForm() {
     showTgUsernameInputError.value = true
   }
 
+  if (bonus.value && !isValidDecimal(bonus.value)) {
+    valid = false
+    showBonusInputError.value = true
+  }
+
   return valid
 }
 
@@ -108,6 +114,7 @@ function resetFieldErrors() {
   showLastNameInputError.value = false
   showPhoneNrInputError.value = false
   showTgUsernameInputError.value = false
+  showBonusInputError.value = false
 }
 
 defineExpose({ open })
@@ -155,8 +162,14 @@ defineExpose({ open })
             placeholder="550e8400-e29b-41d4-a716-446655440000"
             v-model="invitedBy"
           />
-          <Input type="number" label="Balance" placeholder="0" v-model="balance" disabled />
-          <Input type="number" label="Add bonus" placeholder="0" v-model="bonus" />
+          <Input type="text" label="Balance" placeholder="0" v-model="balance" disabled />
+          <Input
+            type="text"
+            label="Add bonus"
+            placeholder="0"
+            v-model="bonus"
+            :class="{ 'input-error': showBonusInputError }"
+          />
         </div>
         <div class="modal-action">
           <button class="btn btn-warning btn-outline" @click="close">Cancel</button>

@@ -15,7 +15,7 @@ const currentPrice = ref('')
 const status = ref<OrderStatus | null>(null)
 const userId = ref('')
 const city = ref<City | null>(null)
-const weight = ref<number | ''>('')
+const weight = ref('')
 const weightRounded = ref(false)
 const additionalCost = ref('')
 const partnerCost = ref('')
@@ -30,6 +30,11 @@ const showErrorToast = ref(false)
 const showSuccessToast = ref(false)
 const showStatusInputError = ref(false)
 const showUserIdInputError = ref(false)
+const showWeightInputError = ref(false)
+const showAdditionalCostInputError = ref(false)
+const showOriginalPriceInputError = ref(false)
+const showCurrentPriceInputError = ref(false)
+const showPartnerCostInputError = ref(false)
 
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -113,6 +118,31 @@ function validateForm() {
     showUserIdInputError.value = true
   }
 
+  if (weight.value && !isValidDecimal(weight.value)) {
+    valid = false
+    showWeightInputError.value = true
+  }
+
+  if (additionalCost.value && !isValidDecimal(additionalCost.value)) {
+    valid = false
+    showAdditionalCostInputError.value = true
+  }
+
+  if (originalPrice.value && !isValidDecimal(originalPrice.value)) {
+    valid = false
+    showOriginalPriceInputError.value = true
+  }
+
+  if (currentPrice.value && !isValidDecimal(currentPrice.value)) {
+    valid = false
+    showCurrentPriceInputError.value = true
+  }
+
+  if (partnerCost.value && !isValidDecimal(partnerCost.value)) {
+    valid = false
+    showPartnerCostInputError.value = true
+  }
+
   return valid
 }
 
@@ -128,7 +158,7 @@ function open(order: Order) {
   status.value = order.status
   userId.value = order.user_id
   city.value = order.city
-  weight.value = order.weight.toNumber()
+  weight.value = order.weight.toString()
   weightRounded.value = order.weight_rounded
   additionalCost.value = order.additional_cost.toString()
   partnerCost.value = order.partner_cost.toString()
@@ -149,15 +179,47 @@ function open(order: Order) {
 function resetFieldErrors() {
   showStatusInputError.value = false
   showUserIdInputError.value = false
+  showWeightInputError.value = false
+  showAdditionalCostInputError.value = false
+  showOriginalPriceInputError.value = false
+  showCurrentPriceInputError.value = false
+  showPartnerCostInputError.value = false
 }
 
 function calculatePrice() {
+  let valid = true
+
+  if (weight.value && !isValidDecimal(weight.value)) {
+    valid = false
+    showWeightInputError.value = true
+  }
+
+  if (additionalCost.value && !isValidDecimal(additionalCost.value)) {
+    valid = false
+    showAdditionalCostInputError.value = true
+  }
+
+  if (!valid) {
+    errorMessage.value = 'Please fill valid values'
+    showToast(showErrorToast)
+
+    return
+  }
+
   const additionalCostDecimal = additionalCost.value ? new Decimal(additionalCost.value) : new Decimal(0)
 
   originalPrice.value = roundedWeight.value.mul(18).add(additionalCostDecimal).toString()
 }
 
 const roundedWeight = computed(() => {
+  if (weight.value && !isValidDecimal(weight.value)) {
+    errorMessage.value = 'Please fill valid values'
+    showWeightInputError.value = true
+    showToast(showErrorToast)
+
+    return new Decimal(0)
+  }
+
   let finalWeight = weight.value ? new Decimal(weight.value) : new Decimal(0)
   const weightValueString = weight.value.toString()
 
@@ -198,7 +260,13 @@ defineExpose({ open })
           />
           <AdminStatusDropdown :class="{ 'select-error': showStatusInputError }" v-model="status" />
           <div>
-            <Input type="number" label="Weight" placeholder="0" v-model="weight" />
+            <Input
+              type="text"
+              label="Weight"
+              placeholder="0"
+              v-model="weight"
+              :class="{ 'input-error': showWeightInputError }"
+            />
             <label class="label cursor-pointer justify-normal gap-2">
               <input type="checkbox" class="checkbox checkbox-xs" v-model="weightRounded" />
               <span
@@ -207,16 +275,40 @@ defineExpose({ open })
               ></span>
             </label>
           </div>
-          <Input type="number" label="Additional cost" placeholder="0" v-model="additionalCost" />
+          <Input
+            type="text"
+            label="Additional cost"
+            placeholder="0"
+            v-model="additionalCost"
+            :class="{ 'input-error': showAdditionalCostInputError }"
+          />
           <div class="flex flex-row items-end gap-2">
-            <Input type="number" label="Original price" placeholder="50.25" v-model="originalPrice" />
+            <Input
+              type="text"
+              label="Original price"
+              placeholder="50.25"
+              v-model="originalPrice"
+              :class="{ 'input-error': showOriginalPriceInputError }"
+            />
             <button class="btn text-2xl btn-square btn-outline" @click="calculatePrice">
               <ion-icon name="calculator-outline"></ion-icon>
             </button>
           </div>
-          <Input type="number" label="Current price" placeholder="50.25" v-model="currentPrice" />
+          <Input
+            type="text"
+            label="Current price"
+            placeholder="50.25"
+            v-model="currentPrice"
+            :class="{ 'input-error': showCurrentPriceInputError }"
+          />
           <CityDropdown label="City" placeholder="Select a city" v-model="city" />
-          <Input type="number" label="Partner cost" placeholder="0" v-model="partnerCost" />
+          <Input
+            type="text"
+            label="Partner cost"
+            placeholder="0"
+            v-model="partnerCost"
+            :class="{ 'input-error': showPartnerCostInputError }"
+          />
           <div class="collapse collapse-arrow">
             <input type="checkbox" />
             <div class="collapse-title text-lg font-medium pl-0">Additional info</div>
