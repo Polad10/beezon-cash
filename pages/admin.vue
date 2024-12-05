@@ -62,7 +62,7 @@ onMounted(async () => {
     processOrderValues(order)
   })
 
-  allOrders.value?.sort((a, b) => a.status - b.status)
+  allOrders.value?.sort((a, b) => b.code - a.status)
   orders.value = [...allOrders.value!]
 })
 
