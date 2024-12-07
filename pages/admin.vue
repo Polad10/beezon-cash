@@ -243,7 +243,7 @@ function reset() {
         </ul>
       </div>
       <div class="flex flex-col grow">
-        <div v-if="visibleTab == VisibleTab.Users" class="flex flex-row h-12 mr-3 justify-between items-center">
+        <div v-if="visibleTab == VisibleTab.Users" class="flex flex-row min-h-12 mr-3 justify-between items-center">
           <span class="text-2xl font-bold">Users</span>
           <div class="flex flex-row gap-5">
             <label
@@ -255,7 +255,7 @@ function reset() {
             <button class="btn btn-sm btn-outline" @click="newUserModalRef?.open()">Add user</button>
           </div>
         </div>
-        <div v-if="visibleTab == VisibleTab.Orders" class="flex flex-row h-12 mr-3 justify-between items-center">
+        <div v-if="visibleTab == VisibleTab.Orders" class="flex flex-row min-h-12 mr-3 justify-between items-center">
           <span class="text-2xl font-bold">Orders</span>
           <div class="flex flex-row gap-5">
             <label
@@ -267,7 +267,7 @@ function reset() {
             <button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
           </div>
         </div>
-        <div v-if="visibleTab == VisibleTab.Messages" class="flex flex-row h-12 mr-3 justify-between items-center">
+        <div v-if="visibleTab == VisibleTab.Messages" class="flex flex-row min-h-12 mr-3 justify-between items-center">
           <span class="text-2xl font-bold">Messages</span>
           <div class="flex flex-row gap-5">
             <button class="btn btn-sm btn-outline" @click="newMessageModalRef?.open()">Add message</button>
