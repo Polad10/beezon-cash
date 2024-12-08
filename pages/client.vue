@@ -147,7 +147,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
     }
 
     const result = (
-      await axios.post<{ user: User; order: Order }>(`${apiUrl}/orders/${orderId}/bonus`, { amount: bonus }, headers)
+      await axios.post<{ user: User; order: Order }>(`api/me/orders/${orderId}/bonus`, { amount: bonus }, headers)
     ).data
 
     user.value!.balance = new Decimal(result.user.balance)
