@@ -447,8 +447,8 @@ function reset() {
     </div>
     <AdminNewUserModal ref="newUserModalRef" @user-created="handleUserCreated" />
     <AdminEditUserModal ref="editUserModalRef" @user-edited="handleUserEdited" />
-    <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" />
-    <AdminEditOrderModal ref="editOrderModalRef" @order-edited="handleOrderEdited" />
+    <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" :users="allUsers || []" />
+    <AdminEditOrderModal ref="editOrderModalRef" @order-edited="handleOrderEdited" :users="allUsers || []" />
     <AdminNewMessageModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
     <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" />
     <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />

@@ -6,13 +6,18 @@ import type { Order, OrderRequest } from '~/models/Order'
 import { OrderStatus } from '~/models/OrderStatus'
 import { OrderType, toDisplayString as orderTypeToDisplayString } from '~/models/OrderTypeMapping'
 import { DeliveryProvider, toDisplayString as deliveryProviderToDisplayString } from '~/models/OrderTrack'
+import type { User } from '~/models/User'
+
+const props = defineProps<{
+  users: User[]
+}>()
 
 const emit = defineEmits(['order-created'])
 
+const selectedUser = ref<User | null>(null)
 const originalPrice = ref('')
 const currentPrice = ref('')
 const status = ref<OrderStatus | null>(null)
-const userId = ref('')
 const city = ref<City | null>(null)
 const weight = ref('')
 const weightRounded = ref(false)
@@ -28,7 +33,7 @@ const post5TrackNumber = ref('')
 const showErrorToast = ref(false)
 const showSuccessToast = ref(false)
 const showStatusInputError = ref(false)
-const showUserIdInputError = ref(false)
+const showUserInputError = ref(false)
 const showWeightInputError = ref(false)
 const showAdditionalCostInputError = ref(false)
 const showOriginalPriceInputError = ref(false)
@@ -39,13 +44,17 @@ const errorMessage = ref('')
 const successMessage = ref('')
 const modalRef = ref<HTMLDialogElement | null>(null)
 
+const fuseUsersOptions = {
+  keys: ['tg_username', 'last_name', 'first_name'],
+}
+
 async function addOrder() {
   if (validateForm()) {
     try {
       const orderRequest: OrderRequest = {
         date: new Date(),
         status: status.value!,
-        user_id: userId.value,
+        user_id: selectedUser.value!.id,
         weight_rounded: weightRounded.value,
         original_price: originalPrice.value ? new Decimal(originalPrice.value) : undefined,
         current_price: currentPrice.value ? new Decimal(currentPrice.value) : undefined,
@@ -112,9 +121,9 @@ function validateForm() {
     showStatusInputError.value = true
   }
 
-  if (!userId.value) {
+  if (!selectedUser.value) {
     valid = false
-    showUserIdInputError.value = true
+    showUserInputError.value = true
   }
 
   if (weight.value && !isValidDecimal(weight.value)) {
@@ -156,10 +165,10 @@ function open() {
 }
 
 function resetFieldValues() {
+  selectedUser.value = null
   originalPrice.value = ''
   currentPrice.value = ''
   status.value = null
-  userId.value = ''
   city.value = null
   weight.value = ''
   weightRounded.value = false
@@ -175,7 +184,7 @@ function resetFieldValues() {
 
 function resetFieldErrors() {
   showStatusInputError.value = false
-  showUserIdInputError.value = false
+  showUserInputError.value = false
   showWeightInputError.value = false
   showAdditionalCostInputError.value = false
   showOriginalPriceInputError.value = false
@@ -248,12 +257,13 @@ defineExpose({ open })
         <p class="text-2xl text-center">New Order</p>
         <div class="divider"></div>
         <div class="flex flex-col gap-2">
-          <Input
-            type="text"
-            label="User id *"
-            placeholder="550e8400-e29b-41d4-a716-446655440000"
-            v-model="userId"
-            :class="{ 'input-error': showUserIdInputError }"
+          <SelectWithSearch
+            placeholder="Select a user"
+            :options="users"
+            :fuse-options="fuseUsersOptions"
+            :class="{ 'input-error': showUserInputError }"
+            :get-option-string="getUserNameAndTelegram"
+            v-model="selectedUser"
           />
           <AdminStatusDropdown :class="{ 'select-error': showStatusInputError }" v-model="status" />
           <div>
