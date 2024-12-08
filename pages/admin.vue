@@ -27,9 +27,8 @@ const allUsers = (await useFetch<User[]>('/api/users')).data
 const allOrders = (await useFetch<Order[]>('/api/orders')).data
 const messages = (await useFetch<Message[]>('/api/messages')).data
 
-const users = ref<User[] | null>([...allUsers.value!])
-const orders = ref<Order[] | null>([])
-const search = ref('')
+const userSearch = ref('')
+const orderSearch = ref('')
 const currentPageNr = ref(1)
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 
@@ -61,9 +60,23 @@ onMounted(async () => {
   allOrders.value?.forEach((order) => {
     processOrderValues(order)
   })
+})
 
-  sortOrders()
-  orders.value = [...allOrders.value!]
+const users = computed(() => {
+  if (!userSearch.value) {
+    return [...allUsers.value!]
+  }
+
+  return fuseUsers.value.search(userSearch.value).map((result) => result.item)
+})
+
+const orders = computed(() => {
+  if (!orderSearch.value) {
+    sortOrders()
+    return [...allOrders.value!]
+  }
+
+  return fuseOrders.value.search(orderSearch.value).map((result) => result.item)
 })
 
 const pageUsers = computed(() => {
@@ -112,8 +125,6 @@ function pageNrIsInBetween(pageNr: number) {
 
 function handleUserCreated(user: User) {
   allUsers.value?.push(user)
-
-  searchUser()
 }
 
 function handleUserEdited(user: User) {
@@ -122,23 +133,17 @@ function handleUserEdited(user: User) {
   if (localUser) {
     Object.assign(localUser, user)
   }
-
-  searchUser()
 }
 
 async function deleteUser(user: User) {
   await axios.delete(`/api/users/${user.id}`)
-  allUsers.value = allUsers.value?.filter((u) => u.id !== user.id)!
-
-  searchUser()
+  allUsers.value = allUsers.value!.filter((u) => u.id !== user.id)
+  allOrders.value = allOrders.value!.filter((o) => o.user_id !== user.id)
 }
 
 function handleOrderCreated(order: Order) {
   processOrderValues(order)
   allOrders.value?.push(order)
-
-  sortOrders()
-  searchOrder()
 }
 
 function handleOrderEdited(order: Order) {
@@ -148,15 +153,11 @@ function handleOrderEdited(order: Order) {
     processOrderValues(order)
     Object.assign(localOrder, order)
   }
-
-  searchOrder()
 }
 
 async function deleteOrder(order: Order) {
   await axios.delete(`/api/orders/${order.id}`)
   allOrders.value = allOrders.value?.filter((o) => o.id !== order.id)!
-
-  searchOrder()
 }
 
 function handleMessageCreated(message: Message) {
@@ -187,33 +188,10 @@ function processOrderValues(order: Order) {
   order.user = users.value?.find((u) => u.id === order.user_id)
 }
 
-function searchUser() {
-  if (!search.value) {
-    users.value = [...allUsers.value!]
-    return
-  }
-
-  users.value = fuseUsers.value.search(search.value).map((result) => result.item)
-}
-
-function searchOrder() {
-  if (!search.value) {
-    orders.value = [...allOrders.value!]
-    return
-  }
-
-  orders.value = fuseOrders.value.search(search.value).map((result) => result.item)
-}
-
 function reset() {
   currentPageNr.value = 1
-  search.value = ''
-
-  if (visibleTab.value == VisibleTab.Users) {
-    users.value = [...allUsers.value!]
-  } else if (visibleTab.value == VisibleTab.Orders) {
-    orders.value = [...allOrders.value!]
-  }
+  userSearch.value = ''
+  orderSearch.value = ''
 }
 
 function sortOrders() {
@@ -254,7 +232,7 @@ function sortOrders() {
             <label
               class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
             >
-              <input type="text" class="grow" placeholder="Search" @input="searchUser" v-model="search" />
+              <input type="text" class="grow" placeholder="Search" v-model="userSearch" />
               <ion-icon name="search-outline"></ion-icon>
             </label>
             <button class="btn btn-sm btn-outline" @click="newUserModalRef?.open()">Add user</button>
@@ -266,7 +244,7 @@ function sortOrders() {
             <label
               class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
             >
-              <input type="text" class="grow" placeholder="Search" @input="searchOrder" v-model="search" />
+              <input type="text" class="grow" placeholder="Search" v-model="orderSearch" />
               <ion-icon name="search-outline"></ion-icon>
             </label>
             <button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
