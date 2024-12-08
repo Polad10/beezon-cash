@@ -6,7 +6,6 @@ import type { User } from '~/models/User'
 import type { Order } from '~/models/Order'
 import Decimal from 'decimal.js'
 
-const apiUrl = process.env.BEEZON_API_URL
 let headers = {}
 
 const copyToastVisible = ref(false)
@@ -71,10 +70,10 @@ onMounted(async () => {
       headers: { Authorization: `tma ${initDataRaw}` },
     }
 
-    const me = (await axios.get<User | null>(`${apiUrl}/me`, headers)).data
+    const me = (await axios.get<User | null>('/api/me', headers)).data
 
     if (me) {
-      const ordersData = (await axios.get<Order[]>(`${apiUrl}/orders`, headers)).data
+      const ordersData = (await axios.get<Order[]>('/api/me/orders', headers)).data
       me.balance = new Decimal(me.balance)
 
       ordersData.forEach((order) => {
