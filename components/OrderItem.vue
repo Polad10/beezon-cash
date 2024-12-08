@@ -47,7 +47,7 @@ async function applyBonus() {
   <div class="card card-compact bg-neutral-100 mb-3">
     <div class="card-body">
       <div class="flex flex-row justify-between">
-        <div :class="['badge', `badge-${toColorCode(order.status)}`, 'text-white', 'h-7', 'rounded-xl']">
+        <div :class="['badge', `badge-${toColorCode(order.status)}`, 'text-white', 'h-7', 'rounded-lg']">
           {{ toDisplayString(order.status) }}
         </div>
         <div v-if="order.bonus_received && order.bonus_received.greaterThan(0)" class="badge bg-primary">
