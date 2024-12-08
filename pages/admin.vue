@@ -62,7 +62,7 @@ onMounted(async () => {
     processOrderValues(order)
   })
 
-  allOrders.value?.sort((a, b) => b.code - a.status)
+  sortOrders()
   orders.value = [...allOrders.value!]
 })
 
@@ -137,6 +137,7 @@ function handleOrderCreated(order: Order) {
   processOrderValues(order)
   allOrders.value?.push(order)
 
+  sortOrders()
   searchOrder()
 }
 
@@ -213,6 +214,10 @@ function reset() {
   } else if (visibleTab.value == VisibleTab.Orders) {
     orders.value = [...allOrders.value!]
   }
+}
+
+function sortOrders() {
+  allOrders.value?.sort((a, b) => b.code - a.code)
 }
 </script>
 
