@@ -2,7 +2,7 @@
 import Decimal from 'decimal.js'
 import { ref } from 'vue'
 import type { Order } from '~/models/Order'
-import { OrderStatus, toDisplayString, toColorCode } from '~/models/OrderStatus'
+import { OrderStatus, toClientDisplayString, toColorCode } from '~/models/OrderStatus'
 
 const props = defineProps<{
   order: Order
@@ -41,14 +41,32 @@ async function applyBonus() {
     closeBonusInput()
   }
 }
+
+function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
+  return (
+    orderStatus == OrderStatus.ReadyForDeliveryInTbilisi ||
+    orderStatus == OrderStatus.WarehouseTbilisi ||
+    orderStatus == OrderStatus.ReadyForDeliveryByPony ||
+    orderStatus == OrderStatus.WaitingForDeliveryByPony
+  )
+}
 </script>
 
 <template>
   <div class="card card-compact bg-neutral-100 mb-3">
     <div class="card-body">
       <div class="flex flex-row justify-between">
-        <div :class="['badge', `badge-${toColorCode(order.status)}`, 'text-white', 'h-7', 'rounded-lg']">
-          {{ toDisplayString(order.status) }}
+        <div
+          :class="[
+            'badge',
+            `bg-${toColorCode(order.status)}`,
+            `border-${toColorCode(order.status)}`,
+            'text-white',
+            'h-7',
+            'rounded-lg',
+          ]"
+        >
+          {{ toClientDisplayString(order.status) }}
         </div>
         <div v-if="order.bonus_received && order.bonus_received.greaterThan(0)" class="badge bg-primary">
           + {{ order.bonus_received }}
@@ -74,7 +92,7 @@ async function applyBonus() {
       <div class="flex flex-row justify-between">
         <span class="text-base font-medium">Использовать бонусы</span>
         <input
-          v-if="!bonusApplied && order.status == OrderStatus.WaitingForPayment"
+          v-if="!bonusApplied && orderStatusEligibleForBonus(order.status)"
           type="checkbox"
           class="toggle border-gray-300 bg-gray-300 checked:bg-blue-800 [--tglbg:white] checked:[--tglbg:white] checked:border-blue-800"
           @change="toggleShowBonusInput"

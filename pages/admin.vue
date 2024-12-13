@@ -2,7 +2,7 @@
 import Decimal from 'decimal.js'
 import type { Order } from '~/models/Order'
 import type { Message } from '~/models/Message'
-import { toDisplayString as orderStatusToDisplayString } from '~/models/OrderStatus'
+import { toAdminDisplayString as orderStatusToDisplayString } from '~/models/OrderStatus'
 import { toDisplayString as cityToDisplayString } from '~/models/City'
 import type { User } from '~/models/User'
 import NewUserModal from '~/components/admin/NewUserModal.vue'
