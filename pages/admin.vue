@@ -2,7 +2,11 @@
 import Decimal from 'decimal.js'
 import type { Order } from '~/models/Order'
 import type { Message } from '~/models/Message'
-import { toAdminDisplayString as orderStatusToDisplayString } from '~/models/OrderStatus'
+import {
+  OrderStatus,
+  toAdminDisplayString as orderStatusToDisplayString,
+  toAdminDisplayString,
+} from '~/models/OrderStatus'
 import { toDisplayString as cityToDisplayString } from '~/models/City'
 import type { User } from '~/models/User'
 import NewUserModal from '~/components/admin/NewUserModal.vue'
@@ -29,6 +33,7 @@ const messages = (await useFetch<Message[]>('/api/messages')).data
 
 const userSearch = ref('')
 const orderSearch = ref('')
+const orderStatusFilter = ref<Set<OrderStatus>>(new Set<OrderStatus>())
 const currentPageNr = ref(1)
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 
@@ -71,12 +76,22 @@ const users = computed(() => {
 })
 
 const orders = computed(() => {
+  let result = []
+
+  // search
   if (!orderSearch.value) {
     sortOrders()
-    return [...allOrders.value!]
+    result = [...allOrders.value!]
+  } else {
+    result = fuseOrders.value.search(orderSearch.value).map((result) => result.item)
   }
 
-  return fuseOrders.value.search(orderSearch.value).map((result) => result.item)
+  // filter by order status
+  if (orderStatusFilter.value.size > 0) {
+    result = result.filter((order) => orderStatusFilter.value.has(order.status))
+  }
+
+  return result
 })
 
 const pageUsers = computed(() => {
@@ -192,6 +207,7 @@ function reset() {
   currentPageNr.value = 1
   userSearch.value = ''
   orderSearch.value = ''
+  orderStatusFilter.value = new Set<OrderStatus>()
 }
 
 function sortOrders() {
@@ -241,6 +257,123 @@ function sortOrders() {
         <div v-if="visibleTab == VisibleTab.Orders" class="flex flex-row min-h-12 mr-3 justify-between items-center">
           <span class="text-2xl font-bold">Orders</span>
           <div class="flex flex-row gap-5">
+            <details class="dropdown dropdown-end">
+              <summary class="btn btn-sm mb-1">
+                {{ orderStatusFilter.size > 0 ? `Selected ${orderStatusFilter.size}` : 'All stages' }}
+              </summary>
+              <ul class="menu dropdown-content rounded-box z-[1] p-2 shadow w-52 bg-white">
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.New) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.New"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.WarehouseRF) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.WarehouseRF"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.Courier1) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.Courier1"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.Courier2) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.Courier2"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.ProcessedInTbilisi) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.ProcessedInTbilisi"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.ReadyForDeliveryInTbilisi) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.ReadyForDeliveryInTbilisi"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.WarehouseTbilisi) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.WarehouseTbilisi"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.ReadyForDeliveryByPony) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.ReadyForDeliveryByPony"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.WaitingForDeliveryByPony) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.WaitingForDeliveryByPony"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+                <li>
+                  <label class="label cursor-pointer">
+                    <span class="label-text">{{ toAdminDisplayString(OrderStatus.Delivered) }}</span>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :value="OrderStatus.Delivered"
+                      v-model="orderStatusFilter"
+                    />
+                  </label>
+                </li>
+              </ul>
+            </details>
             <label
               class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
             >
