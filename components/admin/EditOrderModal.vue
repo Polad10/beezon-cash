@@ -218,7 +218,7 @@ function calculatePrice() {
 
   const additionalCostDecimal = additionalCost.value ? new Decimal(additionalCost.value) : new Decimal(0)
 
-  originalPrice.value = roundedWeight.value.mul(18).add(additionalCostDecimal).toString()
+  originalPrice.value = currentPrice.value = roundedWeight.value.mul(18).add(additionalCostDecimal).toString()
 }
 
 const roundedWeight = computed(() => {
