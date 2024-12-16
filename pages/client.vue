@@ -86,9 +86,7 @@ onMounted(async () => {
         }
       })
 
-      ordersData.sort((a, b) => {
-        return b.date.getTime() - a.date.getTime()
-      })
+      ordersData.sort((a, b) => b.code - a.code)
 
       user.value = me
       orders.value = ordersData
