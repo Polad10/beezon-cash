@@ -213,6 +213,34 @@ function reset() {
 function sortOrders() {
   allOrders.value?.sort((a, b) => b.code - a.code)
 }
+
+function exportToCSV() {
+  const bom = '\uFEFF'
+  const headers = ['Номер заказа', 'Фамилия', 'Имя', 'Вес без округления', 'Начальная сумма', 'Конечная сумма']
+  const rows: string[] = []
+
+  for (const order of orders.value) {
+    const row = [
+      order.code,
+      order.user?.last_name,
+      order.user?.first_name,
+      order.weight,
+      order.original_price,
+      order.current_price,
+    ].join(',')
+    rows.push(row)
+  }
+
+  const data = [headers, rows.join('\n')].join('\n')
+  const blob = new Blob([bom + data], { type: 'text/csv;charset=utf-8' })
+
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'orders.csv'
+
+  a.click()
+}
 </script>
 
 <template>
@@ -257,9 +285,14 @@ function sortOrders() {
         <div v-if="visibleTab == VisibleTab.Orders" class="flex flex-row min-h-12 mr-3 justify-between items-center">
           <span class="text-2xl font-bold">Orders</span>
           <div class="flex flex-row gap-5">
+            <button class="btn btn-sm" @click="exportToCSV">
+              Export CSV
+              <ion-icon name="download-outline" class="text-base"></ion-icon>
+            </button>
             <details class="dropdown dropdown-end">
               <summary class="btn btn-sm mb-1">
                 {{ orderStatusFilter.size > 0 ? `Selected ${orderStatusFilter.size}` : 'All stages' }}
+                <ion-icon name="filter-outline" class="text-base"></ion-icon>
               </summary>
               <ul class="menu dropdown-content rounded-box z-[1] p-2 shadow w-52 bg-white">
                 <li>
