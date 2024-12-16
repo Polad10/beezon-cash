@@ -50,7 +50,7 @@ const fuseUsersOptions = {
 }
 
 const fuseOrdersOptions = {
-  keys: ['user.tg_username', 'user.last_name', 'user.first_name', 'code'],
+  keys: ['user.tg_username', 'user.last_name', 'user.first_name', 'code', 'description', 'order_tracks.track_number'],
 }
 
 let fuseUsers = computed(() => {
