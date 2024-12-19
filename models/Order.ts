@@ -40,4 +40,5 @@ export interface OrderRequest {
   description?: string
   order_type_mappings: OrderTypeMappingRequest[]
   order_tracks: OrderTrackRequest[]
+  send_notification?: boolean
 }

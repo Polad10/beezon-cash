@@ -31,6 +31,7 @@ const cdekTrackNumber = ref('')
 const postTrackNumber = ref('')
 const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
+const sendNotification = ref(false)
 
 const showErrorToast = ref(false)
 const showSuccessToast = ref(false)
@@ -67,6 +68,7 @@ async function editOrder() {
         description: description.value,
         order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
         order_tracks: [],
+        send_notification: sendNotification.value,
       }
 
       if (cdekTrackNumber.value) {
@@ -182,6 +184,7 @@ function open(order: Order) {
     order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.Boxberry)?.track_number || ''
   post5TrackNumber.value =
     order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.POST5)?.track_number || ''
+  sendNotification.value = false
 
   modalRef.value?.showModal()
 }
@@ -380,9 +383,15 @@ defineExpose({ open })
             </div>
           </div>
         </div>
-        <div class="modal-action">
-          <button class="btn btn-warning btn-outline" @click="close">Cancel</button>
-          <button class="btn btn-success" @click="editOrder">Save</button>
+        <div class="modal-action flex-col items-end">
+          <div class="flex flex-row gap-2">
+            <button class="btn btn-warning btn-outline" @click="close">Cancel</button>
+            <button class="btn btn-success" @click="editOrder">Save</button>
+          </div>
+          <label class="label cursor-pointer justify-normal gap-2 mt-2">
+            <input type="checkbox" class="checkbox checkbox-xs" v-model="sendNotification" />
+            <span class="label-text text-xs">Send notification</span>
+          </label>
         </div>
       </div>
       <div v-if="showErrorToast" class="toast toast-top whitespace-normal z-[9999] inset-x-0 top-0 mx-auto w-[200px]">
