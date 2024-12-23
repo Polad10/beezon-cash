@@ -62,6 +62,7 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
             `bg-[${toColorCode(order.status)}]`,
             `border-[${toColorCode(order.status)}]`,
             `text-[${toTextColorCode(order.status)}]`,
+            'font-semibold',
             'h-7',
             'rounded-lg',
           ]"
