@@ -61,21 +61,39 @@ export function toClientDisplayString(orderStatus: OrderStatus) {
 export function toColorCode(orderStatus: OrderStatus) {
   switch (orderStatus) {
     case OrderStatus.New:
-      return 'gray-800'
+      return '#ECECEC'
     case OrderStatus.WarehouseRF:
-      return 'indigo-800'
     case OrderStatus.Courier1:
     case OrderStatus.Courier2:
-      return 'rose-800'
     case OrderStatus.ProcessedInTbilisi:
-      return 'blue-800'
+      return '#B9C8FF'
     case OrderStatus.ReadyForDeliveryInTbilisi:
     case OrderStatus.WarehouseTbilisi:
-      return 'amber-800'
+      return '#DAEDCC'
     case OrderStatus.ReadyForDeliveryByPony:
     case OrderStatus.WaitingForDeliveryByPony:
-      return 'violet-800'
+      return '#E9D9FF'
     case OrderStatus.Delivered:
-      return 'emerald-800'
+      return '#D3D6DA'
+  }
+}
+
+export function toTextColorCode(orderStatus: OrderStatus) {
+  switch (orderStatus) {
+    case OrderStatus.New:
+      return '#000000'
+    case OrderStatus.WarehouseRF:
+    case OrderStatus.Courier1:
+    case OrderStatus.Courier2:
+    case OrderStatus.ProcessedInTbilisi:
+      return '#021E8A'
+    case OrderStatus.ReadyForDeliveryInTbilisi:
+    case OrderStatus.WarehouseTbilisi:
+      return '#1F4700'
+    case OrderStatus.ReadyForDeliveryByPony:
+    case OrderStatus.WaitingForDeliveryByPony:
+      return '#49089C'
+    case OrderStatus.Delivered:
+      return '#000000'
   }
 }

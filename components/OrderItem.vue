@@ -2,7 +2,7 @@
 import Decimal from 'decimal.js'
 import { ref } from 'vue'
 import type { Order } from '~/models/Order'
-import { OrderStatus, toClientDisplayString, toColorCode } from '~/models/OrderStatus'
+import { OrderStatus, toClientDisplayString, toColorCode, toTextColorCode } from '~/models/OrderStatus'
 
 const props = defineProps<{
   order: Order
@@ -59,9 +59,9 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
         <div
           :class="[
             'badge',
-            `bg-${toColorCode(order.status)}`,
-            `border-${toColorCode(order.status)}`,
-            'text-white',
+            `bg-[${toColorCode(order.status)}]`,
+            `border-[${toColorCode(order.status)}]`,
+            `text-[${toTextColorCode(order.status)}]`,
             'h-7',
             'rounded-lg',
           ]"
