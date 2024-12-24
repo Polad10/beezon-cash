@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import Decimal from 'decimal.js'
-import type { Order } from '~/models/Order'
+import type { Order, OrderPatchRequest } from '~/models/Order'
 import type { Message } from '~/models/Message'
 import {
   OrderStatus,
   toAdminDisplayString as orderStatusToDisplayString,
   toAdminDisplayString,
+  toColorCode,
+  toTextColorCode,
 } from '~/models/OrderStatus'
 import { toDisplayString as cityToDisplayString } from '~/models/City'
 import type { User } from '~/models/User'
@@ -36,6 +38,9 @@ const orderSearch = ref('')
 const orderStatusFilter = ref<Set<OrderStatus>>(new Set<OrderStatus>())
 const currentPageNr = ref(1)
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
+const sendNotification = ref(true)
+const showErrorToast = ref(false)
+const errorMessage = ref('')
 
 const newUserModalRef = ref<typeof NewUserModal | null>(null)
 const editUserModalRef = ref<typeof EditUserModal | null>(null)
@@ -208,6 +213,9 @@ function reset() {
   userSearch.value = ''
   orderSearch.value = ''
   orderStatusFilter.value = new Set<OrderStatus>()
+  sendNotification.value = true
+  showErrorToast.value = false
+  errorMessage.value = ''
 }
 
 function sortOrders() {
@@ -240,6 +248,17 @@ function exportToCSV() {
   a.download = 'orders.csv'
 
   a.click()
+}
+
+async function updateOrderStage(order: Order, newOrderStatus: OrderStatus) {
+  try {
+    const request: OrderPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
+    const updatedOrder = (await axios.patch(`/api/orders/${order.id}`, request)).data
+    order.status = updatedOrder.status
+  } catch (ex) {
+    errorMessage.value = 'Something went wrong. Please try again later.'
+    showToast(showErrorToast)
+  }
 }
 </script>
 
@@ -285,6 +304,10 @@ function exportToCSV() {
         <div v-if="visibleTab == VisibleTab.Orders" class="flex flex-row min-h-12 mr-3 justify-between items-center">
           <span class="text-2xl font-bold">Orders</span>
           <div class="flex flex-row gap-5">
+            <label class="label cursor-pointer gap-2 p-0">
+              <input type="checkbox" class="checkbox checkbox-sm" v-model="sendNotification" />
+              <span class="label-text">Send notification</span>
+            </label>
             <button class="btn btn-sm" @click="exportToCSV">
               Export CSV
               <ion-icon name="download-outline" class="text-base"></ion-icon>
@@ -481,7 +504,20 @@ function exportToCSV() {
             <tbody>
               <tr v-for="order in pageOrders" :key="order.id">
                 <td>{{ order.code }}</td>
-                <td>{{ orderStatusToDisplayString(order.status) }}</td>
+                <td>
+                  <AdminStatusDropdown
+                    :model-value="order.status"
+                    class="select-sm"
+                    :class="[
+                      `bg-[${toColorCode(order.status)}]`,
+                      `text-[${toTextColorCode(order.status)}]`,
+                      'focus:bg-white',
+                      'focus:text-black',
+                    ]"
+                    form-control-class="w-fit"
+                    @update:model-value="(val: OrderStatus) => updateOrderStage(order, val)"
+                  />
+                </td>
                 <td>{{ order.user?.first_name }} {{ order.user?.last_name }}</td>
                 <td>{{ order.user?.tg_username }}</td>
                 <td>{{ order.weight }}</td>
@@ -601,6 +637,7 @@ function exportToCSV() {
     <AdminNewMessageModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
     <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" />
     <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
+    <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
   </div>
 </template>
 

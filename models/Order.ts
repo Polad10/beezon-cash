@@ -42,3 +42,8 @@ export interface OrderRequest {
   order_tracks: OrderTrackRequest[]
   send_notification?: boolean
 }
+
+export interface OrderPatchRequest {
+  status: OrderStatus
+  send_notification?: boolean
+}
