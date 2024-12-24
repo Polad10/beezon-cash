@@ -358,14 +358,7 @@ function resetFieldErrors() {
           </button>
         </div>
       </div>
-      <div v-if="showErrorToast" class="toast toast-top whitespace-normal z-[9999] inset-x-0 top-0 mx-auto w-[200px]">
-        <div
-          class="alert alert-error text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-red-300 object-center"
-        >
-          <ion-icon name="close-circle-outline" class="text-xl ml-px"></ion-icon>
-          <span>{{ errorMessage }}</span>
-        </div>
-      </div>
+      <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
     </dialog>
     <div :class="['transition-opacity duration-[3000ms]', orderRegistered ? 'opacity-100' : 'opacity-0']">
       <svg
