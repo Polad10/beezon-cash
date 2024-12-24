@@ -1,6 +1,17 @@
 <script lang="ts" setup>
 import { OrderStatus, toAdminDisplayString } from '~/models/OrderStatus'
 
+defineProps({
+  label: {
+    type: String,
+    required: false,
+  },
+  formControlClass: {
+    type: String,
+    required: false,
+  },
+})
+
 defineOptions({
   inheritAttrs: false,
 })
@@ -9,9 +20,9 @@ const model = defineModel()
 </script>
 
 <template>
-  <label class="form-control">
-    <div class="label">
-      <span class="label-text">Status *</span>
+  <label class="form-control" :class="formControlClass">
+    <div v-if="label" class="label">
+      <span class="label-text">{{ label }}</span>
     </div>
     <select
       class="select select-bordered focus-within:outline-0 focus-within:border-gray-500"
