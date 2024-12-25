@@ -47,3 +47,8 @@ export interface OrderPatchRequest {
   status: OrderStatus
   send_notification?: boolean
 }
+
+export interface OrderBatchPatchRequest {
+  patches: { id: string; status: OrderStatus }[]
+  send_notification?: boolean
+}

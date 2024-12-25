@@ -10,6 +10,10 @@ defineProps({
     type: String,
     required: false,
   },
+  placeholder: {
+    type: String,
+    required: false,
+  },
 })
 
 defineOptions({
@@ -29,7 +33,7 @@ const model = defineModel()
       v-bind="$attrs"
       v-model="model"
     >
-      <option value="null" disabled>Select a status</option>
+      <option :value="null" disabled>{{ placeholder || 'Select a status' }}</option>
       <option :value="OrderStatus.New">{{ toAdminDisplayString(OrderStatus.New) }}</option>
       <option :value="OrderStatus.WarehouseRF">{{ toAdminDisplayString(OrderStatus.WarehouseRF) }}</option>
       <option :value="OrderStatus.Courier1">

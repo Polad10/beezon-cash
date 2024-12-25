@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Decimal from 'decimal.js'
-import type { Order, OrderPatchRequest } from '~/models/Order'
+import type { Order, OrderBatchPatchRequest, OrderPatchRequest } from '~/models/Order'
 import type { Message } from '~/models/Message'
 import {
   OrderStatus,
@@ -20,6 +20,7 @@ import EditOrderModal from '~/components/admin/EditOrderModal.vue'
 import NewMessageModal from '~/components/admin/NewMessageModal.vue'
 import EditMessageModal from '~/components/admin/EditMessageModal.vue'
 import Fuse from 'fuse.js'
+import ConfirmActionModal from '~/components/admin/ConfirmActionModal.vue'
 
 enum VisibleTab {
   Users,
@@ -39,6 +40,9 @@ const orderStatusFilter = ref<Set<OrderStatus>>(new Set<OrderStatus>())
 const currentPageNr = ref(1)
 const visibleTab = ref<VisibleTab>(VisibleTab.Users)
 const sendNotification = ref(true)
+const allOrdersSelected = ref(false)
+const selectedOrders = ref<Order[]>([])
+const selectedOrderStatusToSet = ref<OrderStatus | null>(null)
 const showErrorToast = ref(false)
 const errorMessage = ref('')
 
@@ -49,6 +53,7 @@ const editOrderModalRef = ref<typeof EditOrderModal | null>(null)
 const newMessageModalRef = ref<typeof NewMessageModal | null>(null)
 const editMessageModalRef = ref<typeof EditMessageModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
+const confirmActionModalRef = ref<typeof ConfirmActionModal | null>(null)
 
 const fuseUsersOptions = {
   keys: ['tg_username', 'last_name', 'first_name', 'phone_nr'],
@@ -216,6 +221,9 @@ function reset() {
   sendNotification.value = true
   showErrorToast.value = false
   errorMessage.value = ''
+  allOrdersSelected.value = false
+  selectedOrders.value = []
+  selectedOrderStatusToSet.value = null
 }
 
 function sortOrders() {
@@ -250,15 +258,47 @@ function exportToCSV() {
   a.click()
 }
 
-async function updateOrderStage(order: Order, newOrderStatus: OrderStatus) {
+async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
   try {
-    const request: OrderPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
-    const updatedOrder = (await axios.patch(`/api/orders/${order.id}`, request)).data
+    const body: OrderPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
+    const updatedOrder = (await axios.patch(`/api/orders/${order.id}`, body)).data
     order.status = updatedOrder.status
   } catch (ex) {
     errorMessage.value = 'Something went wrong. Please try again later.'
     showToast(showErrorToast)
   }
+}
+
+function openConfirmModal() {
+  confirmActionModalRef.value?.open()
+}
+
+async function handleOrderStatusUpdateConfirmedForSelection() {
+  try {
+    const body: OrderBatchPatchRequest = {
+      patches: selectedOrders.value.map((order) => ({
+        id: order.id,
+        status: selectedOrderStatusToSet.value!,
+      })),
+      send_notification: sendNotification.value,
+    }
+
+    const updatedOrders = (await axios.patch('/api/orders', body)).data
+
+    for (const order of updatedOrders) {
+      selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
+    }
+  } catch (ex) {
+    errorMessage.value = 'Something went wrong. Please try again later.'
+    showToast(showErrorToast)
+  } finally {
+    selectedOrderStatusToSet.value = null
+    confirmActionModalRef.value?.close()
+  }
+}
+
+function toggleAllOrdersSelected() {
+  selectedOrders.value = allOrdersSelected.value ? [...orders.value] : []
 }
 </script>
 
@@ -308,6 +348,14 @@ async function updateOrderStage(order: Order, newOrderStatus: OrderStatus) {
               <input type="checkbox" class="checkbox checkbox-sm" v-model="sendNotification" />
               <span class="label-text">Send notification</span>
             </label>
+            <AdminStatusDropdown
+              class="select-sm"
+              placeholder="Change status"
+              form-control-class="w-fit"
+              v-model="selectedOrderStatusToSet"
+              :disabled="selectedOrders.length == 0"
+              @change="openConfirmModal"
+            />
             <button class="btn btn-sm" @click="exportToCSV">
               Export CSV
               <ion-icon name="download-outline" class="text-base"></ion-icon>
@@ -490,6 +538,16 @@ async function updateOrderStage(order: Order, newOrderStatus: OrderStatus) {
           <table v-if="visibleTab == VisibleTab.Orders" class="table table-sm">
             <thead>
               <tr class="bg-base-200">
+                <th>
+                  <label class="label cursor-pointer">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      v-model="allOrdersSelected"
+                      @change="toggleAllOrdersSelected"
+                    />
+                  </label>
+                </th>
                 <th>ORDER CODE</th>
                 <th>STATUS</th>
                 <th>USER</th>
@@ -503,6 +561,11 @@ async function updateOrderStage(order: Order, newOrderStatus: OrderStatus) {
             </thead>
             <tbody>
               <tr v-for="order in pageOrders" :key="order.id">
+                <td>
+                  <label class="label cursor-pointer">
+                    <input type="checkbox" class="checkbox checkbox-sm" :value="order" v-model="selectedOrders" />
+                  </label>
+                </td>
                 <td>{{ order.code }}</td>
                 <td>
                   <AdminStatusDropdown
@@ -515,7 +578,7 @@ async function updateOrderStage(order: Order, newOrderStatus: OrderStatus) {
                       'focus:text-black',
                     ]"
                     form-control-class="w-fit"
-                    @update:model-value="(val: OrderStatus) => updateOrderStage(order, val)"
+                    @update:model-value="(val: OrderStatus) => updateOrderStatus(order, val)"
                   />
                 </td>
                 <td>{{ order.user?.first_name }} {{ order.user?.last_name }}</td>
@@ -637,6 +700,11 @@ async function updateOrderStage(order: Order, newOrderStatus: OrderStatus) {
     <AdminNewMessageModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
     <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" />
     <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
+    <AdminConfirmActionModal ref="confirmActionModalRef" @confirmed="handleOrderStatusUpdateConfirmedForSelection">
+      <p>
+        New status: <b>{{ toAdminDisplayString(selectedOrderStatusToSet!) }}</b>
+      </p>
+    </AdminConfirmActionModal>
     <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
   </div>
 </template>
