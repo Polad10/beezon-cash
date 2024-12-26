@@ -137,7 +137,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
       return false
     }
 
-    const maxDiscountAmount = order.current_price.dividedBy(2)
+    const maxDiscountAmount = order.current_price.dividedBy(4)
 
     if (bonus.greaterThan(maxDiscountAmount)) {
       showMaxDiscountAmountExceededToast()
@@ -302,7 +302,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
               class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
             >
               <ion-icon name="alert-circle-outline" class="text-warning text-5xl ml-px"></ion-icon>
-              <span>Можно списать не более 50% от суммы заказа</span>
+              <span>Можно списать не более 25% от суммы заказа</span>
             </div>
           </div>
           <div
