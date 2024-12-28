@@ -292,9 +292,12 @@ async function handleOrderStatusUpdateConfirmedForSelection() {
     errorMessage.value = 'Something went wrong. Please try again later.'
     showToast(showErrorToast)
   } finally {
-    selectedOrderStatusToSet.value = null
     confirmActionModalRef.value?.close()
   }
+}
+
+function handleOrderStatusUpdateClosed() {
+  selectedOrderStatusToSet.value = null
 }
 
 function toggleAllOrdersSelected() {
@@ -700,7 +703,11 @@ function toggleAllOrdersSelected() {
     <AdminNewMessageModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
     <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" />
     <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
-    <AdminConfirmActionModal ref="confirmActionModalRef" @confirmed="handleOrderStatusUpdateConfirmedForSelection">
+    <AdminConfirmActionModal
+      ref="confirmActionModalRef"
+      @confirmed="handleOrderStatusUpdateConfirmedForSelection"
+      @closed="handleOrderStatusUpdateClosed"
+    >
       <p>
         New status: <b>{{ toAdminDisplayString(selectedOrderStatusToSet!) }}</b>
       </p>

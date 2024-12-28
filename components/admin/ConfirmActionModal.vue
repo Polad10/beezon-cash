@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-const emit = defineEmits(['confirmed'])
+const emit = defineEmits(['confirmed', 'closed'])
 
 const modalRef = ref<HTMLDialogElement | null>(null)
 
 function close() {
   modalRef.value?.close()
+  emit('closed')
 }
 
 function open() {
