@@ -1,0 +1,431 @@
+<script lang="ts" setup>
+import type { Order, OrderBatchPatchRequest, OrderPatchRequest } from '~/models/Order'
+import { OrderStatus, toAdminDisplayString, toColorCode, toTextColorCode } from '~/models/OrderStatus'
+import { toDisplayString as cityToDisplayString } from '~/models/City'
+import ConfirmActionModal from '~/components/admin/ConfirmActionModal.vue'
+import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
+import NewOrderModal from '~/components/admin/NewOrderModal.vue'
+import EditOrderModal from '~/components/admin/EditOrderModal.vue'
+import axios from 'axios'
+import Fuse from 'fuse.js'
+import Decimal from 'decimal.js'
+import type { User } from '~/models/User'
+
+const props = defineProps({
+  allOrders: {
+    type: Array<Order>,
+    required: true,
+  },
+  allUsers: {
+    type: Array<User>,
+    required: true,
+  },
+})
+
+const emit = defineEmits(['order-deleted'])
+
+const fuseOrdersOptions = {
+  keys: ['user.tg_username', 'user.last_name', 'user.first_name', 'code', 'description', 'order_tracks.track_number'],
+}
+
+let fuseOrders = computed(() => {
+  return new Fuse(props.allOrders, fuseOrdersOptions)
+})
+
+const newOrderModalRef = ref<typeof NewOrderModal | null>(null)
+const editOrderModalRef = ref<typeof EditOrderModal | null>(null)
+const confirmActionModalRef = ref<typeof ConfirmActionModal | null>(null)
+const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
+
+const rowsPerPage = 30
+const currentPageNr = ref(1)
+const orderSearch = ref('')
+const orderStatusFilter = ref<Set<OrderStatus>>(new Set<OrderStatus>())
+const sendNotification = ref(true)
+const selectedOrderStatusToSet = ref<OrderStatus | null>(null)
+const selectedOrders = ref<Order[]>([])
+const allOrdersSelected = ref(false)
+
+const errorMessage = ref('')
+const showErrorToast = ref(false)
+
+onMounted(async () => {
+  props.allOrders.forEach((order) => {
+    processOrderValues(order)
+  })
+})
+
+const orders = computed(() => {
+  let result = []
+
+  // search
+  if (!orderSearch.value) {
+    sortOrders()
+    result = [...props.allOrders]
+  } else {
+    result = fuseOrders.value.search(orderSearch.value).map((result) => result.item)
+  }
+
+  // filter by order status
+  if (orderStatusFilter.value.size > 0) {
+    result = result.filter((order) => orderStatusFilter.value.has(order.status))
+  }
+
+  return result
+})
+
+const pageNr = computed(() => {
+  currentPageNr.value = Math.min(currentPageNr.value, maxPageNr.value)
+  return currentPageNr.value
+})
+
+const maxPageNr = computed(() => {
+  return Math.max(Math.ceil(orders.value!.length / rowsPerPage), 1)
+})
+
+const pageOrders = computed(() => {
+  return orders.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
+})
+
+function sortOrders() {
+  props.allOrders.sort((a, b) => b.code - a.code)
+}
+
+function openConfirmModal() {
+  confirmActionModalRef.value?.open()
+}
+
+function handleOrderCreated(order: Order) {
+  processOrderValues(order)
+  props.allOrders.push(order)
+}
+
+function handleOrderEdited(order: Order) {
+  const localOrder = props.allOrders.find((o) => o.id === order.id)
+
+  if (localOrder) {
+    processOrderValues(order)
+    Object.assign(localOrder, order)
+  }
+}
+
+async function deleteOrder(order: Order) {
+  emit('order-deleted', order)
+}
+
+function processOrderValues(order: Order) {
+  order.date = new Date(order.date)
+  order.current_price = new Decimal(order.current_price)
+  order.original_price = new Decimal(order.original_price)
+  order.bonus_received = new Decimal(order.bonus_received)
+  order.weight = new Decimal(order.weight)
+  order.additional_cost = new Decimal(order.additional_cost)
+  order.partner_cost = new Decimal(order.partner_cost)
+  order.user = props.allUsers.find((u) => u.id === order.user_id)
+}
+
+async function handleOrderStatusUpdateConfirmedForSelection() {
+  try {
+    const body: OrderBatchPatchRequest = {
+      patches: selectedOrders.value.map((order) => ({
+        id: order.id,
+        status: selectedOrderStatusToSet.value!,
+      })),
+      send_notification: sendNotification.value,
+    }
+
+    const updatedOrders = (await axios.patch('/api/orders', body)).data
+
+    for (const order of updatedOrders) {
+      selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
+    }
+  } catch (ex) {
+    errorMessage.value = 'Something went wrong. Please try again later.'
+    showToast(showErrorToast)
+  } finally {
+    confirmActionModalRef.value?.close()
+  }
+}
+
+function handleOrderStatusUpdateClosed() {
+  selectedOrderStatusToSet.value = null
+}
+
+function exportToCSV() {
+  const bom = '\uFEFF'
+  const headers = ['Номер заказа', 'Фамилия', 'Имя', 'Вес без округления', 'Начальная сумма', 'Конечная сумма']
+  const rows: string[] = []
+
+  for (const order of orders.value) {
+    const row = [
+      order.code,
+      order.user?.last_name,
+      order.user?.first_name,
+      order.weight,
+      order.original_price,
+      order.current_price,
+    ].join(',')
+    rows.push(row)
+  }
+
+  const data = [headers, rows.join('\n')].join('\n')
+  const blob = new Blob([bom + data], { type: 'text/csv' })
+
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'orders.csv'
+
+  a.click()
+}
+
+function toggleAllOrdersSelected() {
+  selectedOrders.value = allOrdersSelected.value ? [...orders.value] : []
+}
+
+async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
+  try {
+    const body: OrderPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
+    const updatedOrder = (await axios.patch(`/api/orders/${order.id}`, body)).data
+    order.status = updatedOrder.status
+  } catch (ex) {
+    errorMessage.value = 'Something went wrong. Please try again later.'
+    showToast(showErrorToast)
+  }
+}
+</script>
+
+<template>
+  <div class="flex flex-col grow">
+    <div class="flex flex-row min-h-12 mr-3 justify-between items-center">
+      <span class="text-2xl font-bold">Orders</span>
+      <div class="flex flex-row gap-5">
+        <label class="label cursor-pointer gap-2 p-0">
+          <input type="checkbox" class="checkbox checkbox-sm" v-model="sendNotification" />
+          <span class="label-text">Send notification</span>
+        </label>
+        <AdminStatusDropdown
+          class="select-sm"
+          placeholder="Change status"
+          form-control-class="w-fit"
+          v-model="selectedOrderStatusToSet"
+          :disabled="selectedOrders.length == 0"
+          @change="openConfirmModal"
+        />
+        <button class="btn btn-sm" @click="exportToCSV">
+          Export CSV
+          <ion-icon name="download-outline" class="text-base"></ion-icon>
+        </button>
+        <details class="dropdown dropdown-end">
+          <summary class="btn btn-sm mb-1">
+            {{ orderStatusFilter.size > 0 ? `Selected ${orderStatusFilter.size}` : 'All stages' }}
+            <ion-icon name="filter-outline" class="text-base"></ion-icon>
+          </summary>
+          <ul class="menu dropdown-content rounded-box z-[1] p-2 shadow w-52 bg-white">
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.New) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.New"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.WarehouseRF) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.WarehouseRF"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.Courier1) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.Courier1"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.Courier2) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.Courier2"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.ProcessedInTbilisi) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.ProcessedInTbilisi"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.ReadyForDeliveryInTbilisi) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.ReadyForDeliveryInTbilisi"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.WarehouseTbilisi) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.WarehouseTbilisi"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.ReadyForDeliveryByPony) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.ReadyForDeliveryByPony"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.WaitingForDeliveryByPony) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.WaitingForDeliveryByPony"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+            <li>
+              <label class="label cursor-pointer">
+                <span class="label-text">{{ toAdminDisplayString(OrderStatus.Delivered) }}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :value="OrderStatus.Delivered"
+                  v-model="orderStatusFilter"
+                />
+              </label>
+            </li>
+          </ul>
+        </details>
+        <label
+          class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
+        >
+          <input type="text" class="grow" placeholder="Search" v-model="orderSearch" />
+          <ion-icon name="search-outline"></ion-icon>
+        </label>
+        <button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
+      </div>
+    </div>
+    <div class="flex flex-col bg-white mr-3 mb-5 grow">
+      <table class="table table-sm">
+        <thead>
+          <tr class="bg-base-200">
+            <th>
+              <label class="label cursor-pointer">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  v-model="allOrdersSelected"
+                  @change="toggleAllOrdersSelected"
+                />
+              </label>
+            </th>
+            <th>ORDER CODE</th>
+            <th>STATUS</th>
+            <th>USER</th>
+            <th>TELEGRAM</th>
+            <th>WEIGHT</th>
+            <th>ORIGINAL PRICE</th>
+            <th>CURRENT PRICE</th>
+            <th>CITY</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="order in pageOrders" :key="order.id">
+            <td>
+              <label class="label cursor-pointer">
+                <input type="checkbox" class="checkbox checkbox-sm" :value="order" v-model="selectedOrders" />
+              </label>
+            </td>
+            <td>{{ order.code }}</td>
+            <td>
+              <AdminStatusDropdown
+                :model-value="order.status"
+                class="select-sm"
+                :class="[
+                  `bg-[${toColorCode(order.status)}]`,
+                  `text-[${toTextColorCode(order.status)}]`,
+                  'focus:bg-white',
+                  'focus:text-black',
+                ]"
+                form-control-class="w-fit"
+                @update:model-value="(val: OrderStatus) => updateOrderStatus(order, val)"
+              />
+            </td>
+            <td>{{ order.user?.first_name }} {{ order.user?.last_name }}</td>
+            <td>{{ order.user?.tg_username }}</td>
+            <td>{{ order.weight }}</td>
+            <td>{{ order.original_price }}</td>
+            <td>{{ order.current_price }}</td>
+            <td>{{ cityToDisplayString(order.city) }}</td>
+            <td>
+              <div class="flex flex-row gap-2">
+                <button class="btn btn-sm text-gray-500 btn-square btn-outline" @click="editOrderModalRef?.open(order)">
+                  <ion-icon name="pencil"></ion-icon>
+                </button>
+                <button
+                  class="btn btn-sm text-gray-500 btn-square btn-outline"
+                  @click="confirmDeleteModalRef?.open(() => deleteOrder(order))"
+                >
+                  <ion-icon name="trash"></ion-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <AdminPagination v-model="pageNr" :max-page-nr="maxPageNr" />
+    <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" :users="allUsers" />
+    <AdminEditOrderModal ref="editOrderModalRef" @order-edited="handleOrderEdited" :users="allUsers" />
+    <AdminConfirmActionModal
+      ref="confirmActionModalRef"
+      @confirmed="handleOrderStatusUpdateConfirmedForSelection"
+      @closed="handleOrderStatusUpdateClosed"
+    >
+      <p>
+        New status: <b>{{ toAdminDisplayString(selectedOrderStatusToSet!) }}</b>
+      </p>
+    </AdminConfirmActionModal>
+    <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
+    <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
+  </div>
+</template>
