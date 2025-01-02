@@ -49,7 +49,7 @@ const allOrdersSelected = ref(false)
 const errorMessage = ref('')
 const showErrorToast = ref(false)
 
-onMounted(async () => {
+onBeforeMount(() => {
   props.allOrders.forEach((order) => {
     processOrderValues(order)
   })
