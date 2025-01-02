@@ -142,7 +142,7 @@ function getUserName(transaction: Transaction) {
     </div>
     <div class="mr-3 mb-5 stats shadow">
       <div class="stat place-items-center">
-        <div class="stat-title">Delivered (кг)</div>
+        <div class="stat-title">Delivered (kg)</div>
         <div class="stat-value">{{ deliveredWeight }}</div>
       </div>
       <div class="stat place-items-center">
