@@ -8,7 +8,7 @@ defineOptions({
 const props = defineProps<{
   type: InputTypeHTMLAttribute
   label?: string
-  placeholder: string
+  placeholder?: string
 }>()
 
 const model = defineModel()

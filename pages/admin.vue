@@ -101,7 +101,7 @@ async function deleteMessage(message: Message) {
       <AdminMessages v-if="visibleTab === VisibleTab.Messages" :messages="messages!" @message-deleted="deleteMessage" />
       <AdminAnalytics
         v-if="visibleTab === VisibleTab.Analytics"
-        :transactions="transactions!"
+        :allTransactions="transactions!"
         :orders="orders!"
         :users="users!"
       />
