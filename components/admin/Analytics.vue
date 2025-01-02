@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import Decimal from 'decimal.js'
 import type { Order } from '~/models/Order'
+import { OrderStatus } from '~/models/OrderStatus'
 import type { Transaction } from '~/models/Transaction'
 import { toColorCode, toDisplayString, toTextColorCode, TransactionType } from '~/models/TransactionType'
 import type { User } from '~/models/User'
@@ -55,6 +56,64 @@ const pageTransactions = computed(() => {
   return transactions.value.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
 })
 
+const deliveredOrders = computed(() => {
+  let orders = props.orders.filter((o) => o.status == OrderStatus.Delivered)
+
+  if (startDate.value) {
+    orders = orders.filter((o) => o.date >= new Date(startDate.value))
+  }
+
+  if (endDate.value) {
+    orders = orders.filter((o) => o.date <= new Date(endDate.value))
+  }
+
+  return orders
+})
+
+const deliveredWeight = computed(() => {
+  let weight = new Decimal(0)
+
+  for (const order of deliveredOrders.value) {
+    weight = weight.add(order.weight)
+  }
+
+  return weight
+})
+
+const income = computed(() => {
+  let income = new Decimal(0)
+
+  for (const order of deliveredOrders.value) {
+    income = income.add(order.current_price)
+  }
+
+  return income
+})
+
+const bonusesAdded = computed(() => {
+  let bonuses = new Decimal(0)
+
+  for (const transaction of transactions.value) {
+    if (transaction.type == TransactionType.Deposit) {
+      bonuses = bonuses.add(transaction.amount)
+    }
+  }
+
+  return bonuses
+})
+
+const bonusesWithdrawn = computed(() => {
+  let bonuses = new Decimal(0)
+
+  for (const transaction of transactions.value) {
+    if (transaction.type == TransactionType.Withdrawal) {
+      bonuses = bonuses.add(transaction.amount)
+    }
+  }
+
+  return bonuses
+})
+
 function getOrderCode(transaction: Transaction) {
   return props.orders.find((o) => o.id === transaction.order_id)?.code
 }
@@ -79,6 +138,24 @@ function getUserName(transaction: Transaction) {
           <span class="text-sm">End date</span>
           <Input type="date" class="input-sm" v-model="endDate" />
         </div>
+      </div>
+    </div>
+    <div class="mr-3 mb-5 stats shadow">
+      <div class="stat place-items-center">
+        <div class="stat-title">Delivered (кг)</div>
+        <div class="stat-value">{{ deliveredWeight }}</div>
+      </div>
+      <div class="stat place-items-center">
+        <div class="stat-title">Income (₾)</div>
+        <div class="stat-value">{{ income }}</div>
+      </div>
+      <div class="stat place-items-center">
+        <div class="stat-title">Bonuses added (₾)</div>
+        <div class="stat-value">{{ bonusesAdded }}</div>
+      </div>
+      <div class="stat place-items-center">
+        <div class="stat-title">Bonuses withdrawn (₾)</div>
+        <div class="stat-value">{{ bonusesWithdrawn }}</div>
       </div>
     </div>
     <div class="flex flex-col bg-white mr-3 mb-5 grow">
