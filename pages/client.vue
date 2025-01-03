@@ -27,7 +27,7 @@ onMounted(async () => {
       themeParams: {},
       initData: {
         user: {
-          id: 99281932,
+          id: 1220167578,
           firstName: 'Andrew',
           lastName: 'Rogue',
           username: 'rikapiu',
@@ -45,7 +45,7 @@ onMounted(async () => {
         [
           'user',
           JSON.stringify({
-            id: 99281932,
+            id: 1220167578,
             first_name: 'Andrew',
             last_name: 'Rogue',
             username: 'rikapiu',
