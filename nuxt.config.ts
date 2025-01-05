@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   },
   modules: ['@kgierke/nuxt-basic-auth', 'nuxt-mongoose'],
   basicAuth: {
-    enabled: false,
+    enabled: true,
     users: [
       {
         username: process.env.ADMIN_USERNAME!,
