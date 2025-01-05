@@ -2,8 +2,12 @@ import axios from 'axios'
 
 export default defineEventHandler(async (event) => {
   try {
-    const users = (await axios.get(`${process.env.BEEZON_ADMIN_API_URL}/users`)).data
-    return users
+    const messages = (
+      await axios.get(`${process.env.BEEZON_ADMIN_API_URL}/messages`, {
+        headers: { Authorization: `Bearer ${process.env.BEEZON_API_SECRET}` },
+      })
+    ).data
+    return messages
   } catch (ex) {
     const error = ex as Error
 

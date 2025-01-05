@@ -3,9 +3,13 @@ import axios from 'axios'
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
-    const order = (await axios.post(`${process.env.BEEZON_ADMIN_API_URL}/orders`, body)).data
+    const user = (
+      await axios.post(`${process.env.BEEZON_ADMIN_API_URL}/users`, body, {
+        headers: { Authorization: `Bearer ${process.env.BEEZON_API_SECRET}` },
+      })
+    ).data
 
-    return order
+    return user
   } catch (ex) {
     const error = ex as Error
 

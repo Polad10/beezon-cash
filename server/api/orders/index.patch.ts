@@ -3,7 +3,11 @@ import axios from 'axios'
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
-    const orders = (await axios.patch(`${process.env.BEEZON_ADMIN_API_URL}/orders`, body)).data
+    const orders = (
+      await axios.patch(`${process.env.BEEZON_ADMIN_API_URL}/orders`, body, {
+        headers: { Authorization: `Bearer ${process.env.BEEZON_API_SECRET}` },
+      })
+    ).data
 
     return orders
   } catch (ex) {

@@ -5,7 +5,11 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const id = getRouterParam(event, 'id')
 
-    const order = (await axios.put(`${process.env.BEEZON_ADMIN_API_URL}/orders/${id}`, body)).data
+    const order = (
+      await axios.put(`${process.env.BEEZON_ADMIN_API_URL}/orders/${id}`, body, {
+        headers: { Authorization: `Bearer ${process.env.BEEZON_API_SECRET}` },
+      })
+    ).data
 
     return order
   } catch (ex) {

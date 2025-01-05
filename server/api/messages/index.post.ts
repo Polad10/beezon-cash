@@ -2,8 +2,14 @@ import axios from 'axios'
 
 export default defineEventHandler(async (event) => {
   try {
-    const orders = (await axios.get(`${process.env.BEEZON_ADMIN_API_URL}/orders`)).data
-    return orders
+    const body = await readBody(event)
+    const message = (
+      await axios.post(`${process.env.BEEZON_ADMIN_API_URL}/messages`, body, {
+        headers: { Authorization: `Bearer ${process.env.BEEZON_API_SECRET}` },
+      })
+    ).data
+
+    return message
   } catch (ex) {
     const error = ex as Error
 

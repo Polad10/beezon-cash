@@ -3,7 +3,9 @@ import axios from 'axios'
 export default defineEventHandler(async (event) => {
   try {
     const id = getRouterParam(event, 'id')
-    await axios.delete(`${process.env.BEEZON_ADMIN_API_URL}/orders/${id}`)
+    await axios.delete(`${process.env.BEEZON_ADMIN_API_URL}/orders/${id}`, {
+      headers: { Authorization: `Bearer ${process.env.BEEZON_API_SECRET}` },
+    })
   } catch (ex) {
     const error = ex as Error
 
