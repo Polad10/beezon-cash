@@ -55,7 +55,6 @@ async function editOrder() {
   if (validateForm()) {
     try {
       const orderRequest: OrderRequest = {
-        date: new Date(),
         status: status.value!,
         user_id: selectedUser.value!.id,
         weight_rounded: weightRounded.value,

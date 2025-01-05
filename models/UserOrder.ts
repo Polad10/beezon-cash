@@ -8,7 +8,6 @@ export interface UserOrderRequest {
   phone_nr: string
   tg_username: string
   invite_code?: string
-  date: Date
   description: string
   city?: City
   order_type_mappings: OrderTypeMappingRequest[]

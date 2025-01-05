@@ -54,7 +54,6 @@ async function registerOrder() {
         phone_nr: phoneNr.value,
         tg_username: tgUserName.value,
         invite_code: inviteCode.value || undefined,
-        date: new Date(),
         description: description.value,
         city: city.value || undefined,
         order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
