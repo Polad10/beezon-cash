@@ -5,7 +5,7 @@ import type { User } from '~/models/User'
 import type { Transaction } from '~/models/Transaction'
 import axios from 'axios'
 
-enum VisibleTab {
+enum ActiveTab {
   Users,
   Orders,
   Messages,
@@ -17,12 +17,25 @@ const orders = (await useFetch<Order[]>('/api/orders')).data
 const messages = (await useFetch<Message[]>('/api/messages')).data
 const transactions = (await useFetch<Transaction[]>('/api/transactions')).data
 
-const visibleTab = ref<VisibleTab>(VisibleTab.Users)
+const activeTab = ref<ActiveTab>()
 const showErrorToast = ref(false)
 const errorMessage = ref('')
 
-function setVisibleTab(tab: VisibleTab) {
-  visibleTab.value = tab
+onMounted(() => {
+  if (process.client) {
+    const storedActiveTab = localStorage.getItem('activeTab')
+
+    if (storedActiveTab) {
+      activeTab.value = Number(storedActiveTab)
+    } else {
+      activeTab.value = ActiveTab.Users
+    }
+  }
+})
+
+function setActiveTab(tab: ActiveTab) {
+  activeTab.value = tab
+  localStorage.setItem('activeTab', tab.toString())
 }
 
 async function deleteUser(user: User) {
@@ -67,44 +80,52 @@ async function deleteMessage(message: Message) {
         <div class="h-12"></div>
         <ul class="menu w-32 rounded-box py-0">
           <li>
-            <button :class="{ active: visibleTab == VisibleTab.Users }" @click="setVisibleTab(VisibleTab.Users)">
+            <button :class="{ active: activeTab == ActiveTab.Users }" @click="setActiveTab(ActiveTab.Users)">
               Users
             </button>
           </li>
           <li>
-            <button :class="{ active: visibleTab == VisibleTab.Orders }" @click="setVisibleTab(VisibleTab.Orders)">
+            <button :class="{ active: activeTab == ActiveTab.Orders }" @click="setActiveTab(ActiveTab.Orders)">
               Orders
             </button>
           </li>
           <li>
-            <button :class="{ active: visibleTab == VisibleTab.Messages }" @click="setVisibleTab(VisibleTab.Messages)">
+            <button :class="{ active: activeTab == ActiveTab.Messages }" @click="setActiveTab(ActiveTab.Messages)">
               Messages
             </button>
           </li>
           <li>
-            <button
-              :class="{ active: visibleTab == VisibleTab.Analytics }"
-              @click="setVisibleTab(VisibleTab.Analytics)"
-            >
+            <button :class="{ active: activeTab == ActiveTab.Analytics }" @click="setActiveTab(ActiveTab.Analytics)">
               Analytics
             </button>
           </li>
         </ul>
       </div>
-      <AdminUsers v-if="visibleTab === VisibleTab.Users" :all-users="users!" @user-deleted="deleteUser" />
-      <AdminOrders
-        v-if="visibleTab === VisibleTab.Orders"
-        :all-orders="orders!"
-        :all-users="users!"
-        @order-deleted="deleteOrder"
-      />
-      <AdminMessages v-if="visibleTab === VisibleTab.Messages" :messages="messages!" @message-deleted="deleteMessage" />
-      <AdminAnalytics
-        v-if="visibleTab === VisibleTab.Analytics"
-        :allTransactions="transactions!"
-        :orders="orders!"
-        :users="users!"
-      />
+      <KeepAlive>
+        <AdminUsers v-if="activeTab === ActiveTab.Users" :all-users="users!" @user-deleted="deleteUser" />
+      </KeepAlive>
+
+      <KeepAlive>
+        <AdminOrders
+          v-if="activeTab === ActiveTab.Orders"
+          :all-orders="orders!"
+          :all-users="users!"
+          @order-deleted="deleteOrder"
+        />
+      </KeepAlive>
+
+      <KeepAlive>
+        <AdminMessages v-if="activeTab === ActiveTab.Messages" :messages="messages!" @message-deleted="deleteMessage" />
+      </KeepAlive>
+
+      <KeepAlive>
+        <AdminAnalytics
+          v-if="activeTab === ActiveTab.Analytics"
+          :allTransactions="transactions!"
+          :orders="orders!"
+          :users="users!"
+        />
+      </KeepAlive>
     </div>
     <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
   </div>
