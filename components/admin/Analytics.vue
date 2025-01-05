@@ -84,7 +84,7 @@ const income = computed(() => {
   let income = new Decimal(0)
 
   for (const order of deliveredOrders.value) {
-    income = income.add(order.current_price)
+    income = income.add(order.original_price)
   }
 
   return income
