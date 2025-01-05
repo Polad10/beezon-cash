@@ -38,15 +38,31 @@ const maxPageNr = computed(() => {
   return Math.max(Math.ceil(props.allTransactions.length / rowsPerPage), 1)
 })
 
+const startDateTime = computed(() => {
+  if (!startDate.value) {
+    return null
+  }
+
+  return new Date(`${startDate.value}T00:00:00.000`)
+})
+
+const endDateTime = computed(() => {
+  if (!endDate.value) {
+    return null
+  }
+
+  return new Date(`${endDate.value}T00:00:00.000`)
+})
+
 const transactions = computed(() => {
   let result = props.allTransactions
 
-  if (startDate.value) {
-    result = result.filter((r) => r.datetime >= new Date(startDate.value))
+  if (startDateTime.value) {
+    result = result.filter((r) => r.datetime >= startDateTime.value!)
   }
 
-  if (endDate.value) {
-    result = result.filter((r) => r.datetime <= new Date(endDate.value))
+  if (endDateTime.value) {
+    result = result.filter((r) => r.datetime <= endDateTime.value!)
   }
 
   return result
@@ -59,12 +75,12 @@ const pageTransactions = computed(() => {
 const deliveredOrders = computed(() => {
   let orders = props.orders.filter((o) => o.status == OrderStatus.Delivered)
 
-  if (startDate.value) {
-    orders = orders.filter((o) => o.date >= new Date(startDate.value))
+  if (startDateTime.value) {
+    orders = orders.filter((o) => o.date >= startDateTime.value!)
   }
 
-  if (endDate.value) {
-    orders = orders.filter((o) => o.date <= new Date(endDate.value))
+  if (endDateTime.value) {
+    orders = orders.filter((o) => o.date <= endDateTime.value!)
   }
 
   return orders
