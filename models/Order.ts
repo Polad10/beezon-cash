@@ -26,7 +26,6 @@ export interface Order {
 }
 
 export interface OrderRequest {
-  date: Date
   original_price?: Decimal
   current_price?: Decimal
   status: OrderStatus
