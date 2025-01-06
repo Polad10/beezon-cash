@@ -52,7 +52,7 @@ async function registerOrder() {
         first_name: firstName.value,
         last_name: lastName.value,
         phone_nr: phoneNr.value,
-        tg_username: tgUserName.value,
+        tg_username: tgUserName.value.replace('@', ''),
         invite_code: inviteCode.value || undefined,
         description: description.value,
         city: city.value || undefined,
