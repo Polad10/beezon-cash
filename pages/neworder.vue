@@ -230,7 +230,7 @@ function resetFieldErrors() {
               <span class="label-text">Где нам нужно будет получить заказ? *</span>
             </div>
             <div :class="{ 'border rounded-lg border-[red]': showDeliveryProviderInputError }">
-              <div class="flex flex-row gap-3">
+              <div class="flex flex-row gap-3 flex-wrap">
                 <label class="label cursor-pointer justify-normal gap-2">
                   <input
                     type="checkbox"
@@ -267,8 +267,6 @@ function resetFieldErrors() {
                   />
                   <span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.PostRussia) }}</span>
                 </label>
-              </div>
-              <div class="flex flex-row gap-3">
                 <label class="label cursor-pointer justify-normal gap-2">
                   <input
                     type="checkbox"
