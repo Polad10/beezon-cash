@@ -51,7 +51,7 @@ const endDateTime = computed(() => {
     return null
   }
 
-  return new Date(`${endDate.value}T00:00:00.000`)
+  return new Date(`${endDate.value}T23:59:59.999`)
 })
 
 const transactions = computed(() => {
