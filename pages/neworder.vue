@@ -334,17 +334,34 @@ function resetFieldErrors() {
               </label>
               <Input v-if="hasReferralCode" type="text" placeholder="Введите промокод" v-model="inviteCode" />
             </div>
-            <label class="label cursor-pointer justify-normal gap-2">
+            <label class="label cursor-pointer justify-normal items-start gap-2">
               <input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Drugs" v-model="orderTypes" />
-              <span class="label-text">В заказе лекарства или БАДы</span>
+              <div class="flex flex-col">
+                <span class="label-text">В заказе лекарства или БАДы</span>
+                <span class="label-text text-xs font-light"
+                  >Для лекарств и БАДов действует наценка 10 лари/упаковка </span
+                >
+              </div>
             </label>
-            <label class="label cursor-pointer justify-normal gap-2">
+            <label class="label cursor-pointer justify-normal items-start gap-2">
               <input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Electronics" v-model="orderTypes" />
-              <span class="label-text">В заказе электронные товары дороже 300 лари</span>
+              <div class="flex flex-col">
+                <span class="label-text">В заказе электронные товары дороже 300 лари</span>
+                <span class="label-text text-xs font-light"
+                  >На провоз электронных товаров дороже 300 лари без растаможивания действует наценка +10% от стоимости
+                  товара</span
+                >
+              </div>
             </label>
-            <label class="label cursor-pointer justify-normal gap-2">
+            <label class="label cursor-pointer justify-normal items-start gap-2">
               <input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Commercial" v-model="orderTypes" />
-              <span class="label-text">В заказе 5 и более штук одинаковых товаров</span>
+              <div class="flex flex-col">
+                <span class="label-text">В заказе 5 и более штук одинаковых товаров</span>
+                <span class="label-text text-xs font-light"
+                  >Такой заказ попадает под понятие “коммерческая партия”, будет действовать наценка от 15 лари и выше в
+                  зависимости от кол-ва повторяющихся товаров</span
+                >
+              </div>
             </label>
           </div>
         </div>
