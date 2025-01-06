@@ -6,7 +6,7 @@ import { OrderType } from '~/models/OrderTypeMapping'
 import type { UserOrderRequest } from '~/models/UserOrder'
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 
-const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie')
+const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie', { maxAge: 365 * 24 * 60 * 60 })
 const modalRef = ref<HTMLDialogElement | null>(null)
 
 const firstName = ref(userOrderCookie.value?.first_name || '')
