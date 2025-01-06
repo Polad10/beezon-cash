@@ -350,7 +350,7 @@ function resetFieldErrors() {
           </div>
         </div>
         <div class="modal-action">
-          <button class="btn btn-success" @click="registerOrder">
+          <button class="btn bg-blue-700 text-white hover:bg-blue-800" @click="registerOrder">
             Отправить
             <ion-icon name="chevron-forward"></ion-icon>
             <span v-if="loading" class="loading loading-spinner"></span>
