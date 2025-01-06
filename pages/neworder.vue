@@ -198,21 +198,21 @@ function resetFieldErrors() {
           <Input
             type="text"
             label="Имя *"
-            placeholder="Alex"
+            placeholder="Имя получателя заказа"
             v-model="firstName"
             :class="{ 'input-error': showFirstNameInputError }"
           />
           <Input
             type="text"
             label="Фамилия *"
-            placeholder="Smith"
+            placeholder="Фамилия получателя заказа"
             v-model="lastName"
             :class="{ 'input-error': showLastNameInputError }"
           />
           <Input
             type="text"
             label="Номер телефона *"
-            placeholder="+995 599 12 34 56"
+            placeholder="+995 999 99 99 99"
             v-model="phoneNr"
             :class="{ 'input-error': showPhoneNrInputError }"
           />
@@ -323,7 +323,7 @@ function resetFieldErrors() {
           />
           <Textarea
             label="Краткая опись заказа *"
-            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            placeholder="Введите список товаров"
             v-model="description"
             :class="{ 'textarea-error': showDescriptionInputError }"
           />
