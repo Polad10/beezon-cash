@@ -21,6 +21,10 @@ onBeforeMount(() => {
   props.allTransactions.sort((a, b) => {
     return b.datetime.getTime() - a.datetime.getTime()
   })
+
+  props.orders.forEach((order) => {
+    order.date = new Date(order.date)
+  })
 })
 
 const rowsPerPage = 30
@@ -74,7 +78,7 @@ const pageTransactions = computed(() => {
 
 const deliveredOrders = computed(() => {
   let orders = props.orders.filter((o) => o.status == OrderStatus.Delivered)
-
+  console.log(orders)
   if (startDateTime.value) {
     orders = orders.filter((o) => o.date >= startDateTime.value!)
   }
