@@ -78,7 +78,7 @@ const pageTransactions = computed(() => {
 
 const deliveredOrders = computed(() => {
   let orders = props.orders.filter((o) => o.status == OrderStatus.Delivered)
-  console.log(orders)
+
   if (startDateTime.value) {
     orders = orders.filter((o) => o.date >= startDateTime.value!)
   }
