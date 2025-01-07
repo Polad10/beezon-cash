@@ -147,7 +147,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
             />
             <div role="tabpanel" class="tab-content pt-7">
               <div class="flex justify-center">
-                <div class="relative">
+                <div class="relative shrink-0">
                   <img src="~/public/balance-card.svg" class="rounded-3xl" />
                   <div class="absolute top-36 w-full px-5">
                     <div class="flex flex-col">
