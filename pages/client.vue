@@ -228,7 +228,8 @@ async function applyBonus(orderId: string, bonus: Decimal) {
                     <div>
                       <p class="font-semibold text-lg text-left">Получаете бонусы</p>
                       <p class="font-thin text-base text-left leading-none">
-                        Вам на баланс вернется 5% от стоимости первого заказа вашего друга
+                        Начисляем <span class="font-medium">10 лари</span> на баланс за первый завершенный заказ вашего
+                        друга
                       </p>
                     </div>
                   </li>
