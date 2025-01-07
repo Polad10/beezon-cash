@@ -149,7 +149,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
               <div class="flex justify-center">
                 <div class="relative">
                   <img src="~/public/balance-card.svg" class="rounded-3xl" />
-                  <div class="absolute top-1/2 w-full px-5">
+                  <div class="absolute top-36 w-full px-5">
                     <div class="flex flex-col">
                       <div class="flex flex-row justify-between">
                         <div>
