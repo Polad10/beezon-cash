@@ -238,9 +238,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
             </div>
           </div>
           <div v-if="copyToastVisible" class="toast toast-center">
-            <div
-              class="alert bg-secondary text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-primary object-center"
-            >
+            <div class="alert bg-secondary text-sm font-bold p-2 flex items-center gap-y-0.5 object-center">
               <span>Скопировано</span>
             </div>
           </div>
