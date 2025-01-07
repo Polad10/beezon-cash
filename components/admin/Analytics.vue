@@ -23,7 +23,9 @@ onBeforeMount(() => {
   })
 
   props.orders.forEach((order) => {
-    order.date = new Date(order.date)
+    if (order.end_date) {
+      order.end_date = new Date(order.end_date)
+    }
   })
 })
 
@@ -77,14 +79,14 @@ const pageTransactions = computed(() => {
 })
 
 const deliveredOrders = computed(() => {
-  let orders = props.orders.filter((o) => o.status == OrderStatus.Delivered)
+  let orders = props.orders.filter((o) => o.end_date)
 
   if (startDateTime.value) {
-    orders = orders.filter((o) => o.date >= startDateTime.value!)
+    orders = orders.filter((o) => o.end_date! >= startDateTime.value!)
   }
 
   if (endDateTime.value) {
-    orders = orders.filter((o) => o.date <= endDateTime.value!)
+    orders = orders.filter((o) => o.end_date! <= endDateTime.value!)
   }
 
   return orders

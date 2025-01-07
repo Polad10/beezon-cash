@@ -8,6 +8,7 @@ import type { User } from './User'
 export interface Order {
   id: string
   date: Date
+  end_date?: Date
   original_price: Decimal
   current_price: Decimal
   status: OrderStatus
