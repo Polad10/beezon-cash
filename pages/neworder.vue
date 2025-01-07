@@ -376,12 +376,7 @@ function resetFieldErrors() {
       <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
     </dialog>
     <div :class="['transition-opacity duration-[3000ms]', orderRegistered ? 'opacity-100' : 'opacity-0']">
-      <DotLottieVue
-        v-if="orderRegistered"
-        style="height: 500px; width: 500px"
-        autoplay
-        src="/animations/thanks-for-order.lottie"
-      />
+      <DotLottieVue v-if="orderRegistered" style="height: 300px; width: 300px" autoplay src="/animations/done.lottie" />
       <p class="text-center text-3xl mt-5">Спасибо за заказ!</p>
     </div>
   </div>
