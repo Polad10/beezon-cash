@@ -296,5 +296,6 @@ async function applyBonus(orderId: string, bonus: Decimal) {
 .tab:is(input:checked) {
   color: theme('colors.accent');
   border-color: theme('colors.accent');
+  font-weight: 600;
 }
 </style>
