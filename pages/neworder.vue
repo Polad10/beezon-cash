@@ -380,7 +380,6 @@ function resetFieldErrors() {
         v-if="orderRegistered"
         style="height: 500px; width: 500px"
         autoplay
-        loop
         src="/animations/thanks-for-order.lottie"
       />
       <p class="text-center text-3xl mt-5">Спасибо за заказ!</p>
