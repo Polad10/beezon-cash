@@ -6,6 +6,8 @@ defineOptions({
 const props = defineProps<{
   label: string
   placeholder: string
+  labelClass?: string
+  labelTextClass?: string
 }>()
 
 const model = defineModel<string>()
@@ -13,8 +15,8 @@ const model = defineModel<string>()
 
 <template>
   <label class="form-control">
-    <div class="label">
-      <span class="label-text">{{ props.label }}</span>
+    <div class="label" :class="labelClass">
+      <span class="label-text" :class="labelTextClass">{{ props.label }}</span>
     </div>
     <textarea
       :placeholder="props.placeholder"

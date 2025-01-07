@@ -9,6 +9,8 @@ const props = defineProps<{
   type: InputTypeHTMLAttribute
   label?: string
   placeholder?: string
+  labelClass?: string
+  labelTextClass?: string
 }>()
 
 const model = defineModel()
@@ -16,8 +18,8 @@ const model = defineModel()
 
 <template>
   <label class="form-control grow">
-    <div class="label" v-if="props.label">
-      <span class="label-text">{{ props.label }}</span>
+    <div class="label" :class="labelClass" v-if="props.label">
+      <span class="label-text" :class="labelTextClass">{{ props.label }}</span>
     </div>
     <input
       :type="props.type"

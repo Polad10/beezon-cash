@@ -4,6 +4,8 @@ import { City, toDisplayString } from '~/models/City'
 const props = defineProps<{
   label: string
   placeholder: string
+  labelClass?: string
+  labelTextClass?: string
 }>()
 
 defineOptions({
@@ -15,8 +17,8 @@ const model = defineModel()
 
 <template>
   <label class="form-control">
-    <div class="label">
-      <span class="label-text">{{ props.label }}</span>
+    <div class="label" :class="labelClass">
+      <span class="label-text" :class="labelTextClass">{{ props.label }}</span>
     </div>
     <select
       class="select select-bordered focus-within:outline-0 focus-within:border-gray-500"
