@@ -1,15 +1,13 @@
 <script lang="ts" setup>
-const props = defineProps({
-  maxPageNr: {
-    type: Number,
-    required: true,
-  },
-})
+const props = defineProps<{
+  pageNr: number
+  maxPageNr: number
+}>()
 
-const pageNr = defineModel<number>({ default: 1 })
+const emit = defineEmits(['page-nr-changed'])
 
 function setPageNr(newPageNr: number) {
-  pageNr.value = newPageNr
+  emit('page-nr-changed', newPageNr)
 }
 
 function pageNrIsInBetween(pageNr: number) {
@@ -29,11 +27,7 @@ function pageNrIsInBetween(pageNr: number) {
     <button v-if="pageNrIsInBetween(pageNr - 1)" class="join-item btn btn-ghost" @click="setPageNr(pageNr - 1)">
       {{ pageNr - 1 }}
     </button>
-    <button
-      v-if="pageNrIsInBetween(pageNr)"
-      class="join-item btn btn-ghost btn-active bg-white"
-      @click="setPageNr(pageNr)"
-    >
+    <button v-if="pageNrIsInBetween(pageNr)" class="join-item btn btn-active" @click="setPageNr(pageNr)">
       {{ pageNr }}
     </button>
     <button v-if="pageNrIsInBetween(pageNr + 1)" class="join-item btn btn-ghost" @click="setPageNr(pageNr + 1)">
@@ -57,3 +51,10 @@ function pageNrIsInBetween(pageNr: number) {
     </button>
   </div>
 </template>
+
+<style scoped>
+.btn-active {
+  background-color: black;
+  color: white;
+}
+</style>

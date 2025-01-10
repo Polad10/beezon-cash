@@ -35,6 +35,10 @@ const maxPageNr = computed(() => {
   return Math.max(Math.ceil(props.messages.length / rowsPerPage), 1)
 })
 
+function setPageNr(newPageNr: number) {
+  currentPageNr.value = newPageNr
+}
+
 function handleMessageCreated(message: Message) {
   props.messages.push(message)
 }
@@ -97,7 +101,7 @@ async function deleteMessage(message: Message) {
         </tbody>
       </table>
     </div>
-    <AdminPagination v-model="pageNr" :max-page-nr="maxPageNr" />
+    <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
     <AdminNewMessageModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
     <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" />
   </div>

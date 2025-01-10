@@ -136,6 +136,10 @@ const bonusesWithdrawn = computed(() => {
   return bonuses
 })
 
+function setPageNr(newPageNr: number) {
+  currentPageNr.value = newPageNr
+}
+
 function getOrderCode(transaction: Transaction) {
   return props.orders.find((o) => o.id === transaction.order_id)?.code
 }
@@ -213,6 +217,6 @@ function getUserName(transaction: Transaction) {
         </tbody>
       </table>
     </div>
-    <AdminPagination v-model="pageNr" :max-page-nr="maxPageNr" />
+    <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
   </div>
 </template>

@@ -51,6 +51,10 @@ const maxPageNr = computed(() => {
   return Math.max(Math.ceil(users.value.length / rowsPerPage), 1)
 })
 
+function setPageNr(newPageNr: number) {
+  currentPageNr.value = newPageNr
+}
+
 function handleUserCreated(user: User) {
   props.allUsers.push(user)
 }
@@ -122,7 +126,7 @@ async function deleteUser(user: User) {
         </tbody>
       </table>
     </div>
-    <AdminPagination v-model="pageNr" :max-page-nr="maxPageNr" />
+    <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
     <AdminNewUserModal ref="newUserModalRef" @user-created="handleUserCreated" />
     <AdminEditUserModal ref="editUserModalRef" @user-edited="handleUserEdited" />
     <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />

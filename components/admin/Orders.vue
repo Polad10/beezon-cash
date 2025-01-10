@@ -87,6 +87,10 @@ const pageOrders = computed(() => {
   return orders.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
 })
 
+function setPageNr(newPageNr: number) {
+  currentPageNr.value = newPageNr
+}
+
 function sortOrders() {
   props.allOrders.sort((a, b) => b.code - a.code)
 }
@@ -413,7 +417,7 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
         </tbody>
       </table>
     </div>
-    <AdminPagination v-model="pageNr" :max-page-nr="maxPageNr" />
+    <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
     <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" :users="allUsers" />
     <AdminEditOrderModal ref="editOrderModalRef" @order-edited="handleOrderEdited" :users="allUsers" />
     <AdminConfirmActionModal
