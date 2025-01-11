@@ -2,6 +2,17 @@
 import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
+  app: {
+    head: {
+      link: [
+        {
+          rel: 'icon',
+          type: 'image/x-icon',
+          href: '/favicon.svg',
+        },
+      ],
+    },
+  },
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   css: ['@/assets/css/tailwind.css'],
