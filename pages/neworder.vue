@@ -5,6 +5,8 @@ import { DeliveryProvider, toDisplayString as deliveryProviderToDisplayString } 
 import { OrderType } from '~/models/OrderTypeMapping'
 import type { UserOrderRequest } from '~/models/UserOrder'
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
+import { ErrorName } from '~/enums/exceptions/ErrorName'
+import { TelegramEntityErrorType } from '~/enums/exceptions/TelegramEntityErrorType'
 
 const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie', { maxAge: 365 * 24 * 60 * 60 })
 const modalRef = ref<HTMLDialogElement | null>(null)
@@ -107,6 +109,16 @@ async function registerOrder() {
       userOrderCookie.value = userOrderRequest
       modalRef.value?.close()
     } catch (ex) {
+      const errorResponseData = getErrorResponseData(ex)
+
+      if (
+        errorResponseData?.errorName == ErrorName.TelegramEntityError &&
+        errorResponseData?.errorType == TelegramEntityErrorType.EntityNotFound
+      ) {
+        errorMessage.value = 'Указанный ник в Telegram не найден.'
+        return showToast(showErrorToast)
+      }
+
       errorMessage.value = 'Что-то пошло не так. Пожалуйста, попробуйте чуть позже.'
       showToast(showErrorToast)
     } finally {

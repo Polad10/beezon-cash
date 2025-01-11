@@ -1,18 +1,25 @@
-import axios from 'axios'
+import axios, { AxiosError, HttpStatusCode } from 'axios'
 
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
     await axios.post(`${process.env.BEEZON_PUBLIC_API_URL}/orders`, body)
-  } catch (ex) {
-    const error = ex as Error
+  } catch (ex: any) {
+    const error = ex as AxiosError
 
     const logExtra = {
       cause: error.cause,
       stack: error.stack,
+      data: error.response?.data,
     }
 
     log(event.context.correlationId, LogLevel.ERROR, error.message, logExtra)
-    throw ex
+
+    throw createError({
+      statusCode: error.response?.status || HttpStatusCode.InternalServerError,
+      statusMessage: error.response?.statusText || 'Something went wrong',
+      message: error.message,
+      data: error.response?.data,
+    })
   }
 })

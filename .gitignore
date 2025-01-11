@@ -23,5 +23,5 @@ logs
 .env.*
 !.env.example
 
-#certificates
-*.pem
+#vs code
+*.vscode
