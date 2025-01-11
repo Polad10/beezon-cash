@@ -1,6 +1,5 @@
 <script setup lang="ts">
 useHead({
-  title: 'Test',
   link: [
     {
       rel: 'stylesheet',
