@@ -225,7 +225,7 @@ function resetFieldErrors() {
           />
           <Input
             type="text"
-            label="Телеграм *"
+            label="Ваш ник в Telegram *"
             placeholder="username"
             v-model="tgUserName"
             :class="{ 'input-error': showTgUsernameInputError }"
