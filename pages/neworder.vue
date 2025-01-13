@@ -115,7 +115,7 @@ async function registerOrder() {
         errorResponseData?.errorName == ErrorName.TelegramEntityError &&
         errorResponseData?.errorType == TelegramEntityErrorType.EntityNotFound
       ) {
-        errorMessage.value = 'Указанный ник в Telegram не найден.'
+        errorMessage.value = 'Указанный ник в Telegram не найден'
         return showToast(showErrorToast)
       }
 
@@ -125,7 +125,7 @@ async function registerOrder() {
       loading.value = false
     }
   } else {
-    errorMessage.value = 'Пожалуйста заполните все необходимые поля.'
+    errorMessage.value = 'Пожалуйста заполните все необходимые поля'
     showToast(showErrorToast)
   }
 }
