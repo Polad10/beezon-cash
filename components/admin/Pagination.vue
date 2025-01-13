@@ -21,9 +21,7 @@ function pageNrIsInBetween(pageNr: number) {
       {{ '«' }}
     </button>
     <button class="join-item btn btn-ghost" :class="{ 'btn-active': pageNr == 1 }" @click="setPageNr(1)">1</button>
-    <button v-if="pageNrIsInBetween(pageNr - 2)" class="join-item btn btn-ghost btn-disabled disabled: bg-black">
-      ...
-    </button>
+    <button v-if="pageNrIsInBetween(pageNr - 2)" class="join-item btn btn-ghost btn-disabled dots">...</button>
     <button v-if="pageNrIsInBetween(pageNr - 1)" class="join-item btn btn-ghost" @click="setPageNr(pageNr - 1)">
       {{ pageNr - 1 }}
     </button>
@@ -33,9 +31,9 @@ function pageNrIsInBetween(pageNr: number) {
     <button v-if="pageNrIsInBetween(pageNr + 1)" class="join-item btn btn-ghost" @click="setPageNr(pageNr + 1)">
       {{ pageNr + 1 }}
     </button>
-    <button v-if="pageNrIsInBetween(pageNr + 2)" class="join-item btn btn-ghost btn-disabled bg-white">...</button>
+    <button v-if="pageNrIsInBetween(pageNr + 2)" class="join-item btn btn-ghost btn-disabled dots">...</button>
     <button
-      v-if="pageNr > 1"
+      v-if="maxPageNr > 1"
       class="join-item btn btn-ghost"
       @click="setPageNr(maxPageNr)"
       :class="{ 'btn-active': pageNr == maxPageNr }"
@@ -56,5 +54,10 @@ function pageNrIsInBetween(pageNr: number) {
 .btn-active {
   background-color: black;
   color: white;
+}
+.dots {
+  background-color: transparent;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 </style>
