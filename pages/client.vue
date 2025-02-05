@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { retrieveLaunchParams, postEvent } from '@telegram-apps/sdk'
+import { retrieveLaunchParams } from '@telegram-apps/sdk'
 import { ref } from 'vue'
 import axios from 'axios'
 import type { User } from '~/models/User'
@@ -24,7 +24,6 @@ onMounted(async () => {
 
   try {
     //mockTgEnv()
-    postEvent('web_app_request_fullscreen')
     const { initDataRaw } = retrieveLaunchParams()
 
     headers = {
