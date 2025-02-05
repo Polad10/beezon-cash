@@ -136,7 +136,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
           <p class="text-3xl font-bold">BEEZON CASH</p>
         </div>
         <div class="bg-white min-h-screen">
-          <div role="tablist" class="tabs tabs-bordered grid-cols-3 py-7">
+          <div role="tablist" class="tabs tabs-bordered grid-cols-3 pt-7 min-h-screen content-start">
             <input
               type="radio"
               name="tab"
@@ -145,7 +145,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
               aria-label="Баланс аккаунта"
               checked
             />
-            <div role="tabpanel" class="tab-content pt-7">
+            <div role="tabpanel" class="tab-content pt-7 min-h-screen">
               <div class="flex justify-center">
                 <div class="relative shrink-0">
                   <img src="~/public/balance-card.svg" class="rounded-3xl w-80" />
@@ -185,7 +185,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
               class="tab text-lg font-light content-end leading-tight pb-1.5 text-black"
               aria-label="Список заказов"
             />
-            <div role="tabpanel" class="tab-content p-5">
+            <div role="tabpanel" class="tab-content p-5 min-h-screen">
               <OrderItem v-for="order in orders" :key="order.id" :order="order" :apply-bonus="applyBonus" />
             </div>
             <input
@@ -195,7 +195,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
               class="tab text-lg font-light content-end leading-tight pb-1.5 text-black"
               aria-label="Пригласи друга"
             />
-            <div role="tabpanel" class="tab-content p-5">
+            <div role="tabpanel" class="tab-content p-5 min-h-screen">
               <div class="flex flex-col items-center">
                 <p class="text-xl font-regular text-center">Ваш промокод</p>
                 <button
