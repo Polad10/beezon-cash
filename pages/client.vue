@@ -6,8 +6,15 @@ import type { User } from '~/models/User'
 import type { Order } from '~/models/Order'
 import Decimal from 'decimal.js'
 
+enum Tab {
+  Home,
+  Orders,
+  Promo,
+}
+
 let headers = {}
 
+const activeTab = ref<Tab>(Tab.Home)
 const initDataRaw = ref<string | undefined>(undefined)
 const copyToastVisible = ref(false)
 const bonusBalanceExceededToastVisible = ref(false)
@@ -159,65 +166,74 @@ async function handleUserSignedUp() {
     <div v-else>
       <div class="text-black">
         <div class="bg-white min-h-screen">
-          <div role="tablist" class="tabs tabs-bordered grid-cols-3 pt-7 min-h-screen content-start">
-            <input
-              type="radio"
-              name="tab"
+          <div role="tablist" class="tabs tabs-bordered grid-cols-3 pt-2 min-h-screen content-start">
+            <a
               role="tab"
-              class="tab text-lg font-light content-end leading-tight pb-1.5 text-black"
-              aria-label="Баланс аккаунта"
-              checked
-            />
-            <div role="tabpanel" class="tab-content pt-7 min-h-screen">
-              <div class="flex justify-center">
-                <div class="relative shrink-0">
-                  <img src="~/public/balance-card.svg" class="rounded-3xl w-80" />
-                  <div class="absolute top-40 w-full px-5">
-                    <div class="flex flex-col">
-                      <div class="flex flex-row justify-between">
-                        <div>
-                          <p class="leading-none text-lg text-slate-300 font-light">Владелец карты</p>
-                          <p class="text-lg text-white font-bold">{{ user.first_name }} {{ user.last_name }}</p>
-                        </div>
-                        <div>
-                          <p class="leading-none text-lg text-slate-300 font-light">Бонусы</p>
-                          <p class="text-xl text-white font-bold text-center">{{ user.balance }} ₾</p>
-                        </div>
-                      </div>
-                      <div class="flex flex-row mt-3">
-                        <div>
-                          <p class="leading-none text-lg text-slate-300 font-light">Номер телефона</p>
-                          <p class="text-lg text-white font-bold">{{ user.phone_nr }}</p>
-                        </div>
-                      </div>
-                      <div class="flex flex-row mt-3">
-                        <div>
-                          <p class="leading-none text-lg text-slate-300 font-light">Telegram</p>
-                          <p class="text-lg text-white font-bold">@{{ user.tg_username }}</p>
-                        </div>
-                      </div>
-                    </div>
+              class="tab text-lg font-light content-end leading-tight pb-1.5 text-black h-16"
+              :class="{ 'tab-active': activeTab == Tab.Home }"
+              @click="activeTab = Tab.Home"
+            >
+              <div class="flex flex-col items-center gap-2">
+                <ion-icon name="home-outline" class="text-2xl"></ion-icon>
+                Главная
+              </div>
+            </a>
+            <div role="tabpanel" class="tab-content pt-7 px-5 min-h-screen">
+              <div id="profile-card" class="flex flex-col justify-between h-64 bg-blue-700 rounded-2xl p-6 text-white">
+                <div class="flex flex-row justify-between">
+                  <div class="flex flex-col">
+                    <p>Ваш бонусный баланс</p>
+                    <p class="text-3xl font-semibold">₾ {{ user.balance }}</p>
+                  </div>
+                  <img src="~public/georgia-flag.svg" width="60" />
+                </div>
+                <div class="flex flex-row mt-7 text-center text-sm justify-between px-6">
+                  <div class="flex flex-col w-12 items-center gap-2">
+                    <button class="btn btn-circle text-2xl">
+                      <ion-icon name="add-outline"></ion-icon>
+                    </button>
+                    <p>Оформить заказ</p>
+                  </div>
+                  <div class="flex flex-col w-12 items-center gap-2">
+                    <button class="btn btn-circle text-2xl">
+                      <ion-icon name="paper-plane-outline"></ion-icon>
+                    </button>
+                    <p>Написать менеджеру</p>
+                  </div>
+                  <div class="flex flex-col w-12 items-center gap-2">
+                    <button class="btn btn-circle text-2xl">
+                      <ion-icon name="storefront-outline"></ion-icon>
+                    </button>
+                    <p>Открыть Beezmarket</p>
                   </div>
                 </div>
               </div>
             </div>
-            <input
-              type="radio"
-              name="tab"
+            <a
               role="tab"
               class="tab text-lg font-light content-end leading-tight pb-1.5 text-black"
-              aria-label="Список заказов"
-            />
+              :class="{ 'tab-active': activeTab == Tab.Orders }"
+              @click="activeTab = Tab.Orders"
+            >
+              <div class="flex flex-col items-center gap-2">
+                <ion-icon name="heart-outline" class="text-2xl"></ion-icon>
+                Заказы
+              </div></a
+            >
             <div role="tabpanel" class="tab-content p-5 min-h-screen">
               <OrderItem v-for="order in orders" :key="order.id" :order="order" :apply-bonus="applyBonus" />
             </div>
-            <input
-              type="radio"
-              name="tab"
+            <a
               role="tab"
               class="tab text-lg font-light content-end leading-tight pb-1.5 text-black"
-              aria-label="Пригласи друга"
-            />
+              :class="{ 'tab-active': activeTab == Tab.Promo }"
+              @click="activeTab = Tab.Promo"
+            >
+              <div class="flex flex-col items-center gap-2">
+                <ion-icon name="ticket-outline" class="text-2xl"></ion-icon>
+                Промокод
+              </div></a
+            >
             <div role="tabpanel" class="tab-content p-5 min-h-screen">
               <div class="flex flex-col items-center">
                 <p class="text-xl font-regular text-center">Ваш промокод</p>
@@ -318,5 +334,10 @@ async function handleUserSignedUp() {
   color: theme('colors.accent');
   border-color: theme('colors.accent');
   font-weight: 600;
+}
+
+#profile-card {
+  background-color: #5e7de3;
+  background-image: linear-gradient(160deg, #819bff 0%, #214ad0 80%);
 }
 </style>
