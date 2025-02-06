@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { retrieveLaunchParams } from '@telegram-apps/sdk'
 import { ref } from 'vue'
-import axios from 'axios'
+import axios, { HttpStatusCode } from 'axios'
 import type { User } from '~/models/User'
 import type { Order } from '~/models/Order'
 import Decimal from 'decimal.js'
@@ -52,6 +52,13 @@ onMounted(async () => {
       orders.value = ordersData
     }
   } catch (err) {
+    const statusCode = getErrorResponseStatusCode(err)
+
+    if (statusCode == HttpStatusCode.NotFound) {
+      // user is just not found
+      return
+    }
+
     loadingError.value = true
   } finally {
     loading.value = false
@@ -127,9 +134,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
     <div v-else-if="loading" class="h-full flex flex-col justify-center items-center">
       <span class="loading loading-spinner text-accent"></span>
     </div>
-    <div v-else-if="!user" class="h-full flex flex-col justify-center items-center">
-      <p class="text-2xl">Пользователь не найден</p>
-    </div>
+    <Signup v-else-if="!user" />
     <div v-else>
       <div class="text-black">
         <div class="flex justify-center py-4 bg-zinc-100">
