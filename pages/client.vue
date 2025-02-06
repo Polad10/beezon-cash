@@ -8,6 +8,7 @@ import Decimal from 'decimal.js'
 
 let headers = {}
 
+const initDataRaw = ref<string | undefined>(undefined)
 const copyToastVisible = ref(false)
 const bonusBalanceExceededToastVisible = ref(false)
 const maxDiscountAmountExceededToastVisible = ref(false)
@@ -24,12 +25,22 @@ onMounted(async () => {
 
   try {
     //mockTgEnv()
-    const { initDataRaw } = retrieveLaunchParams()
+    initDataRaw.value = retrieveLaunchParams().initDataRaw
 
     headers = {
-      headers: { Authorization: `tma ${initDataRaw}` },
+      headers: { Authorization: `tma ${initDataRaw.value}` },
     }
 
+    await retrieveMe()
+  } catch (err) {
+    loadingError.value = true
+  } finally {
+    loading.value = false
+  }
+})
+
+async function retrieveMe() {
+  try {
     const me = (await axios.get<User | null>('/api/me', headers)).data
 
     if (me) {
@@ -59,11 +70,9 @@ onMounted(async () => {
       return
     }
 
-    loadingError.value = true
-  } finally {
-    loading.value = false
+    throw err
   }
-})
+}
 
 function showBonusBalanceExceededToast() {
   showToast(bonusBalanceExceededToastVisible)
@@ -124,6 +133,18 @@ async function applyBonus(orderId: string, bonus: Decimal) {
     return false
   }
 }
+
+async function handleUserSignedUp() {
+  loading.value = true
+
+  try {
+    await retrieveMe()
+  } catch (err) {
+    loadingError.value = true
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -134,7 +155,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
     <div v-else-if="loading" class="h-full flex flex-col justify-center items-center">
       <span class="loading loading-spinner text-accent"></span>
     </div>
-    <Signup v-else-if="!user" />
+    <Signup v-else-if="!user" :init-data-raw="initDataRaw!" @user-signed-up="handleUserSignedUp" />
     <div v-else>
       <div class="text-black">
         <div class="flex justify-center py-4 bg-zinc-100">

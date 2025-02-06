@@ -27,6 +27,8 @@ const model = defineModel()
       class="input input-bordered focus-within:outline-0 focus-within:border-gray-500"
       v-model="model"
       v-bind="$attrs"
+      enterkeyhint="done"
+      @keydown.enter=";($event.target as HTMLInputElement).blur()"
     />
   </label>
 </template>

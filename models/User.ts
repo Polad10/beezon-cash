@@ -19,3 +19,10 @@ export interface UserRequest {
   invited_by?: string | null
   balance?: Decimal
 }
+
+export interface UserSignupRequest {
+  first_name: string
+  last_name: string
+  phone_nr: string
+  invite_code?: string
+}
