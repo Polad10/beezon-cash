@@ -158,9 +158,6 @@ async function handleUserSignedUp() {
     <Signup v-else-if="!user" :init-data-raw="initDataRaw!" @user-signed-up="handleUserSignedUp" />
     <div v-else>
       <div class="text-black">
-        <div class="flex justify-center py-4 bg-zinc-100">
-          <p class="text-3xl font-bold">BEEZON CASH</p>
-        </div>
         <div class="bg-white min-h-screen">
           <div role="tablist" class="tabs tabs-bordered grid-cols-3 pt-7 min-h-screen content-start">
             <input
