@@ -7,6 +7,11 @@ import type { UserOrderRequest } from '~/models/UserOrder'
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 import { ErrorName } from '~/enums/exceptions/ErrorName'
 import { TelegramEntityErrorType } from '~/enums/exceptions/TelegramEntityErrorType'
+import DeliveryProviderInput from '~/components/new-order-form/DeliveryProviderInput.vue'
+import OrderTypeInput from '~/components/new-order-form/OrderTypeInput.vue'
+import CityInput from '~/components/new-order-form/CityInput.vue'
+import FormInput from '~/components/new-order-form/FormInput.vue'
+import DescriptionInput from '~/components/new-order-form/DescriptionInput.vue'
 
 const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie', { maxAge: 365 * 24 * 60 * 60 })
 const modalRef = ref<HTMLDialogElement | null>(null)
@@ -244,125 +249,40 @@ function resetFieldErrors() {
             label-class="font-medium pb-1"
             label-text-class="text-base"
           />
-          <CityDropdown
-            label="В какой город Грузии требуется доставка?"
-            placeholder="Выберите город"
-            v-model="city"
-            class="text-base"
-            label-class="font-medium pb-1"
-            label-text-class="text-base"
+          <CityInput v-model="city" />
+          <DeliveryProviderInput
+            label="Где нам нужно будет получить заказ? *"
+            v-model="deliveryProviders"
+            :show-input-error="showDeliveryProviderInputError"
           />
-          <div>
-            <div class="label font-medium pb-1">
-              <span>Где нам нужно будет получить заказ? *</span>
-            </div>
-            <div :class="{ 'border rounded-lg border-[red]': showDeliveryProviderInputError }">
-              <div class="flex flex-row gap-x-1 flex-wrap">
-                <label class="label cursor-pointer justify-normal gap-2 font-light">
-                  <input
-                    type="checkbox"
-                    class="checkbox checkbox-sm"
-                    :value="DeliveryProvider.Ozon"
-                    v-model="deliveryProviders"
-                  />
-                  <span>{{ deliveryProviderToDisplayString(DeliveryProvider.Ozon) }}</span>
-                </label>
-                <label class="label cursor-pointer justify-normal gap-2 font-light">
-                  <input
-                    type="checkbox"
-                    class="checkbox checkbox-sm"
-                    :value="DeliveryProvider.Wilbderries"
-                    v-model="deliveryProviders"
-                  />
-                  <span>{{ deliveryProviderToDisplayString(DeliveryProvider.Wilbderries) }}</span>
-                </label>
-                <label class="label cursor-pointer justify-normal gap-2 font-light">
-                  <input
-                    type="checkbox"
-                    class="checkbox checkbox-sm"
-                    :value="DeliveryProvider.CDEK"
-                    v-model="deliveryProviders"
-                  />
-                  <span>{{ deliveryProviderToDisplayString(DeliveryProvider.CDEK) }}</span>
-                </label>
-                <label class="label cursor-pointer justify-normal gap-2 font-light">
-                  <input
-                    type="checkbox"
-                    class="checkbox checkbox-sm"
-                    :value="DeliveryProvider.PostRussia"
-                    v-model="deliveryProviders"
-                  />
-                  <span>{{ deliveryProviderToDisplayString(DeliveryProvider.PostRussia) }}</span>
-                </label>
-                <label class="label cursor-pointer justify-normal gap-2 font-light">
-                  <input
-                    type="checkbox"
-                    class="checkbox checkbox-sm"
-                    :value="DeliveryProvider.POST5"
-                    v-model="deliveryProviders"
-                  />
-                  <span>{{ deliveryProviderToDisplayString(DeliveryProvider.POST5) }}</span>
-                </label>
-                <label class="label cursor-pointer justify-normal gap-2 font-light">
-                  <input
-                    type="checkbox"
-                    class="checkbox checkbox-sm"
-                    :value="DeliveryProvider.Boxberry"
-                    v-model="deliveryProviders"
-                  />
-                  <span>{{ deliveryProviderToDisplayString(DeliveryProvider.Boxberry) }}</span>
-                </label>
-              </div>
-            </div>
-          </div>
-          <Input
+          <FormInput
             v-if="deliveryProviders.includes(DeliveryProvider.CDEK)"
             label="Трек-номер CDEK *"
-            type="text"
-            placeholder="123456789"
             v-model="cdekTrackNumber"
-            :class="{ 'input-error': showCdekTrackNumberInputError }"
-            label-class="font-medium pb-1"
-            label-text-class="text-base"
+            :show-input-error="showCdekTrackNumberInputError"
           />
-          <Input
+          <FormInput
             v-if="deliveryProviders.includes(DeliveryProvider.PostRussia)"
             label="Трек-номер Почты России *"
-            type="text"
-            placeholder="123456789"
             v-model="postTrackNumber"
-            :class="{ 'input-error': showPostTrackNumberInputError }"
-            label-class="font-medium pb-1"
-            label-text-class="text-base"
+            :show-input-error="showPostTrackNumberInputError"
           />
-          <Input
+          <FormInput
             v-if="deliveryProviders.includes(DeliveryProvider.POST5)"
             label="Трек-номер 5POST *"
-            type="text"
-            placeholder="123456789"
             v-model="post5TrackNumber"
-            :class="{ 'input-error': showPost5TrackNumberInputError }"
-            label-class="font-medium pb-1"
-            label-text-class="text-base"
+            :show-input-error="showPost5TrackNumberInputError"
           />
-          <Input
+          <FormInput
             v-if="deliveryProviders.includes(DeliveryProvider.Boxberry)"
             label="Трек-номер Boxberry *"
-            type="text"
-            placeholder="123456789"
             v-model="boxberryTrackNumber"
-            :class="{ 'input-error': showBoxberryTrackNumberInputError }"
-            label-class="font-medium pb-1"
-            label-text-class="text-base"
+            :show-input-error="showBoxberryTrackNumberInputError"
           />
-          <Textarea
-            label="Краткая опись заказа *"
-            placeholder="Введите список товаров"
+          <DescriptionInput
             v-model="description"
-            class="text-base"
-            :class="{ 'textarea-error': showDescriptionInputError }"
-            label-class="font-medium pb-1"
-            label-text-class="text-base"
+            :show-input-error="showDescriptionInputError"
+            label="Краткая опись заказа *"
           />
           <div>
             <div>
@@ -372,35 +292,7 @@ function resetFieldErrors() {
               </label>
               <Input v-if="hasReferralCode" type="text" placeholder="Введите промокод" v-model="inviteCode" />
             </div>
-            <label class="label cursor-pointer justify-normal items-start gap-2">
-              <input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Drugs" v-model="orderTypes" />
-              <div class="flex flex-col">
-                <span class="font-medium">В заказе лекарства или БАДы</span>
-                <span class="text-sm font-light leading-4"
-                  >Для лекарств и БАДов действует наценка 10 лари/упаковка </span
-                >
-              </div>
-            </label>
-            <label class="label cursor-pointer justify-normal items-start gap-2">
-              <input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Electronics" v-model="orderTypes" />
-              <div class="flex flex-col">
-                <span class="font-medium">В заказе электронные товары дороже 300 лари</span>
-                <span class="text-sm font-light leading-4"
-                  >На провоз электронных товаров дороже 300 лари без растаможивания действует наценка +10% от стоимости
-                  товара</span
-                >
-              </div>
-            </label>
-            <label class="label cursor-pointer justify-normal items-start gap-2">
-              <input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Commercial" v-model="orderTypes" />
-              <div class="flex flex-col">
-                <span class="font-medium">В заказе 5 и более штук одинаковых товаров</span>
-                <span class="text-sm font-light leading-4"
-                  >Такой заказ попадает под понятие “коммерческая партия”, будет действовать наценка от 15 лари и выше в
-                  зависимости от кол-ва повторяющихся товаров</span
-                >
-              </div>
-            </label>
+            <OrderTypeInput v-model="orderTypes" />
           </div>
         </div>
         <div class="modal-action">
