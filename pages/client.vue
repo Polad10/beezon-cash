@@ -215,7 +215,7 @@ async function handleOrderCreated(order: Order) {
                       <p>Написать менеджеру</p>
                     </div>
                   </a>
-                  <a href="https://beezon.store/">
+                  <a href="https://beezon.store/" target="_blank">
                     <div class="flex flex-col w-12 items-center gap-2">
                       <button class="btn btn-circle text-2xl">
                         <ion-icon name="storefront-outline"></ion-icon>
