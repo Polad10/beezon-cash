@@ -23,6 +23,8 @@ const model = defineModel<string>()
       class="textarea textarea-bordered focus-within:outline-0 focus-within:border-gray-500 h-36"
       v-model="model"
       v-bind="$attrs"
+      enterkeyhint="done"
+      @keydown.enter=";($event.target as HTMLInputElement).blur()"
     ></textarea>
   </label>
 </template>
