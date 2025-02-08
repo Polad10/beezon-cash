@@ -207,18 +207,22 @@ async function handleOrderCreated(order: Order) {
                     </button>
                     <p>Оформить заказ</p>
                   </div>
-                  <div class="flex flex-col w-12 items-center gap-2">
-                    <button class="btn btn-circle text-2xl">
-                      <ion-icon name="paper-plane-outline"></ion-icon>
-                    </button>
-                    <p>Написать менеджеру</p>
-                  </div>
-                  <div class="flex flex-col w-12 items-center gap-2">
-                    <button class="btn btn-circle text-2xl">
-                      <ion-icon name="storefront-outline"></ion-icon>
-                    </button>
-                    <p>Открыть Beezmarket</p>
-                  </div>
+                  <a href="https://t.me/Beezon_manager_ge">
+                    <div class="flex flex-col w-12 items-center gap-2">
+                      <button class="btn btn-circle text-2xl">
+                        <ion-icon name="paper-plane-outline"></ion-icon>
+                      </button>
+                      <p>Написать менеджеру</p>
+                    </div>
+                  </a>
+                  <a href="https://beezon.store/">
+                    <div class="flex flex-col w-12 items-center gap-2">
+                      <button class="btn btn-circle text-2xl">
+                        <ion-icon name="storefront-outline"></ion-icon>
+                      </button>
+                      <p>Открыть Beezmarket</p>
+                    </div>
+                  </a>
                 </div>
               </div>
             </div>
