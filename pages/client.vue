@@ -5,6 +5,7 @@ import axios, { HttpStatusCode } from 'axios'
 import type { User } from '~/models/User'
 import type { Order } from '~/models/Order'
 import Decimal from 'decimal.js'
+import type NewOrderWithoutUserInfo from '~/components/NewOrderWithoutUserInfo.vue'
 
 enum Tab {
   Home,
@@ -21,11 +22,19 @@ const bonusBalanceExceededToastVisible = ref(false)
 const maxDiscountAmountExceededToastVisible = ref(false)
 const bonusIsZeroToastVisible = ref(false)
 const errorToastVisible = ref(false)
+const showOrderCreatedToast = ref(false)
 const loading = ref(true)
 const loadingError = ref(false)
 
 const user = ref<User | null>(null)
 const orders = ref<Order[]>([])
+
+const newOrderRef = ref<typeof NewOrderWithoutUserInfo | null>(null)
+
+const computedOrders = computed(() => {
+  orders.value.forEach(processOrder)
+  return orders.value.sort((a, b) => b.code - a.code)
+})
 
 onMounted(async () => {
   loading.value = true
@@ -54,18 +63,6 @@ async function retrieveMe() {
       const ordersData = (await axios.get<Order[]>('/api/me/orders', headers)).data
       me.balance = new Decimal(me.balance)
 
-      ordersData.forEach((order) => {
-        order.date = new Date(order.date)
-        order.current_price = new Decimal(order.current_price)
-        order.original_price = new Decimal(order.original_price)
-
-        if (order.bonus_received) {
-          order.bonus_received = new Decimal(order.bonus_received)
-        }
-      })
-
-      ordersData.sort((a, b) => b.code - a.code)
-
       user.value = me
       orders.value = ordersData
     }
@@ -79,6 +76,13 @@ async function retrieveMe() {
 
     throw err
   }
+}
+
+function processOrder(order: Order) {
+  order.date = new Date(order.date)
+  order.current_price = new Decimal(order.current_price)
+  order.original_price = new Decimal(order.original_price)
+  order.bonus_received = new Decimal(order.bonus_received)
 }
 
 function showBonusBalanceExceededToast() {
@@ -152,6 +156,12 @@ async function handleUserSignedUp() {
     loading.value = false
   }
 }
+
+async function handleOrderCreated(order: Order) {
+  activeTab.value = Tab.Orders
+  orders.value.push(order)
+  showToast(showOrderCreatedToast)
+}
 </script>
 
 <template>
@@ -179,7 +189,10 @@ async function handleUserSignedUp() {
               </div>
             </a>
             <div role="tabpanel" class="tab-content pt-7 px-5 min-h-screen">
-              <div id="profile-card" class="flex flex-col justify-between h-64 bg-blue-700 rounded-2xl p-6 text-white">
+              <div
+                id="profile-card"
+                class="flex flex-col justify-between container mx-auto h-64 bg-blue-700 rounded-2xl p-6 text-white"
+              >
                 <div class="flex flex-row justify-between">
                   <div class="flex flex-col">
                     <p>Ваш бонусный баланс</p>
@@ -187,8 +200,8 @@ async function handleUserSignedUp() {
                   </div>
                   <img src="~public/georgia-flag.svg" width="60" />
                 </div>
-                <div class="flex flex-row mt-7 text-center text-sm justify-between px-6">
-                  <div class="flex flex-col w-12 items-center gap-2">
+                <div class="flex flex-row mt-7 text-center text-sm justify-center gap-16">
+                  <div class="flex flex-col w-12 items-center gap-2" @click="newOrderRef?.open()">
                     <button class="btn btn-circle text-2xl">
                       <ion-icon name="add-outline"></ion-icon>
                     </button>
@@ -221,7 +234,7 @@ async function handleUserSignedUp() {
               </div></a
             >
             <div role="tabpanel" class="tab-content p-5 min-h-screen">
-              <OrderItem v-for="order in orders" :key="order.id" :order="order" :apply-bonus="applyBonus" />
+              <OrderItem v-for="order in computedOrders" :key="order.id" :order="order" :apply-bonus="applyBonus" />
             </div>
             <a
               role="tab"
@@ -322,7 +335,15 @@ async function handleUserSignedUp() {
               <span>Что-то пошло не так. Пожалуйста, попробуйте чуть позже.</span>
             </div>
           </div>
+          <Toast
+            v-if="showOrderCreatedToast"
+            class="bg-green-200 border-green-400"
+            icon-name="checkmark-circle-outline"
+            icon-props="text-green-800"
+            message="Заказ оформлен!"
+          />
         </div>
+        <NewOrderWithoutUserInfo ref="newOrderRef" :init-data-raw="initDataRaw!" @order-created="handleOrderCreated" />
       </div>
     </div>
   </div>

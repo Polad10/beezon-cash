@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import axios from 'axios'
 import type { City } from '~/models/City'
-import { DeliveryProvider, toDisplayString as deliveryProviderToDisplayString } from '~/models/OrderTrack'
+import { DeliveryProvider } from '~/models/OrderTrack'
 import { OrderType } from '~/models/OrderTypeMapping'
 import type { UserOrderRequest } from '~/models/UserOrder'
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'

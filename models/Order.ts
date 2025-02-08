@@ -43,6 +43,13 @@ export interface OrderRequest {
   send_notification?: boolean
 }
 
+export interface NewOrderRequest {
+  city?: City
+  description: string
+  order_tracks: OrderTrackRequest[]
+  order_type_mappings: OrderTypeMappingRequest[]
+}
+
 export interface OrderPatchRequest {
   status: OrderStatus
   send_notification?: boolean
