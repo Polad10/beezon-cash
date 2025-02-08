@@ -179,11 +179,11 @@ function open() {
 <template>
   <div data-theme="cmyk" class="flex flex-col w-full h-full justify-center items-center">
     <dialog class="modal" ref="modalRef">
-      <div class="modal-box">
+      <div class="modal-box" tabindex="0">
         <p class="text-xl text-center">Форма приема заказов</p>
         <div class="divider my-1"></div>
         <div class="flex flex-col gap-2">
-          <CityInput v-model="city" tabindex="-1" />
+          <CityInput v-model="city" />
           <DeliveryProviderInput
             label="Где нам нужно будет получить заказ?"
             v-model="deliveryProviders"
