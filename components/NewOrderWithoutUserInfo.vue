@@ -183,7 +183,7 @@ function open() {
         <p class="text-xl text-center">Форма приема заказов</p>
         <div class="divider my-1"></div>
         <div class="flex flex-col gap-2">
-          <CityInput v-model="city" />
+          <CityInput v-model="city" tabindex="-1" />
           <DeliveryProviderInput
             label="Где нам нужно будет получить заказ?"
             v-model="deliveryProviders"
