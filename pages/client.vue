@@ -243,9 +243,9 @@ async function handleOrderCreated(order: Order) {
                 <div class="w-64 text-center">
                   <img src="public/orders-empty.svg" />
                   <p class="mt-7">Здесь будет история ваших заказов</p>
-                  <btn class="btn btn-ghost text-blue-800 text-lg mt-10" @click="newOrderRef?.open()"
-                    >Оформить первый заказ</btn
-                  >
+                  <button class="btn btn-ghost text-blue-800 text-lg mt-10" @click="newOrderRef?.open()">
+                    Оформить первый заказ
+                  </button>
                 </div>
               </div>
             </div>

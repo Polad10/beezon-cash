@@ -1,13 +1,15 @@
 <script lang="ts" setup>
-import { retrieveLaunchParams } from '@telegram-apps/sdk'
 import axios from 'axios'
 import type { UserSignupRequest } from '~/models/User'
+import type DataProcessAgreement from './DataProcessAgreement.vue'
 
 const props = defineProps<{
   initDataRaw: String
 }>()
 
 const emit = defineEmits(['user-signed-up'])
+
+const dataProcessAgreementRef = ref<typeof DataProcessAgreement | null>(null)
 
 const firstName = ref('')
 const lastName = ref('')
@@ -141,7 +143,9 @@ function resetFieldErrors() {
         />
         <span class="text-sm"
           >Я согласен с условиями <a href="#" class="text-blue-700 font-semibold">Политики конфиденциальности</a> и даю
-          <a class="text-blue-700 font-semibold" href="#">Согласие на обработку персональных данных</a></span
+          <a class="text-blue-700 font-semibold" href="#" @click="dataProcessAgreementRef?.open()"
+            >Согласие на обработку персональных данных</a
+          ></span
         >
       </label>
       <button class="btn btn-block self-center bg-blue-700 text-white rounded-xl" @click="signUp">
@@ -150,5 +154,6 @@ function resetFieldErrors() {
       </button>
     </div>
     <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
+    <DataProcessAgreement ref="dataProcessAgreementRef" />
   </div>
 </template>
