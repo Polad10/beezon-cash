@@ -12,9 +12,14 @@ import OrderTypeInput from '~/components/new-order-form/OrderTypeInput.vue'
 import CityInput from '~/components/new-order-form/CityInput.vue'
 import FormInput from '~/components/new-order-form/FormInput.vue'
 import DescriptionInput from '~/components/new-order-form/DescriptionInput.vue'
+import type DataProcessAgreement from '~/components/DataProcessAgreement.vue'
+import PrivacyPolicyAgreement from '~/components/PrivacyPolicyAgreement.vue'
 
 const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie', { maxAge: 365 * 24 * 60 * 60 })
+
 const modalRef = ref<HTMLDialogElement | null>(null)
+const dataProcessAgreementRef = ref<typeof DataProcessAgreement | null>(null)
+const privacyPolicyAgreementRef = ref<typeof PrivacyPolicyAgreement | null>(null)
 
 const firstName = ref(userOrderCookie.value?.first_name || '')
 const lastName = ref(userOrderCookie.value?.last_name || '')
@@ -30,6 +35,7 @@ const city = ref<City | null>(userOrderCookie.value?.city || null)
 const deliveryProviders = ref<DeliveryProvider[]>([])
 const orderTypes = ref<OrderType[]>([])
 const hasReferralCode = ref(userOrderCookie.value?.invite_code ? true : false)
+const termsAccepted = ref(false)
 
 const orderRegistered = ref(false)
 const loading = ref(false)
@@ -45,6 +51,7 @@ const showPostTrackNumberInputError = ref(false)
 const showBoxberryTrackNumberInputError = ref(false)
 const showPost5TrackNumberInputError = ref(false)
 const showDeliveryProviderInputError = ref(false)
+const showTermsAcceptedInputError = ref(false)
 const showErrorToast = ref(false)
 
 onMounted(() => {
@@ -189,6 +196,11 @@ function validateForm() {
     showBoxberryTrackNumberInputError.value = true
   }
 
+  if (!termsAccepted.value) {
+    valid = false
+    showTermsAcceptedInputError.value = true
+  }
+
   return valid
 }
 
@@ -203,6 +215,7 @@ function resetFieldErrors() {
   showBoxberryTrackNumberInputError.value = false
   showPost5TrackNumberInputError.value = false
   showDeliveryProviderInputError.value = false
+  showTermsAcceptedInputError.value = false
 }
 </script>
 
@@ -294,6 +307,25 @@ function resetFieldErrors() {
             </div>
             <OrderTypeInput v-model="orderTypes" />
           </div>
+          <label class="label cursor-pointer justify-normal items-start gap-2">
+            <input
+              type="checkbox"
+              class="checkbox checkbox-sm"
+              :class="{ 'checkbox-error': showTermsAcceptedInputError }"
+              v-model="termsAccepted"
+              @change="showTermsAcceptedInputError = false"
+            />
+            <span class="text-sm"
+              >Я согласен с условиями
+              <a href="#" class="text-blue-700 font-semibold" @click="privacyPolicyAgreementRef?.open()"
+                >Политики конфиденциальности</a
+              >
+              и даю
+              <a class="text-blue-700 font-semibold" href="#" @click="dataProcessAgreementRef?.open()"
+                >Согласие на обработку персональных данных</a
+              ></span
+            >
+          </label>
         </div>
         <div class="modal-action">
           <button class="btn bg-blue-700 text-white hover:bg-blue-800" @click="registerOrder">
@@ -305,6 +337,8 @@ function resetFieldErrors() {
       </div>
       <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
     </dialog>
+    <DataProcessAgreement ref="dataProcessAgreementRef" />
+    <PrivacyPolicyAgreement ref="privacyPolicyAgreementRef" />
     <div :class="['transition-opacity duration-[3000ms]', orderRegistered ? 'opacity-100' : 'opacity-0']">
       <DotLottieVue v-if="orderRegistered" style="height: 300px; width: 300px" autoplay src="/animations/done.lottie" />
       <p class="text-center text-3xl mt-5">Спасибо за заказ!</p>
