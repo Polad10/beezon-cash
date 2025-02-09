@@ -2,6 +2,7 @@
 import axios from 'axios'
 import type { UserSignupRequest } from '~/models/User'
 import type DataProcessAgreement from './DataProcessAgreement.vue'
+import PrivacyPolicyAgreement from './PrivacyPolicyAgreement.vue'
 
 const props = defineProps<{
   initDataRaw: String
@@ -10,6 +11,7 @@ const props = defineProps<{
 const emit = defineEmits(['user-signed-up'])
 
 const dataProcessAgreementRef = ref<typeof DataProcessAgreement | null>(null)
+const privacyPolicyAgreementRef = ref<typeof PrivacyPolicyAgreement | null>(null)
 
 const firstName = ref('')
 const lastName = ref('')
@@ -142,7 +144,11 @@ function resetFieldErrors() {
           @change="showTermsAcceptedInputError = false"
         />
         <span class="text-sm"
-          >Я согласен с условиями <a href="#" class="text-blue-700 font-semibold">Политики конфиденциальности</a> и даю
+          >Я согласен с условиями
+          <a href="#" class="text-blue-700 font-semibold" @click="privacyPolicyAgreementRef?.open()"
+            >Политики конфиденциальности</a
+          >
+          и даю
           <a class="text-blue-700 font-semibold" href="#" @click="dataProcessAgreementRef?.open()"
             >Согласие на обработку персональных данных</a
           ></span
@@ -155,5 +161,6 @@ function resetFieldErrors() {
     </div>
     <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
     <DataProcessAgreement ref="dataProcessAgreementRef" />
+    <PrivacyPolicyAgreement ref="privacyPolicyAgreementRef" />
   </div>
 </template>
