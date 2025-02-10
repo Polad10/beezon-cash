@@ -119,6 +119,7 @@ async function deleteOrder(order: Order) {
 
 function processOrderValues(order: Order) {
   order.date = new Date(order.date)
+  order.end_date = order.end_date ? new Date(order.end_date) : undefined
   order.current_price = new Decimal(order.current_price)
   order.original_price = new Decimal(order.original_price)
   order.bonus_received = new Decimal(order.bonus_received)
@@ -366,9 +367,10 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
             <th>USER</th>
             <th>TELEGRAM</th>
             <th>WEIGHT</th>
-            <th>ORIGINAL PRICE</th>
-            <th>CURRENT PRICE</th>
+            <th>PRICE</th>
+            <th>FINAL PRICE</th>
             <th>CITY</th>
+            <th>DELIVERY DATE</th>
             <th></th>
           </tr>
         </thead>
@@ -395,6 +397,7 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
             <td>{{ order.original_price }}</td>
             <td>{{ order.current_price }}</td>
             <td>{{ cityToDisplayString(order.city) }}</td>
+            <td>{{ order.end_date?.toLocaleDateString() }}</td>
             <td>
               <div class="flex flex-row gap-2">
                 <button class="btn btn-sm text-gray-500 btn-square btn-outline" @click="editOrderModalRef?.open(order)">
