@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import Decimal from 'decimal.js'
 import type { Order } from '~/models/Order'
-import { OrderStatus } from '~/models/OrderStatus'
 import type { Transaction } from '~/models/Transaction'
 import { toColorCode, toDisplayString, toTextColorCode, TransactionType } from '~/models/TransactionType'
 import type { User } from '~/models/User'

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Order, OrderBatchPatchRequest, OrderPatchRequest } from '~/models/Order'
-import { OrderStatus, toAdminDisplayString, toColorCode, toTextColorCode } from '~/models/OrderStatus'
+import { OrderStatus, toAdminDisplayString, toAdminColorCode } from '~/models/OrderStatus'
 import { toDisplayString as cityToDisplayString } from '~/models/City'
 import ConfirmActionModal from '~/components/admin/ConfirmActionModal.vue'
 import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
@@ -384,12 +384,7 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
               <AdminStatusDropdown
                 :model-value="order.status"
                 class="select-sm"
-                :class="[
-                  `bg-[${toColorCode(order.status)}]`,
-                  `text-[${toTextColorCode(order.status)}]`,
-                  'focus:bg-white',
-                  'focus:text-black',
-                ]"
+                :class="[`bg-[${toAdminColorCode(order.status)}]`, 'focus:bg-white', 'focus:text-black']"
                 form-control-class="w-fit"
                 @update:model-value="(val: OrderStatus) => updateOrderStatus(order, val)"
               />

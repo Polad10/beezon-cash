@@ -58,42 +58,49 @@ export function toClientDisplayString(orderStatus: OrderStatus) {
   }
 }
 
-export function toColorCode(orderStatus: OrderStatus) {
+export function toAdminColorCode(orderStatus: OrderStatus) {
   switch (orderStatus) {
     case OrderStatus.New:
       return '#ECECEC'
     case OrderStatus.WarehouseRF:
+      return '#B9C4FF'
     case OrderStatus.Courier1:
+      return '#FFD6B9'
     case OrderStatus.Courier2:
+      return '#FFF2B9'
     case OrderStatus.ProcessedInTbilisi:
-      return '#B9C8FF'
+      return '#B9D7EC'
     case OrderStatus.ReadyForDeliveryInTbilisi:
+      return '#D5F0CA'
     case OrderStatus.WarehouseTbilisi:
-      return '#DAEDCC'
+      return '#BEB7FF'
     case OrderStatus.ReadyForDeliveryByPony:
+      return '#EED5FF'
     case OrderStatus.WaitingForDeliveryByPony:
-      return '#E9D9FF'
+      return '#FFB7DC'
     case OrderStatus.Delivered:
-      return '#D3D6DA'
+      return '#C3C3C3'
   }
 }
 
-export function toTextColorCode(orderStatus: OrderStatus) {
+export function toClientColorCode(orderStatus: OrderStatus) {
   switch (orderStatus) {
     case OrderStatus.New:
-      return '#000000'
+      return '#ECECEC'
     case OrderStatus.WarehouseRF:
+      return '#B9C4FF'
     case OrderStatus.Courier1:
     case OrderStatus.Courier2:
+      return '#FFD6B9'
     case OrderStatus.ProcessedInTbilisi:
-      return '#021E8A'
+      return '#B9D7EC'
     case OrderStatus.ReadyForDeliveryInTbilisi:
     case OrderStatus.WarehouseTbilisi:
-      return '#1F4700'
+      return '#D5F0CA'
     case OrderStatus.ReadyForDeliveryByPony:
     case OrderStatus.WaitingForDeliveryByPony:
-      return '#49089C'
+      return '#EED5FF'
     case OrderStatus.Delivered:
-      return '#000000'
+      return '#C3C3C3'
   }
 }
