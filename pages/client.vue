@@ -240,10 +240,10 @@ async function handleOrderCreated(order: Order) {
             <div role="tabpanel" class="tab-content p-5 min-h-screen h-screen">
               <OrderItem v-for="order in computedOrders" :key="order.id" :order="order" :apply-bonus="applyBonus" />
               <div v-if="computedOrders.length == 0" class="flex flex-col items-center h-full mt-24">
-                <div class="w-64 text-center">
-                  <img src="public/orders-empty.svg" />
+                <div class="flex flex-col w-64 text-center items-center">
+                  <img src="public/orders-empty.svg" class="w-36" />
                   <p class="mt-7">Здесь будет история ваших заказов</p>
-                  <button class="btn btn-ghost text-blue-800 text-lg mt-10" @click="newOrderRef?.open()">
+                  <button class="btn btn-ghost text-blue-800 text-lg mt-7" @click="newOrderRef?.open()">
                     Оформить первый заказ
                   </button>
                 </div>
