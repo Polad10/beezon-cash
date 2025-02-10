@@ -15,7 +15,7 @@ const props = defineProps({
 const emit = defineEmits(['user-deleted'])
 
 const fuseUsersOptions = {
-  keys: ['tg_username', 'last_name', 'first_name', 'phone_nr'],
+  keys: ['id', 'tg_username', 'last_name', 'first_name', 'phone_nr', 'referral_code'],
 }
 
 const userSearch = ref('')
