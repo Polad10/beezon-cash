@@ -27,10 +27,12 @@ const additionalCost = ref('')
 const partnerCost = ref('')
 const description = ref('')
 const orderTypes = ref<OrderType[]>([])
+const deliveryProviders = ref<DeliveryProvider[]>([])
 const cdekTrackNumber = ref('')
 const postTrackNumber = ref('')
 const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
+const dpdTrackNumber = ref('')
 const sendNotification = ref(false)
 
 const showErrorToast = ref(false)
@@ -70,6 +72,24 @@ async function editOrder() {
         send_notification: sendNotification.value,
       }
 
+      if (deliveryProviders.value.includes(DeliveryProvider.Ozon)) {
+        orderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.Ozon,
+        })
+      }
+
+      if (deliveryProviders.value.includes(DeliveryProvider.Wilbderries)) {
+        orderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.Wilbderries,
+        })
+      }
+
+      if (deliveryProviders.value.includes(DeliveryProvider.Cold)) {
+        orderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.Cold,
+        })
+      }
+
       if (cdekTrackNumber.value) {
         orderRequest.order_tracks.push({
           delivery_provider: DeliveryProvider.CDEK,
@@ -95,6 +115,13 @@ async function editOrder() {
         orderRequest.order_tracks.push({
           delivery_provider: DeliveryProvider.POST5,
           track_number: post5TrackNumber.value,
+        })
+      }
+
+      if (dpdTrackNumber.value) {
+        orderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.DPD,
+          track_number: dpdTrackNumber.value,
         })
       }
 
@@ -175,6 +202,7 @@ function open(order: Order) {
   partnerCost.value = order.partner_cost.toString()
   description.value = order.description
   orderTypes.value = order.order_type_mappings.map((mapping) => mapping.order_type)
+  deliveryProviders.value = order.order_tracks.map((mapping) => mapping.delivery_provider)
   cdekTrackNumber.value =
     order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.CDEK)?.track_number || ''
   postTrackNumber.value =
@@ -183,6 +211,8 @@ function open(order: Order) {
     order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.Boxberry)?.track_number || ''
   post5TrackNumber.value =
     order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.POST5)?.track_number || ''
+  dpdTrackNumber.value =
+    order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.DPD)?.track_number || ''
   sendNotification.value = false
 
   modalRef.value?.showModal()
@@ -355,6 +385,35 @@ defineExpose({ open })
                 placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
                 v-model="description"
               />
+              <div class="flex flex-row gap-x-1 flex-wrap">
+                <label class="label cursor-pointer justify-normal gap-2 font-light">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="DeliveryProvider.Ozon"
+                    v-model="deliveryProviders"
+                  />
+                  <span>{{ deliveryProviderToDisplayString(DeliveryProvider.Ozon) }}</span>
+                </label>
+                <label class="label cursor-pointer justify-normal gap-2 font-light">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="DeliveryProvider.Wilbderries"
+                    v-model="deliveryProviders"
+                  />
+                  <span>{{ deliveryProviderToDisplayString(DeliveryProvider.Wilbderries) }}</span>
+                </label>
+                <label class="label cursor-pointer justify-normal gap-2 font-light">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    :value="DeliveryProvider.Cold"
+                    v-model="deliveryProviders"
+                  />
+                  <span>{{ deliveryProviderToDisplayString(DeliveryProvider.Cold) }}</span>
+                </label>
+              </div>
               <Input
                 type="text"
                 :label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.CDEK)}`"
@@ -378,6 +437,12 @@ defineExpose({ open })
                 :label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.POST5)}`"
                 placeholder="123456789"
                 v-model="post5TrackNumber"
+              />
+              <Input
+                type="text"
+                :label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.DPD)}`"
+                placeholder="123456789"
+                v-model="dpdTrackNumber"
               />
             </div>
           </div>

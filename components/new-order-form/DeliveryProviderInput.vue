@@ -40,6 +40,14 @@ const model = defineModel()
           <input type="checkbox" class="checkbox checkbox-sm" :value="DeliveryProvider.Boxberry" v-model="model" />
           <span>{{ deliveryProviderToDisplayString(DeliveryProvider.Boxberry) }}</span>
         </label>
+        <label class="label cursor-pointer justify-normal gap-2 font-light">
+          <input type="checkbox" class="checkbox checkbox-sm" :value="DeliveryProvider.DPD" v-model="model" />
+          <span>{{ deliveryProviderToDisplayString(DeliveryProvider.DPD) }}</span>
+        </label>
+        <label class="label cursor-pointer justify-normal gap-2 font-light">
+          <input type="checkbox" class="checkbox checkbox-sm" :value="DeliveryProvider.Cold" v-model="model" />
+          <span>{{ deliveryProviderToDisplayString(DeliveryProvider.Cold) }}</span>
+        </label>
       </div>
     </div>
   </div>

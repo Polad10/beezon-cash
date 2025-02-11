@@ -17,6 +17,8 @@ export enum DeliveryProvider {
   PostRussia,
   Boxberry,
   POST5,
+  DPD,
+  Cold,
 }
 
 export function toDisplayString(deliveryProvider: DeliveryProvider) {
@@ -33,5 +35,9 @@ export function toDisplayString(deliveryProvider: DeliveryProvider) {
       return 'Boxberry'
     case DeliveryProvider.POST5:
       return '5POST'
+    case DeliveryProvider.DPD:
+      return 'DPD'
+    case DeliveryProvider.Cold:
+      return 'Доставка в холоде'
   }
 }

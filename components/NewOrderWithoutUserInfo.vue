@@ -24,6 +24,7 @@ const cdekTrackNumber = ref('')
 const postTrackNumber = ref('')
 const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
+const dpdTrackNumber = ref('')
 const city = ref<City | null>(null)
 const deliveryProviders = ref<DeliveryProvider[]>([])
 const orderTypes = ref<OrderType[]>([])
@@ -36,6 +37,7 @@ const showCdekTrackNumberInputError = ref(false)
 const showPostTrackNumberInputError = ref(false)
 const showBoxberryTrackNumberInputError = ref(false)
 const showPost5TrackNumberInputError = ref(false)
+const showDpdTrackNumberInputError = ref(false)
 const showDeliveryProviderInputError = ref(false)
 const showErrorToast = ref(false)
 
@@ -60,6 +62,12 @@ async function registerOrder() {
       if (deliveryProviders.value.includes(DeliveryProvider.Wilbderries)) {
         orderRequest.order_tracks.push({
           delivery_provider: DeliveryProvider.Wilbderries,
+        })
+      }
+
+      if (deliveryProviders.value.includes(DeliveryProvider.Cold)) {
+        orderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.Cold,
         })
       }
 
@@ -88,6 +96,13 @@ async function registerOrder() {
         orderRequest.order_tracks.push({
           delivery_provider: DeliveryProvider.POST5,
           track_number: post5TrackNumber.value,
+        })
+      }
+
+      if (dpdTrackNumber.value) {
+        orderRequest.order_tracks.push({
+          delivery_provider: DeliveryProvider.DPD,
+          track_number: dpdTrackNumber.value,
         })
       }
 
@@ -145,6 +160,11 @@ function validateForm() {
     showBoxberryTrackNumberInputError.value = true
   }
 
+  if (deliveryProviders.value.includes(DeliveryProvider.DPD) && !dpdTrackNumber.value) {
+    valid = false
+    showDpdTrackNumberInputError.value = true
+  }
+
   return valid
 }
 
@@ -154,6 +174,7 @@ function resetFieldErrors() {
   showPostTrackNumberInputError.value = false
   showBoxberryTrackNumberInputError.value = false
   showPost5TrackNumberInputError.value = false
+  showDpdTrackNumberInputError.value = false
   showDeliveryProviderInputError.value = false
 }
 
@@ -212,6 +233,12 @@ function open() {
             label="Трек-номер Boxberry"
             v-model="boxberryTrackNumber"
             :show-input-error="showBoxberryTrackNumberInputError"
+          />
+          <FormInput
+            v-if="deliveryProviders.includes(DeliveryProvider.DPD)"
+            label="Трек-номер DPD *"
+            v-model="dpdTrackNumber"
+            :show-input-error="showDpdTrackNumberInputError"
           />
           <DescriptionInput
             v-model="description"
