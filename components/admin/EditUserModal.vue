@@ -101,7 +101,7 @@ function open(user: User) {
   firstName.value = user.first_name
   lastName.value = user.last_name
   phoneNr.value = user.phone_nr
-  tgUserName.value = user.tg_username
+  tgUserName.value = user.tg_username ?? ''
   invitedBy.value = user.invited_by ?? ''
   balance.value = user.balance.toString()
   bonus.value = ''
