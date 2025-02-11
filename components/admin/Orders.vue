@@ -158,7 +158,15 @@ function handleOrderStatusUpdateClosed() {
 
 function exportToCSV() {
   const bom = '\uFEFF'
-  const headers = ['Номер заказа', 'Фамилия', 'Имя', 'Вес без округления', 'Начальная сумма', 'Конечная сумма']
+  const headers = [
+    'Номер заказа',
+    'Фамилия',
+    'Имя',
+    'Вес без округления',
+    'Начальная сумма',
+    'Конечная сумма',
+    'Дата завершения заказа',
+  ]
   const rows: string[] = []
 
   for (const order of orders.value) {
@@ -169,6 +177,7 @@ function exportToCSV() {
       order.weight,
       order.original_price,
       order.current_price,
+      order.end_date?.toLocaleDateString(),
     ].join(',')
     rows.push(row)
   }
