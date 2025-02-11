@@ -85,7 +85,9 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
             class="font-semibold text-2xl leading-none mr-2 line-through decoration-2 opacity-50"
             >{{ order.original_price }}</span
           >
-          <span class="font-semibold text-2xl leading-none">{{ order.current_price }} ₾</span>
+          <span class="font-semibold text-2xl leading-none"
+            >{{ order.status >= OrderStatus.ReadyForDeliveryInTbilisi ? order.current_price : 0 }} ₾</span
+          >
         </div>
       </div>
       <div class="divider opacity-50 m-0"></div>
