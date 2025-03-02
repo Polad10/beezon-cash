@@ -188,11 +188,8 @@ async function handleOrderCreated(order: Order) {
                 Главная
               </div>
             </a>
-            <div role="tabpanel" class="tab-content pt-7 px-5 min-h-screen">
-              <div
-                id="profile-card"
-                class="flex flex-col justify-between container mx-auto h-64 bg-blue-700 rounded-2xl p-6 text-white"
-              >
+            <div role="tabpanel" class="tab-content container mx-auto pt-7 px-5 min-h-screen">
+              <div id="profile-card" class="flex flex-col justify-between h-64 bg-blue-700 rounded-2xl p-6 text-white">
                 <div class="flex flex-row justify-between">
                   <div class="flex flex-col">
                     <p>Ваш бонусный баланс</p>
@@ -224,6 +221,10 @@ async function handleOrderCreated(order: Order) {
                     </div>
                   </a>
                 </div>
+              </div>
+              <div class="flex flex-row gap-5 mt-5">
+                <a class="btn flex-1" href="https://t.me/beezon_logistics/145">Инструкции</a>
+                <a class="btn flex-1" href="https://t.me/beezon_logistic">Общий чат</a>
               </div>
             </div>
             <a
