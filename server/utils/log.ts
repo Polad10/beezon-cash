@@ -1,3 +1,5 @@
+import { LogLevel } from '~/models/LogLevel'
+
 export async function log(correlationId: String, level: LogLevel, message: String, extra: Object | null = null) {
   const logData = {
     correlationId: correlationId,

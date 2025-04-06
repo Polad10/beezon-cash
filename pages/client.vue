@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { retrieveLaunchParams } from '@telegram-apps/sdk'
+import { retrieveLaunchParams, type LaunchParams } from '@telegram-apps/sdk'
 import { ref } from 'vue'
 import axios, { HttpStatusCode } from 'axios'
 import type { User } from '~/models/User'
 import type { Order } from '~/models/Order'
 import Decimal from 'decimal.js'
 import type NewOrderWithoutUserInfo from '~/components/NewOrderWithoutUserInfo.vue'
+import { LogLevel } from '~/models/LogLevel'
 
 enum Tab {
   Home,
@@ -38,10 +39,12 @@ const computedOrders = computed(() => {
 
 onMounted(async () => {
   loading.value = true
+  var launchParams: LaunchParams | null = null
 
   try {
     //mockTgEnv()
-    initDataRaw.value = retrieveLaunchParams().initDataRaw
+    launchParams = retrieveLaunchParams()
+    initDataRaw.value = launchParams.initDataRaw
 
     headers = {
       headers: { Authorization: `tma ${initDataRaw.value}` },
@@ -50,6 +53,19 @@ onMounted(async () => {
     await retrieveMe()
   } catch (err) {
     loadingError.value = true
+    var error = err as Error
+    var initData = launchParams?.initData
+
+    const log = {
+      message: 'Failed to load client page',
+      logLevel: LogLevel.ERROR,
+      extra: {
+        user: initData?.user,
+        ...error,
+      },
+    }
+
+    await axios.post('/api/public/log', log)
   } finally {
     loading.value = false
   }

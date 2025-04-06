@@ -1,10 +1,5 @@
 import { Schema, model } from 'mongoose'
-
-export enum LogLevel {
-  INFO = 'info',
-  WARN = 'warn',
-  ERROR = 'error',
-}
+import { LogLevel } from '~/models/LogLevel'
 
 const LogSchema = new Schema({
   correlationId: {

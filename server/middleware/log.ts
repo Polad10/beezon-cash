@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto'
+import { LogLevel } from '~/models/LogLevel'
 
 export default defineEventHandler(async (event) => {
   const correlationId = randomUUID()

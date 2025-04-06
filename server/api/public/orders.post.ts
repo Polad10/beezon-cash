@@ -1,4 +1,5 @@
 import axios, { AxiosError, HttpStatusCode } from 'axios'
+import { LogLevel } from '~/models/LogLevel'
 
 export default defineEventHandler(async (event) => {
   try {
