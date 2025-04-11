@@ -276,6 +276,7 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
             <th>PRICE</th>
             <th>FINAL PRICE</th>
             <th>CITY</th>
+            <th>CREATION DATE</th>
             <th>DELIVERY DATE</th>
             <th></th>
           </tr>
@@ -303,6 +304,7 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
             <td>{{ order.original_price }}</td>
             <td>{{ order.current_price }}</td>
             <td>{{ cityToDisplayString(order.city) }}</td>
+            <td>{{ order.date.toLocaleDateString() }}</td>
             <td>{{ order.end_date?.toLocaleDateString() }}</td>
             <td>
               <div class="flex flex-row gap-2">
