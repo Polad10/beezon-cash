@@ -38,7 +38,7 @@ const editOrderModalRef = ref<typeof EditOrderModal | null>(null)
 const confirmActionModalRef = ref<typeof ConfirmActionModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 
-const rowsPerPage = 30
+const rowsPerPage = 100
 const currentPageNr = ref(1)
 const orderSearch = ref('')
 const orderStatusFilter = ref<Set<OrderStatus>>(new Set<OrderStatus>())

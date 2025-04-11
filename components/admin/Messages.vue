@@ -14,7 +14,7 @@ const props = defineProps({
 
 const emit = defineEmits(['message-deleted'])
 
-const rowsPerPage = 30
+const rowsPerPage = 100
 
 const newMessageModalRef = ref<typeof NewMessageModal | null>(null)
 const editMessageModalRef = ref<typeof EditMessageModal | null>(null)

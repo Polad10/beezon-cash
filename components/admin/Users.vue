@@ -21,7 +21,7 @@ const fuseUsersOptions = {
 
 const userSearch = ref('')
 const currentPageNr = ref(1)
-const rowsPerPage = 30
+const rowsPerPage = 100
 
 const newUserModalRef = ref<typeof NewUserModal | null>(null)
 const editUserModalRef = ref<typeof EditUserModal | null>(null)

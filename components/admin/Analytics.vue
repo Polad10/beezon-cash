@@ -28,7 +28,7 @@ onBeforeMount(() => {
   })
 })
 
-const rowsPerPage = 30
+const rowsPerPage = 100
 
 const currentPageNr = ref(1)
 const startDate = ref('')
