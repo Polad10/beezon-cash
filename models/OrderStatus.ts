@@ -3,6 +3,7 @@ export enum OrderStatus {
   WarehouseRF,
   Courier1,
   Courier2,
+  Waiting,
   ProcessedInTbilisi,
   ReadyForDeliveryInTbilisi,
   WarehouseTbilisi,
@@ -21,6 +22,8 @@ export function toAdminDisplayString(orderStatus: OrderStatus) {
       return 'Курьер 1'
     case OrderStatus.Courier2:
       return 'Курьер 2'
+    case OrderStatus.Waiting:
+      return 'Ожидание'
     case OrderStatus.ProcessedInTbilisi:
       return 'Собран в Тбилиси'
     case OrderStatus.ReadyForDeliveryInTbilisi:
@@ -44,6 +47,7 @@ export function toClientDisplayString(orderStatus: OrderStatus) {
       return 'Передается в доставку'
     case OrderStatus.Courier1:
     case OrderStatus.Courier2:
+    case OrderStatus.Waiting:
       return 'В пути'
     case OrderStatus.ProcessedInTbilisi:
       return 'Сортировка'
@@ -68,6 +72,8 @@ export function toAdminColorCode(orderStatus: OrderStatus) {
       return '#FFD6B9'
     case OrderStatus.Courier2:
       return '#FFF2B9'
+    case OrderStatus.Waiting:
+      return '#8ae5dc'
     case OrderStatus.ProcessedInTbilisi:
       return '#B9D7EC'
     case OrderStatus.ReadyForDeliveryInTbilisi:
@@ -91,6 +97,7 @@ export function toClientColorCode(orderStatus: OrderStatus) {
       return '#B9C4FF'
     case OrderStatus.Courier1:
     case OrderStatus.Courier2:
+    case OrderStatus.Waiting:
       return '#FFD6B9'
     case OrderStatus.ProcessedInTbilisi:
       return '#B9D7EC'
