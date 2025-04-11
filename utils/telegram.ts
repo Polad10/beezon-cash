@@ -5,10 +5,10 @@ export function mockTgEnv() {
     themeParams: {},
     initData: {
       user: {
-        id: 1220167578,
+        id: 1249006206,
         firstName: 'Andrew',
         lastName: 'Rogue',
-        username: 'rikapiu',
+        username: 'polad_10',
         languageCode: 'en',
         isPremium: true,
         allowsWriteToPm: true,
@@ -23,10 +23,10 @@ export function mockTgEnv() {
       [
         'user',
         JSON.stringify({
-          id: 1220167578,
+          id: 1249006206,
           first_name: 'Andrew',
           last_name: 'Rogue',
-          username: 'rikapiu',
+          username: 'polad_10',
           language_code: 'en',
           is_premium: true,
           allows_write_to_pm: true,
