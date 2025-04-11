@@ -110,7 +110,7 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
             <input
               type="number"
               class="grow ml-2"
-              placeholder="0"
+              :placeholder="`Макс. ${getMaxDiscountAmount(order)}`"
               v-model="bonus"
               enterkeyhint="done"
               @keydown.enter=";($event.target as HTMLInputElement).blur()"

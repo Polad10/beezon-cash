@@ -63,4 +63,9 @@ export default defineNuxtConfig({
       isCustomElement: (tag) => tag.startsWith('ion-'),
     },
   },
+  runtimeConfig: {
+    public: {
+      ENVIRONMENT: process.env.NUXT_ENVIRONMENT,
+    },
+  },
 })

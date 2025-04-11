@@ -19,9 +19,8 @@ let headers = {}
 const activeTab = ref<Tab>(Tab.Home)
 const initDataRaw = ref<string | undefined>(undefined)
 const copyToastVisible = ref(false)
-const bonusBalanceExceededToastVisible = ref(false)
-const maxDiscountAmountExceededToastVisible = ref(false)
-const bonusIsZeroToastVisible = ref(false)
+const customErrorToasVisible = ref(false)
+const customErrorMessage = ref('')
 const errorToastVisible = ref(false)
 const showOrderCreatedToast = ref(false)
 const loading = ref(true)
@@ -42,7 +41,7 @@ onMounted(async () => {
   var launchParams: LaunchParams | null = null
 
   try {
-    if (process.env.ENVIRONMENT == 'local') {
+    if (useRuntimeConfig().public.ENVIRONMENT == 'local') {
       mockTgEnv()
     }
 
@@ -105,15 +104,18 @@ function processOrder(order: Order) {
 }
 
 function showBonusBalanceExceededToast() {
-  showToast(bonusBalanceExceededToastVisible)
+  customErrorMessage.value = 'Вы списываете больше бонусов, чем есть на балансе'
+  showToast(customErrorToasVisible)
 }
 
-function showMaxDiscountAmountExceededToast() {
-  showToast(maxDiscountAmountExceededToastVisible)
+function showMaxDiscountAmountExceededToast(maxDiscountAmount: Decimal) {
+  customErrorMessage.value = `Для данного заказа вы можете списать не более ${maxDiscountAmount} лари`
+  showToast(customErrorToasVisible)
 }
 
 function showBonusIsZeroToast() {
-  showToast(bonusIsZeroToastVisible)
+  customErrorMessage.value = 'Сумма должна быть > 0'
+  showToast(customErrorToasVisible)
 }
 
 function showErrorToast() {
@@ -143,10 +145,10 @@ async function applyBonus(orderId: string, bonus: Decimal) {
       return false
     }
 
-    const maxDiscountAmount = order.current_price.dividedBy(4)
+    const maxDiscountAmount = getMaxDiscountAmount(order)
 
     if (bonus.greaterThan(maxDiscountAmount)) {
-      showMaxDiscountAmountExceededToast()
+      showMaxDiscountAmountExceededToast(maxDiscountAmount)
       return false
     }
 
@@ -328,36 +330,14 @@ async function handleOrderCreated(order: Order) {
             </div>
           </div>
           <div
-            v-if="bonusBalanceExceededToastVisible"
+            v-if="customErrorToasVisible"
             class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full"
           >
             <div
               class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
             >
               <ion-icon name="alert-circle-outline" class="text-warning text-5xl ml-px"></ion-icon>
-              <span>Вы списываете больше бонусов, чем есть на балансе</span>
-            </div>
-          </div>
-          <div
-            v-if="maxDiscountAmountExceededToastVisible"
-            class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full"
-          >
-            <div
-              class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
-            >
-              <ion-icon name="alert-circle-outline" class="text-warning text-5xl ml-px"></ion-icon>
-              <span>Можно списать не более 25% от суммы заказа</span>
-            </div>
-          </div>
-          <div
-            v-if="bonusIsZeroToastVisible"
-            class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full"
-          >
-            <div
-              class="alert bg-orange-100 text-sm font-bold py-3 px-3 flex items-center gap-y-0.5 border border-orange-200 object-center"
-            >
-              <ion-icon name="alert-circle-outline" class="text-warning text-5xl ml-px"></ion-icon>
-              <span>Сумма должна быть > 0</span>
+              <span>{{ customErrorMessage }}</span>
             </div>
           </div>
           <div v-if="errorToastVisible" class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full">
