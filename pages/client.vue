@@ -42,7 +42,10 @@ onMounted(async () => {
   var launchParams: LaunchParams | null = null
 
   try {
-    //mockTgEnv()
+    if (process.env.ENVIRONMENT == 'local') {
+      mockTgEnv()
+    }
+
     launchParams = retrieveLaunchParams()
     initDataRaw.value = launchParams.initDataRaw
 
