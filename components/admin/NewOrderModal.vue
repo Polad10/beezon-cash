@@ -259,9 +259,13 @@ const roundedWeight = computed(() => {
   }
 
   let finalWeight = weight.value ? new Decimal(weight.value) : new Decimal(0)
-  const weightValueString = weight.value.toString()
 
   if (weightRounded.value) {
+    if (finalWeight.lte(0.5)) {
+      return new Decimal(1)
+    }
+
+    const weightValueString = weight.value.toString()
     const weightDecimalsString = weightValueString.includes('.') ? weightValueString.split('.')[1] : '0'
     const zeroPrefixedWeightDecimalsString = `0.${weightDecimalsString}`
     const weightDecimals = new Decimal(zeroPrefixedWeightDecimalsString)
