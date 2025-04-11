@@ -230,12 +230,12 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
           Export CSV
           <ion-icon name="download-outline" class="text-base"></ion-icon>
         </button>
-        <details class="dropdown dropdown-end">
-          <summary class="btn btn-sm mb-1">
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-sm mb-1">
             {{ orderStatusFilter.size > 0 ? `Selected ${orderStatusFilter.size}` : 'All stages' }}
             <ion-icon name="filter-outline" class="text-base"></ion-icon>
-          </summary>
-          <ul class="menu dropdown-content rounded-box z-[1] p-2 shadow w-52 bg-white">
+          </div>
+          <ul tabindex="0" class="menu dropdown-content rounded-box z-[1] p-2 shadow w-52 bg-white">
             <li>
               <label class="label cursor-pointer">
                 <span class="label-text">{{ toAdminDisplayString(OrderStatus.New) }}</span>
@@ -347,7 +347,7 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
               </label>
             </li>
           </ul>
-        </details>
+        </div>
         <label
           class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
         >
