@@ -51,6 +51,7 @@ const modalRef = ref<HTMLDialogElement | null>(null)
 
 const fuseUsersOptions = {
   keys: ['tg_username', 'last_name', 'first_name'],
+  threshold: 0.1,
 }
 
 async function editOrder() {

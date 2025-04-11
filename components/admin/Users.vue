@@ -16,6 +16,7 @@ const emit = defineEmits(['user-deleted'])
 
 const fuseUsersOptions = {
   keys: ['id', 'tg_username', 'last_name', 'first_name', 'phone_nr', 'referral_code', 'invited_by'],
+  threshold: 0.1,
 }
 
 const userSearch = ref('')
