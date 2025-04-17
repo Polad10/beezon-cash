@@ -56,7 +56,7 @@ export default defineNuxtConfig({
         password: process.env.ADMIN_PASSWORD!,
       },
     ],
-    allowedRoutes: ['/neworder', '/client', '/api/public', '/api/me/*'],
+    allowedRoutes: ['/neworder', 'geruorder', '/client', '/api/public', '/api/me/*'],
   },
   vue: {
     compilerOptions: {

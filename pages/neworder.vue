@@ -12,7 +12,7 @@ import OrderTypeInput from '~/components/new-order-form/OrderTypeInput.vue'
 import CityInput from '~/components/new-order-form/CityInput.vue'
 import FormInput from '~/components/new-order-form/FormInput.vue'
 import DescriptionInput from '~/components/new-order-form/DescriptionInput.vue'
-import type DataProcessAgreement from '~/components/DataProcessAgreement.vue'
+import DataProcessAgreement from '~/components/DataProcessAgreement.vue'
 import PrivacyPolicyAgreement from '~/components/PrivacyPolicyAgreement.vue'
 
 const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie', { maxAge: 365 * 24 * 60 * 60 })
