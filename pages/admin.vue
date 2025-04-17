@@ -8,6 +8,7 @@ import axios from 'axios'
 enum ActiveTab {
   Users,
   Orders,
+  OrdersGeRu,
   Messages,
   Analytics,
 }
@@ -76,9 +77,9 @@ async function deleteMessage(message: Message) {
       <p class="text-2xl font-bold">BEEZON CASH</p>
     </div>
     <div class="flex flex-row my-3 pr-3 bg-zinc-100 grow overflow-auto">
-      <div class="flex flex-col w-32">
+      <div class="flex flex-col w-40">
         <div class="h-12"></div>
-        <ul class="menu w-32 rounded-box py-0">
+        <ul class="menu w-40 rounded-box py-0">
           <li>
             <button :class="{ active: activeTab == ActiveTab.Users }" @click="setActiveTab(ActiveTab.Users)">
               Users
@@ -86,7 +87,12 @@ async function deleteMessage(message: Message) {
           </li>
           <li>
             <button :class="{ active: activeTab == ActiveTab.Orders }" @click="setActiveTab(ActiveTab.Orders)">
-              Orders
+              Orders &nbsp;&nbsp; RU - GE
+            </button>
+          </li>
+          <li>
+            <button :class="{ active: activeTab == ActiveTab.OrdersGeRu }" @click="setActiveTab(ActiveTab.OrdersGeRu)">
+              Orders &nbsp;&nbsp; GE - RU
             </button>
           </li>
           <li>
