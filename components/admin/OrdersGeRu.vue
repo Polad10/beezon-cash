@@ -7,6 +7,7 @@ import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
 import type { OrderGeRu } from '~/models/OrderGeRu'
 import type { User } from '~/models/User'
 import StatusGeRuDropdown from './StatusGeRuDropdown.vue'
+import NewOrderGeRuModal from './NewOrderGeRuModal.vue'
 
 const props = defineProps<{
   allOrders: Array<OrderGeRu>
@@ -24,7 +25,7 @@ let fuseOrders = computed(() => {
   return new Fuse(props.allOrders, fuseOrdersOptions)
 })
 
-// const newOrderModalRef = ref<typeof NewOrderModal | null>(null)
+const newOrderModalRef = ref<typeof NewOrderGeRuModal | null>(null)
 // const editOrderModalRef = ref<typeof EditOrderModal | null>(null)
 const confirmActionModalRef = ref<typeof ConfirmActionModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
@@ -237,7 +238,7 @@ async function updateOrderStatus(order: OrderGeRu, newOrderStatus: OrderStatusGe
           <input type="text" class="grow" placeholder="Search" v-model="orderSearch" />
           <ion-icon name="search-outline"></ion-icon>
         </label>
-        <button class="btn btn-sm btn-outline" @click="">Add order</button>
+        <button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
       </div>
     </div>
     <div class="flex flex-col bg-white mr-3 mb-5 grow">
@@ -308,8 +309,7 @@ async function updateOrderStatus(order: OrderGeRu, newOrderStatus: OrderStatusGe
       </table>
     </div>
     <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
-    <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" :users="allUsers" />
-    <AdminEditOrderModal ref="editOrderModalRef" @order-edited="handleOrderEdited" :users="allUsers" />
+    <NewOrderGeRuModal ref="newOrderModalRef" @order-created="handleOrderCreated" :users="allUsers" />
     <AdminConfirmActionModal
       ref="confirmActionModalRef"
       @confirmed="handleOrderStatusUpdateConfirmedForSelection"
