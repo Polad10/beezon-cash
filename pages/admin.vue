@@ -17,7 +17,7 @@ enum ActiveTab {
 
 const users = (await useFetch<User[]>('/api/users')).data
 const orders = (await useFetch<Order[]>('/api/orders')).data
-const orderGeRu = (await useFetch<OrderGeRu[]>('/api/geru/admin/orders')).data
+const ordersGeRu = (await useFetch<OrderGeRu[]>('/api/geru/admin/orders')).data
 const messages = (await useFetch<Message[]>('/api/messages')).data
 const transactions = (await useFetch<Transaction[]>('/api/transactions')).data
 
@@ -63,7 +63,15 @@ async function deleteOrder(order: Order) {
   }
 }
 
-async function deleteGeRuOrder(order: OrderGeRu) {}
+async function deleteGeRuOrder(order: OrderGeRu) {
+  try {
+    await axios.delete(`/api/geru/admin/orders/${order.id}`)
+    ordersGeRu.value = ordersGeRu.value?.filter((o) => o.id !== order.id)!
+  } catch (ex) {
+    errorMessage.value = 'Something went wrong. Please try again later.'
+    showToast(showErrorToast)
+  }
+}
 
 async function deleteMessage(message: Message) {
   try {
@@ -128,7 +136,7 @@ async function deleteMessage(message: Message) {
       <KeepAlive>
         <OrdersGeRu
           v-if="activeTab === ActiveTab.OrdersGeRu"
-          :all-orders="orderGeRu!"
+          :all-orders="ordersGeRu!"
           :all-users="users!"
           @order-deleted="deleteGeRuOrder"
         />
