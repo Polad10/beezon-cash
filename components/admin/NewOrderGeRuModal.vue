@@ -4,6 +4,7 @@ import Decimal from 'decimal.js'
 import type { OrderStatusGeRu } from '~/enums/OrderStatusGeRu'
 import type { User } from '~/models/User'
 import StatusGeRuDropdown from './StatusGeRuDropdown.vue'
+import type { OrderGeRu, OrderGeRuRequest } from '~/models/OrderGeRu'
 
 const props = defineProps<{
   users: User[]
@@ -13,6 +14,9 @@ const emit = defineEmits(['order-created'])
 
 const selectedUser = ref<User | null>(null)
 const status = ref<OrderStatusGeRu | null>(null)
+const receiverName = ref('')
+const receiverPhoneNr = ref('')
+const receiverAddress = ref('')
 const weight = ref('')
 const price = ref('')
 const weightRounded = ref(true)
@@ -24,6 +28,9 @@ const showErrorToast = ref(false)
 const showSuccessToast = ref(false)
 const showUserInputError = ref(false)
 const showStatusInputError = ref(false)
+const showReceiverNameInputError = ref(false)
+const showReceiverPhoneNrInputError = ref(false)
+const showReceiverAddressInputError = ref(false)
 const showWeightInputError = ref(false)
 const showPriceInputError = ref(false)
 
@@ -37,36 +44,38 @@ const fuseUsersOptions = {
 }
 
 async function addOrder() {
-  // if (validateForm()) {
-  //   try {
-  //     const orderRequest: OrderRequest = {
-  //       status: status.value!,
-  //       user_id: selectedUser.value!.id,
-  //       weight_rounded: weightRounded.value,
-  //       original_price: originalPrice.value ? new Decimal(originalPrice.value) : undefined,
-  //       current_price: currentPrice.value ? new Decimal(currentPrice.value) : undefined,
-  //       city: city.value || undefined,
-  //       weight: weight.value ? new Decimal(weight.value) : undefined,
-  //       additional_cost: additionalCost.value ? new Decimal(additionalCost.value) : undefined,
-  //       partner_cost: partnerCost.value ? new Decimal(partnerCost.value) : undefined,
-  //       description: description.value || undefined,
-  //       order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
-  //       order_tracks: [],
-  //       send_notification: sendNotification.value,
-  //     }
-  //     const order: Order = (await axios.post('/api/orders', orderRequest)).data
-  //     emit('order-created', order)
-  //     successMessage.value = 'Order added'
-  //     showToast(showSuccessToast)
-  //     close()
-  //   } catch (ex) {
-  //     errorMessage.value = 'Something went wrong. Please try again later.'
-  //     showToast(showErrorToast)
-  //   }
-  // } else {
-  //   errorMessage.value = 'Please fill all the required fields'
-  //   showToast(showErrorToast)
-  // }
+  if (validateForm()) {
+    try {
+      const orderRequest: OrderGeRuRequest = {
+        original_price: price.value ? new Decimal(price.value) : undefined,
+        current_price: price.value ? new Decimal(price.value) : undefined,
+        status: status.value!,
+        user_id: selectedUser.value!.id,
+        description: description.value,
+        weight: weight.value ? new Decimal(weight.value) : undefined,
+        weight_rounded: weightRounded.value,
+        receiver_name: receiverName.value,
+        receiver_phone_nr: receiverPhoneNr.value,
+        receiver_address: receiverAddress.value,
+        cdek_track_nr: cdekTrackNumber.value,
+        send_notification: sendNotification.value,
+      }
+
+      const order: OrderGeRu = (await axios.post('/api/geru/admin/orders', orderRequest)).data
+      emit('order-created', order)
+
+      successMessage.value = 'Order added'
+      showToast(showSuccessToast)
+
+      close()
+    } catch (ex) {
+      errorMessage.value = 'Something went wrong. Please try again later.'
+      showToast(showErrorToast)
+    }
+  } else {
+    errorMessage.value = 'Please fill all the required fields'
+    showToast(showErrorToast)
+  }
 }
 
 function validateForm() {
@@ -81,6 +90,21 @@ function validateForm() {
   if (status.value == null) {
     valid = false
     showStatusInputError.value = true
+  }
+
+  if (!receiverName.value) {
+    valid = false
+    showReceiverNameInputError.value = true
+  }
+
+  if (!receiverPhoneNr.value) {
+    valid = false
+    showReceiverPhoneNrInputError.value = true
+  }
+
+  if (!receiverAddress.value) {
+    valid = false
+    showReceiverAddressInputError.value = true
   }
 
   if (weight.value && !isValidDecimal(weight.value)) {
@@ -109,6 +133,9 @@ function open() {
 function resetFieldValues() {
   selectedUser.value = null
   status.value = null
+  receiverName.value = ''
+  receiverPhoneNr.value = ''
+  receiverAddress.value = ''
   weight.value = ''
   weightRounded.value = false
   price.value = ''
@@ -120,6 +147,9 @@ function resetFieldValues() {
 function resetFieldErrors() {
   showUserInputError.value = false
   showStatusInputError.value = false
+  showReceiverNameInputError.value = false
+  showReceiverPhoneNrInputError.value = false
+  showReceiverAddressInputError.value = false
   showWeightInputError.value = false
   showPriceInputError.value = false
 }
@@ -195,6 +225,27 @@ defineExpose({ open })
             v-model="selectedUser"
           />
           <StatusGeRuDropdown label="Status *" :class="{ 'select-error': showStatusInputError }" v-model="status" />
+          <Input
+            type="text"
+            label="Receiver's name *"
+            placeholder="Full name"
+            v-model="receiverName"
+            :class="{ 'input-error': showReceiverNameInputError }"
+          />
+          <Input
+            type="text"
+            label="Receiver's phone number *"
+            placeholder="+79999097878"
+            v-model="receiverPhoneNr"
+            :class="{ 'input-error': showReceiverPhoneNrInputError }"
+          />
+          <Input
+            type="text"
+            label="Receiver's address *"
+            placeholder="Address"
+            v-model="receiverAddress"
+            :class="{ 'input-error': showReceiverAddressInputError }"
+          />
           <div>
             <Input
               type="text"

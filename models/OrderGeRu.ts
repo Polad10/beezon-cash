@@ -21,3 +21,18 @@ export interface OrderGeRu {
   delivered_at: Date | null
   user?: User
 }
+
+export interface OrderGeRuRequest {
+  original_price?: Decimal
+  current_price?: Decimal
+  status?: OrderStatusGeRu
+  user_id: string
+  description?: string
+  weight?: Decimal
+  weight_rounded?: boolean
+  receiver_name: string
+  receiver_phone_nr: string
+  receiver_address: string
+  cdek_track_nr?: string
+  send_notification?: boolean
+}
