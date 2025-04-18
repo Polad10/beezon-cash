@@ -4,6 +4,8 @@ import type { Message } from '~/models/Message'
 import type { User } from '~/models/User'
 import type { Transaction } from '~/models/Transaction'
 import axios from 'axios'
+import OrdersGeRu from '~/components/admin/OrdersGeRu.vue'
+import type { OrderGeRu } from '~/models/OrderGeRu'
 
 enum ActiveTab {
   Users,
@@ -15,6 +17,7 @@ enum ActiveTab {
 
 const users = (await useFetch<User[]>('/api/users')).data
 const orders = (await useFetch<Order[]>('/api/orders')).data
+const orderGeRu = (await useFetch<OrderGeRu[]>('/api/geru/admin/orders')).data
 const messages = (await useFetch<Message[]>('/api/messages')).data
 const transactions = (await useFetch<Transaction[]>('/api/transactions')).data
 
@@ -59,6 +62,8 @@ async function deleteOrder(order: Order) {
     showToast(showErrorToast)
   }
 }
+
+async function deleteGeRuOrder(order: OrderGeRu) {}
 
 async function deleteMessage(message: Message) {
   try {
@@ -117,6 +122,15 @@ async function deleteMessage(message: Message) {
           :all-orders="orders!"
           :all-users="users!"
           @order-deleted="deleteOrder"
+        />
+      </KeepAlive>
+
+      <KeepAlive>
+        <OrdersGeRu
+          v-if="activeTab === ActiveTab.OrdersGeRu"
+          :all-orders="orderGeRu!"
+          :all-users="users!"
+          @order-deleted="deleteGeRuOrder"
         />
       </KeepAlive>
 
