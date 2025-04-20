@@ -5,13 +5,16 @@ import type { User } from '~/models/User'
 import type { Transaction } from '~/models/Transaction'
 import axios from 'axios'
 import OrdersGeRu from '~/components/admin/OrdersGeRu.vue'
+import MessagesGeRu from '~/components/admin/MessagesGeRu.vue'
 import type { OrderGeRu } from '~/models/OrderGeRu'
+import type { MessageGeRu } from '~/models/MessageGeRu'
 
 enum ActiveTab {
   Users,
   Orders,
   OrdersGeRu,
   Messages,
+  MessagesGeRu,
   Analytics,
 }
 
@@ -19,6 +22,7 @@ const users = (await useFetch<User[]>('/api/users')).data
 const orders = (await useFetch<Order[]>('/api/orders')).data
 const ordersGeRu = (await useFetch<OrderGeRu[]>('/api/geru/admin/orders')).data
 const messages = (await useFetch<Message[]>('/api/messages')).data
+const messagesGeRu = (await useFetch<MessageGeRu[]>('/api/geru/admin/messages')).data
 const transactions = (await useFetch<Transaction[]>('/api/transactions')).data
 
 const activeTab = ref<ActiveTab>()
@@ -82,6 +86,16 @@ async function deleteMessage(message: Message) {
     showToast(showErrorToast)
   }
 }
+
+async function deleteGeRuMessage(message: MessageGeRu) {
+  try {
+    await axios.delete(`/api/geru/admin/messages/${message.id}`)
+    messagesGeRu.value = messagesGeRu.value?.filter((m) => m.id !== message.id)!
+  } catch (ex) {
+    errorMessage.value = 'Something went wrong. Please try again later.'
+    showToast(showErrorToast)
+  }
+}
 </script>
 
 <template>
@@ -90,9 +104,9 @@ async function deleteMessage(message: Message) {
       <p class="text-2xl font-bold">BEEZON CASH</p>
     </div>
     <div class="flex flex-row my-3 pr-3 bg-zinc-100 grow overflow-auto">
-      <div class="flex flex-col w-40">
+      <div class="flex flex-col w-44">
         <div class="h-12"></div>
-        <ul class="menu w-40 rounded-box py-0">
+        <ul class="menu w-44 rounded-box py-0">
           <li>
             <button :class="{ active: activeTab == ActiveTab.Users }" @click="setActiveTab(ActiveTab.Users)">
               Users
@@ -110,7 +124,15 @@ async function deleteMessage(message: Message) {
           </li>
           <li>
             <button :class="{ active: activeTab == ActiveTab.Messages }" @click="setActiveTab(ActiveTab.Messages)">
-              Messages
+              Messages &nbsp;&nbsp; RU - GE
+            </button>
+          </li>
+          <li>
+            <button
+              :class="{ active: activeTab == ActiveTab.MessagesGeRu }"
+              @click="setActiveTab(ActiveTab.MessagesGeRu)"
+            >
+              Messages &nbsp;&nbsp; GE - RU
             </button>
           </li>
           <li>
@@ -144,6 +166,14 @@ async function deleteMessage(message: Message) {
 
       <KeepAlive>
         <AdminMessages v-if="activeTab === ActiveTab.Messages" :messages="messages!" @message-deleted="deleteMessage" />
+      </KeepAlive>
+
+      <KeepAlive>
+        <MessagesGeRu
+          v-if="activeTab === ActiveTab.MessagesGeRu"
+          :messages="messagesGeRu!"
+          @message-deleted="deleteGeRuMessage"
+        />
       </KeepAlive>
 
       <KeepAlive>

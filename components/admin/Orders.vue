@@ -213,7 +213,7 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
 <template>
   <div class="flex flex-col grow">
     <div class="flex flex-row min-h-12 mr-3 justify-between items-center">
-      <span class="text-2xl font-bold">Orders</span>
+      <span class="text-2xl font-bold">Orders &nbsp;&nbsp; RU - GE</span>
       <div class="flex flex-row gap-5">
         <label class="label cursor-pointer gap-2 p-0">
           <input type="checkbox" class="checkbox checkbox-sm" v-model="sendNotification" />

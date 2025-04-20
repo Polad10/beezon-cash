@@ -59,7 +59,7 @@ async function deleteMessage(message: Message) {
 <template>
   <div class="flex flex-col grow">
     <div class="flex flex-row min-h-12 mr-3 justify-between items-center">
-      <span class="text-2xl font-bold">Messages</span>
+      <span class="text-2xl font-bold">Messages &nbsp;&nbsp; RU - GE</span>
       <div class="flex flex-row gap-5">
         <button class="btn btn-sm btn-outline" @click="newMessageModalRef?.open()">Add message</button>
       </div>
@@ -104,5 +104,6 @@ async function deleteMessage(message: Message) {
     <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
     <AdminNewMessageModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
     <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" />
+    <ConfirmDeleteModal ref="confirmDeleteModalRef" />
   </div>
 </template>
