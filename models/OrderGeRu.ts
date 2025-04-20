@@ -36,3 +36,8 @@ export interface OrderGeRuRequest {
   cdek_track_nr?: string
   send_notification?: boolean
 }
+
+export interface OrderGeRuPatchRequest {
+  status: OrderStatusGeRu
+  send_notification?: boolean
+}

@@ -4,11 +4,12 @@ import Fuse from 'fuse.js'
 import { OrderStatusGeRu, toAdminColorCode, toAdminDisplayString } from '~/enums/OrderStatusGeRu'
 import ConfirmActionModal from '~/components/admin/ConfirmActionModal.vue'
 import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
-import type { OrderGeRu } from '~/models/OrderGeRu'
+import type { OrderGeRu, OrderGeRuPatchRequest } from '~/models/OrderGeRu'
 import type { User } from '~/models/User'
 import StatusGeRuDropdown from './StatusGeRuDropdown.vue'
 import NewOrderGeRuModal from './NewOrderGeRuModal.vue'
 import EditOrderGeRuModal from './EditOrderGeRuModal.vue'
+import axios from 'axios'
 
 const props = defineProps<{
   allOrders: Array<OrderGeRu>
@@ -187,14 +188,14 @@ function toggleAllOrdersSelected() {
 }
 
 async function updateOrderStatus(order: OrderGeRu, newOrderStatus: OrderStatusGeRu) {
-  // try {
-  //   const body: OrderPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
-  //   const updatedOrder = (await axios.patch(`/api/orders/${order.id}`, body)).data
-  //   order.status = updatedOrder.status
-  // } catch (ex) {
-  //   errorMessage.value = 'Something went wrong. Please try again later.'
-  //   showToast(showErrorToast)
-  // }
+  try {
+    const body: OrderGeRuPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
+    const updatedOrder = (await axios.patch(`/api/geru/admin/orders/${order.id}`, body)).data
+    order.status = updatedOrder.status
+  } catch (ex) {
+    errorMessage.value = 'Something went wrong. Please try again later.'
+    showToast(showErrorToast)
+  }
 }
 </script>
 
