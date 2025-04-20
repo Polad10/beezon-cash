@@ -8,6 +8,7 @@ import type { OrderGeRu } from '~/models/OrderGeRu'
 import type { User } from '~/models/User'
 import StatusGeRuDropdown from './StatusGeRuDropdown.vue'
 import NewOrderGeRuModal from './NewOrderGeRuModal.vue'
+import EditOrderGeRuModal from './EditOrderGeRuModal.vue'
 
 const props = defineProps<{
   allOrders: Array<OrderGeRu>
@@ -26,7 +27,7 @@ let fuseOrders = computed(() => {
 })
 
 const newOrderModalRef = ref<typeof NewOrderGeRuModal | null>(null)
-// const editOrderModalRef = ref<typeof EditOrderModal | null>(null)
+const editOrderModalRef = ref<typeof EditOrderGeRuModal | null>(null)
 const confirmActionModalRef = ref<typeof ConfirmActionModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 
@@ -293,7 +294,7 @@ async function updateOrderStatus(order: OrderGeRu, newOrderStatus: OrderStatusGe
             <td>{{ order.delivered_at?.toLocaleDateString() }}</td>
             <td>
               <div class="flex flex-row gap-2">
-                <button class="btn btn-sm text-gray-500 btn-square btn-outline" @click="">
+                <button class="btn btn-sm text-gray-500 btn-square btn-outline" @click="editOrderModalRef?.open(order)">
                   <ion-icon name="pencil"></ion-icon>
                 </button>
                 <button
@@ -310,6 +311,7 @@ async function updateOrderStatus(order: OrderGeRu, newOrderStatus: OrderStatusGe
     </div>
     <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
     <NewOrderGeRuModal ref="newOrderModalRef" @order-created="handleOrderCreated" :users="allUsers" />
+    <EditOrderGeRuModal ref="editOrderModalRef" @order-edited="handleOrderEdited" :users="allUsers" />
     <AdminConfirmActionModal
       ref="confirmActionModalRef"
       @confirmed="handleOrderStatusUpdateConfirmedForSelection"
