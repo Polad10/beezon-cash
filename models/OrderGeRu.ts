@@ -41,3 +41,8 @@ export interface OrderGeRuPatchRequest {
   status: OrderStatusGeRu
   send_notification?: boolean
 }
+
+export interface OrderGeRuBatchPatchRequest {
+  patches: { id: string; status: OrderStatusGeRu }[]
+  send_notification?: boolean
+}

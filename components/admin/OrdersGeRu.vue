@@ -4,7 +4,7 @@ import Fuse from 'fuse.js'
 import { OrderStatusGeRu, toAdminColorCode, toAdminDisplayString } from '~/enums/OrderStatusGeRu'
 import ConfirmActionModal from '~/components/admin/ConfirmActionModal.vue'
 import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
-import type { OrderGeRu, OrderGeRuPatchRequest } from '~/models/OrderGeRu'
+import type { OrderGeRu, OrderGeRuBatchPatchRequest, OrderGeRuPatchRequest } from '~/models/OrderGeRu'
 import type { User } from '~/models/User'
 import StatusGeRuDropdown from './StatusGeRuDropdown.vue'
 import NewOrderGeRuModal from './NewOrderGeRuModal.vue'
@@ -121,25 +121,27 @@ function processOrderValues(order: OrderGeRu) {
   order.user = props.allUsers.find((u) => u.id === order.user_id)
 }
 
-async function handleOrderStatusUpdateConfirmedForSelection() {
-  // try {
-  //   const body: OrderBatchPatchRequest = {
-  //     patches: selectedOrders.value.map((order) => ({
-  //       id: order.id,
-  //       status: selectedOrderStatusToSet.value!,
-  //     })),
-  //     send_notification: sendNotification.value,
-  //   }
-  //   const updatedOrders = (await axios.patch('/api/orders', body)).data
-  //   for (const order of updatedOrders) {
-  //     selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
-  //   }
-  // } catch (ex) {
-  //   errorMessage.value = 'Something went wrong. Please try again later.'
-  //   showToast(showErrorToast)
-  // } finally {
-  //   confirmActionModalRef.value?.close()
-  // }
+async function updateOrderStatusForSelection() {
+  try {
+    const body: OrderGeRuBatchPatchRequest = {
+      patches: selectedOrders.value.map((order) => ({
+        id: order.id,
+        status: selectedOrderStatusToSet.value!,
+      })),
+      send_notification: sendNotification.value,
+    }
+
+    const updatedOrders = (await axios.patch('/api/geru/admin/orders', body)).data
+
+    for (const order of updatedOrders) {
+      selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
+    }
+  } catch (ex) {
+    errorMessage.value = 'Something went wrong. Please try again later.'
+    showToast(showErrorToast)
+  } finally {
+    confirmActionModalRef.value?.close()
+  }
 }
 
 function handleOrderStatusUpdateClosed() {
@@ -208,7 +210,7 @@ async function updateOrderStatus(order: OrderGeRu, newOrderStatus: OrderStatusGe
           <input type="checkbox" class="checkbox checkbox-sm" v-model="sendNotification" />
           <span class="label-text">Send notification</span>
         </label>
-        <AdminStatusDropdown
+        <StatusGeRuDropdown
           class="select-sm"
           placeholder="Change status"
           form-control-class="w-fit"
@@ -315,7 +317,7 @@ async function updateOrderStatus(order: OrderGeRu, newOrderStatus: OrderStatusGe
     <EditOrderGeRuModal ref="editOrderModalRef" @order-edited="handleOrderEdited" :users="allUsers" />
     <AdminConfirmActionModal
       ref="confirmActionModalRef"
-      @confirmed="handleOrderStatusUpdateConfirmedForSelection"
+      @confirmed="updateOrderStatusForSelection"
       @closed="handleOrderStatusUpdateClosed"
     >
       <p>
