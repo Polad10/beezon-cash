@@ -2,6 +2,7 @@
 import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
 import type { MessageGeRu } from '~/models/MessageGeRu'
 import { toAdminDisplayString } from '~/enums/OrderStatusGeRu'
+import NewMessageGeRuModal from './NewMessageGeRuModal.vue'
 
 const props = defineProps({
   messages: {
@@ -14,7 +15,7 @@ const emit = defineEmits(['message-deleted'])
 
 const rowsPerPage = 100
 
-// const newMessageModalRef = ref<typeof NewMessageModal | null>(null)
+const newMessageModalRef = ref<typeof NewMessageGeRuModal | null>(null)
 // const editMessageModalRef = ref<typeof EditMessageModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 
@@ -38,7 +39,7 @@ function setPageNr(newPageNr: number) {
 }
 
 function handleMessageCreated(message: MessageGeRu) {
-  // props.messages.push(message)
+  props.messages.push(message)
 }
 
 function handleMessageEdited(message: MessageGeRu) {
@@ -58,7 +59,7 @@ async function deleteMessage(message: MessageGeRu) {
     <div class="flex flex-row min-h-12 mr-3 justify-between items-center">
       <span class="text-2xl font-bold">Messages &nbsp;&nbsp; GE - RU</span>
       <div class="flex flex-row gap-5">
-        <button class="btn btn-sm btn-outline" @click="">Add message</button>
+        <button class="btn btn-sm btn-outline" @click="newMessageModalRef?.open()">Add message</button>
       </div>
     </div>
     <div class="flex flex-col bg-white mr-3 mb-5 grow">
@@ -96,8 +97,8 @@ async function deleteMessage(message: MessageGeRu) {
       </table>
     </div>
     <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
-    <!-- <AdminNewMessageModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
-    <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" /> -->
+    <NewMessageGeRuModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
+    <!-- <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" /> -->
     <ConfirmDeleteModal ref="confirmDeleteModalRef" />
   </div>
 </template>

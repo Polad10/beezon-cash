@@ -6,3 +6,9 @@ export interface MessageGeRu {
   text: string
   order_status: OrderStatusGeRu
 }
+
+export interface MessageGeRuRequest {
+  name: string
+  text: string
+  order_status: OrderStatusGeRu
+}
