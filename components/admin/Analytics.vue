@@ -139,10 +139,6 @@ function setPageNr(newPageNr: number) {
   currentPageNr.value = newPageNr
 }
 
-function getOrderCode(transaction: Transaction) {
-  return props.orders.find((o) => o.id === transaction.order_id)?.code
-}
-
 function getUserName(transaction: Transaction) {
   const user = props.users.find((u) => u.id === transaction.user_id)
 
@@ -188,7 +184,7 @@ function getUserName(transaction: Transaction) {
         <thead>
           <tr class="bg-base-200">
             <th>DATE</th>
-            <th>ORDER CODE</th>
+            <th>REASON</th>
             <th>CLIENT</th>
             <th>ACTION</th>
             <th>AMOUNT</th>
@@ -197,7 +193,7 @@ function getUserName(transaction: Transaction) {
         <tbody>
           <tr v-for="transaction in pageTransactions" :key="transaction.id">
             <td>{{ transaction.datetime.toLocaleDateString() }}</td>
-            <td>{{ getOrderCode(transaction) }}</td>
+            <td>{{ transaction.reason }}</td>
             <td>{{ getUserName(transaction) }}</td>
             <td>
               <div
