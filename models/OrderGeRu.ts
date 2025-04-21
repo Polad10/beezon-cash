@@ -30,6 +30,7 @@ export interface OrderGeRuRequest {
   description?: string
   weight?: Decimal
   weight_rounded?: boolean
+  hint_price: string
   receiver_name: string
   receiver_phone_nr: string
   receiver_address: string

@@ -18,8 +18,9 @@ const receiverName = ref('')
 const receiverPhoneNr = ref('')
 const receiverAddress = ref('')
 const weight = ref('')
-const price = ref('')
 const weightRounded = ref(true)
+const price = ref('')
+const hintPrice = ref('')
 const cdekTrackNumber = ref('')
 const description = ref('')
 const sendNotification = ref(false)
@@ -54,6 +55,7 @@ async function addOrder() {
         description: description.value,
         weight: weight.value ? new Decimal(weight.value) : undefined,
         weight_rounded: weightRounded.value,
+        hint_price: hintPrice.value,
         receiver_name: receiverName.value,
         receiver_phone_nr: receiverPhoneNr.value,
         receiver_address: receiverAddress.value,
@@ -274,6 +276,7 @@ defineExpose({ open })
               <ion-icon name="calculator-outline"></ion-icon>
             </button>
           </div>
+          <Input type="text" label="Hint price" placeholder="50.25" v-model="hintPrice" />
           <Input type="text" label="Track number" placeholder="123456789" v-model="cdekTrackNumber" />
           <Textarea
             label="Description"
