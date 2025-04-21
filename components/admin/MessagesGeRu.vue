@@ -3,6 +3,7 @@ import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
 import type { MessageGeRu } from '~/models/MessageGeRu'
 import { toAdminDisplayString } from '~/enums/OrderStatusGeRu'
 import NewMessageGeRuModal from './NewMessageGeRuModal.vue'
+import EditMessageGeRuModal from './EditMessageGeRuModal.vue'
 
 const props = defineProps({
   messages: {
@@ -16,7 +17,7 @@ const emit = defineEmits(['message-deleted'])
 const rowsPerPage = 100
 
 const newMessageModalRef = ref<typeof NewMessageGeRuModal | null>(null)
-// const editMessageModalRef = ref<typeof EditMessageModal | null>(null)
+const editMessageModalRef = ref<typeof EditMessageGeRuModal | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 
 const currentPageNr = ref(1)
@@ -43,10 +44,11 @@ function handleMessageCreated(message: MessageGeRu) {
 }
 
 function handleMessageEdited(message: MessageGeRu) {
-  // const localMessage = props.messages.find((m) => m.id === message.id)
-  // if (localMessage) {
-  //   Object.assign(localMessage, message)
-  // }
+  const localMessage = props.messages.find((m) => m.id === message.id)
+
+  if (localMessage) {
+    Object.assign(localMessage, message)
+  }
 }
 
 async function deleteMessage(message: MessageGeRu) {
@@ -81,7 +83,10 @@ async function deleteMessage(message: MessageGeRu) {
             <td>{{ toAdminDisplayString(message.order_status) }}</td>
             <td>
               <div class="flex flex-row gap-2">
-                <button class="btn btn-sm text-gray-500 btn-square btn-outline" @click="">
+                <button
+                  class="btn btn-sm text-gray-500 btn-square btn-outline"
+                  @click="editMessageModalRef?.open(message)"
+                >
                   <ion-icon name="pencil"></ion-icon>
                 </button>
                 <button
@@ -98,7 +103,7 @@ async function deleteMessage(message: MessageGeRu) {
     </div>
     <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
     <NewMessageGeRuModal ref="newMessageModalRef" @message-created="handleMessageCreated" />
-    <!-- <AdminEditMessageModal ref="editMessageModalRef" @message-edited="handleMessageEdited" /> -->
+    <EditMessageGeRuModal ref="editMessageModalRef" @message-edited="handleMessageEdited" />
     <ConfirmDeleteModal ref="confirmDeleteModalRef" />
   </div>
 </template>
