@@ -165,7 +165,7 @@ function resetFieldErrors() {
   <div data-theme="cmyk" class="flex flex-col w-full h-full justify-center items-center">
     <dialog class="modal" ref="modalRef">
       <div class="modal-box">
-        <p class="text-2xl text-center">Доставка из РФ в Грузию</p>
+        <p class="text-2xl text-center">Доставка из Грузии в РФ</p>
         <div class="divider"></div>
         <div class="flex flex-col gap-2">
           <Input
@@ -206,7 +206,7 @@ function resetFieldErrors() {
           />
           <Input
             type="text"
-            label="ФИО получателя в России (полностью) *"
+            label="ФИО получателя (полностью) *"
             placeholder="ФИО получателя в России (полностью)"
             v-model="receiverName"
             :class="{ 'input-error': showReceiverNameInputError }"
@@ -215,7 +215,7 @@ function resetFieldErrors() {
           />
           <Input
             type="text"
-            label="Номер телефона получателя в России *"
+            label="Номер телефона получателя *"
             placeholder="+79999097878"
             v-model="receiverPhoneNr"
             :class="{ 'input-error': showReceiverPhoneNrInputError }"
