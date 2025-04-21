@@ -170,80 +170,89 @@ function resetFieldErrors() {
         <div class="flex flex-col gap-2">
           <Input
             type="text"
-            label="Имя отправителя *"
+            label="Имя отправителя"
             placeholder="Имя отправителя"
             v-model="firstName"
             :class="{ 'input-error': showFirstNameInputError }"
             label-class="font-medium pb-1"
             label-text-class="text-base"
+            :required="true"
           />
           <Input
             type="text"
-            label="Фамилия отправителя *"
+            label="Фамилия отправителя"
             placeholder="Фамилия отправителя"
             v-model="lastName"
             :class="{ 'input-error': showLastNameInputError }"
             label-class="font-medium pb-1"
             label-text-class="text-base"
+            :required="true"
           />
           <Input
             type="text"
-            label="Номер телефона отправителя *"
+            label="Номер телефона отправителя"
             placeholder="+79999097878"
             v-model="phoneNr"
             :class="{ 'input-error': showPhoneNrInputError }"
             label-class="font-medium pb-1"
             label-text-class="text-base"
+            :required="true"
           />
           <Input
             type="text"
-            label="Логин отправителя в Telegram *"
+            label="Логин отправителя в Telegram"
             placeholder="username"
             v-model="tgUserName"
             :class="{ 'input-error': showTgUsernameInputError }"
             label-class="font-medium pb-1"
             label-text-class="text-base"
+            :required="true"
           />
           <Input
             type="text"
-            label="ФИО получателя (полностью) *"
+            label="ФИО получателя в России (полностью)"
             placeholder="ФИО получателя в России (полностью)"
             v-model="receiverName"
             :class="{ 'input-error': showReceiverNameInputError }"
             label-class="font-medium pb-1"
             label-text-class="text-base"
+            :required="true"
           />
           <Input
             type="text"
-            label="Номер телефона получателя *"
+            label="Номер телефона получателя в России"
             placeholder="+79999097878"
             v-model="receiverPhoneNr"
             :class="{ 'input-error': showReceiverPhoneNrInputError }"
             label-class="font-medium pb-1"
             label-text-class="text-base"
+            :required="true"
           />
           <Input
             type="text"
-            label="Адрес ПВЗ СДЭКа / Адрес получателя *"
+            label="Адрес ПВЗ СДЭКа / Адрес получателя"
             placeholder="Адрес ПВЗ СДЭКа / Адрес получателя"
             v-model="receiverAddress"
             :class="{ 'input-error': showReceiverAddressInputError }"
             label-class="font-medium pb-1"
             label-text-class="text-base"
+            :required="true"
           />
           <DescriptionInput
             v-model="description"
             :show-input-error="showDescriptionInputError"
-            label="Краткая опись заказа *"
+            label="Краткая опись заказа"
+            :required="true"
           />
           <Input
             type="text"
-            label="Объявленная ценность посылки (в лари) *"
+            label="Объявленная ценность посылки (в лари)"
             placeholder="Объявленная ценность посылки (в лари)"
             v-model="hintPrice"
             :class="{ 'input-error': showHintPriceInputError }"
             label-class="font-medium pb-1"
             label-text-class="text-base"
+            :required="true"
           />
           <label class="label cursor-pointer justify-normal items-start gap-2">
             <input

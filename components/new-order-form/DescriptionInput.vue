@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-defineProps<{
+const props = defineProps<{
   label: string
   showInputError: boolean
+  required?: boolean
 }>()
 
 const model = defineModel<string>()
@@ -16,5 +17,6 @@ const model = defineModel<string>()
     :class="{ 'textarea-error': showInputError }"
     label-class="font-medium pb-1"
     label-text-class="text-base"
+    :required="props.required"
   />
 </template>

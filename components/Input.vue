@@ -11,6 +11,7 @@ const props = defineProps<{
   placeholder?: string
   labelClass?: string
   labelTextClass?: string
+  required?: boolean
 }>()
 
 const model = defineModel()
@@ -19,7 +20,9 @@ const model = defineModel()
 <template>
   <label class="form-control grow">
     <div class="label" :class="labelClass" v-if="props.label">
-      <span class="label-text" :class="labelTextClass">{{ props.label }}</span>
+      <span class="label-text" :class="labelTextClass"
+        >{{ props.label }} <span v-if="required" class="hidden sm:inline">*</span></span
+      >
     </div>
     <input
       :type="props.type"
