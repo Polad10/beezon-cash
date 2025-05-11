@@ -43,7 +43,7 @@ async function signUp() {
         headers: { Authorization: `tma ${props.initDataRaw}` },
       }
 
-      await axios.post(`api/me`, userSignupRequest, headers)
+      await axios.post(`/api/client/me`, userSignupRequest, headers)
       emit('user-signed-up')
     } else {
       errorMessage.value = 'Пожалуйста заполните все необходимые поля'

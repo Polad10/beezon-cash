@@ -28,7 +28,7 @@ async function addMessage() {
         order_status: orderStatus.value!,
       }
 
-      const message: Message = (await axios.post('/api/messages', MessageRequest)).data
+      const message: Message = (await axios.post('/api/admin/messages', MessageRequest)).data
       emit('message-created', message)
 
       successMessage.value = 'Message added'

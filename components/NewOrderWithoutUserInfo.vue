@@ -110,7 +110,7 @@ async function registerOrder() {
         headers: { Authorization: `tma ${props.initDataRaw}` },
       }
 
-      const order = (await axios.post('api/me/orders', orderRequest, headers)).data
+      const order = (await axios.post('/api/client/orders', orderRequest, headers)).data
 
       modalRef.value?.close()
       emit('order-created', order)

@@ -4,7 +4,7 @@ import { LogLevel } from '~/models/LogLevel'
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
-    await axios.post(`${process.env.BEEZON_PUBLIC_API_URL}/orders`, body)
+    await axios.post(`${process.env.BEEZON_API_URL}/public/orders`, body)
   } catch (ex: any) {
     const error = ex as AxiosError
 

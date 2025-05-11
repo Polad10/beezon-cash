@@ -124,7 +124,7 @@ async function addOrder() {
         })
       }
 
-      const order: Order = (await axios.post('/api/orders', orderRequest)).data
+      const order: Order = (await axios.post('/api/admin/orders', orderRequest)).data
       emit('order-created', order)
 
       successMessage.value = 'Order added'

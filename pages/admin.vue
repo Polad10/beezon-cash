@@ -18,12 +18,12 @@ enum ActiveTab {
   Analytics,
 }
 
-const users = (await useFetch<User[]>('/api/users')).data
-const orders = (await useFetch<Order[]>('/api/orders')).data
-const ordersGeRu = (await useFetch<OrderGeRu[]>('/api/geru/admin/orders')).data
-const messages = (await useFetch<Message[]>('/api/messages')).data
-const messagesGeRu = (await useFetch<MessageGeRu[]>('/api/geru/admin/messages')).data
-const transactions = (await useFetch<Transaction[]>('/api/transactions')).data
+const users = (await useFetch<User[]>('/api/admin/users')).data
+const orders = (await useFetch<Order[]>('/api/admin/orders')).data
+const ordersGeRu = (await useFetch<OrderGeRu[]>('/api/admin/geru/orders')).data
+const messages = (await useFetch<Message[]>('/api/admin/messages')).data
+const messagesGeRu = (await useFetch<MessageGeRu[]>('/api/admin/geru/messages')).data
+const transactions = (await useFetch<Transaction[]>('/api/admin/transactions')).data
 
 const activeTab = ref<ActiveTab>()
 const showErrorToast = ref(false)
@@ -48,7 +48,7 @@ function setActiveTab(tab: ActiveTab) {
 
 async function deleteUser(user: User) {
   try {
-    await axios.delete(`/api/users/${user.id}`)
+    await axios.delete(`/api/admin/users/${user.id}`)
     users.value = users.value!.filter((u) => u.id !== user.id)
     orders.value = orders.value!.filter((o) => o.user_id !== user.id)
   } catch (ex) {
@@ -59,7 +59,7 @@ async function deleteUser(user: User) {
 
 async function deleteOrder(order: Order) {
   try {
-    await axios.delete(`/api/orders/${order.id}`)
+    await axios.delete(`/api/admin/orders/${order.id}`)
     orders.value = orders.value?.filter((o) => o.id !== order.id)!
   } catch (ex) {
     errorMessage.value = 'Something went wrong. Please try again later.'
@@ -69,7 +69,7 @@ async function deleteOrder(order: Order) {
 
 async function deleteGeRuOrder(order: OrderGeRu) {
   try {
-    await axios.delete(`/api/geru/admin/orders/${order.id}`)
+    await axios.delete(`/api/admin/geru/orders/${order.id}`)
     ordersGeRu.value = ordersGeRu.value?.filter((o) => o.id !== order.id)!
   } catch (ex) {
     errorMessage.value = 'Something went wrong. Please try again later.'
@@ -79,7 +79,7 @@ async function deleteGeRuOrder(order: OrderGeRu) {
 
 async function deleteMessage(message: Message) {
   try {
-    await axios.delete(`/api/messages/${message.id}`)
+    await axios.delete(`/api/admin/messages/${message.id}`)
     messages.value = messages.value?.filter((m) => m.id !== message.id)!
   } catch (ex) {
     errorMessage.value = 'Something went wrong. Please try again later.'
@@ -89,7 +89,7 @@ async function deleteMessage(message: Message) {
 
 async function deleteGeRuMessage(message: MessageGeRu) {
   try {
-    await axios.delete(`/api/geru/admin/messages/${message.id}`)
+    await axios.delete(`/api/admin/geru/messages/${message.id}`)
     messagesGeRu.value = messagesGeRu.value?.filter((m) => m.id !== message.id)!
   } catch (ex) {
     errorMessage.value = 'Something went wrong. Please try again later.'

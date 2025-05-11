@@ -64,7 +64,7 @@ async function saveOrder() {
         send_notification: sendNotification.value,
       }
 
-      const order: OrderGeRu = (await axios.put(`/api/geru/admin/orders/${id.value}`, orderRequest)).data
+      const order: OrderGeRu = (await axios.put(`/api/admin/geru/orders/${id.value}`, orderRequest)).data
       emit('order-edited', order)
 
       successMessage.value = 'Saved'

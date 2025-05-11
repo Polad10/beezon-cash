@@ -29,7 +29,7 @@ async function editMessage() {
         order_status: orderStatus.value!,
       }
 
-      const message: Message = (await axios.put(`/api/messages/${id.value}`, messageRequest)).data
+      const message: Message = (await axios.put(`/api/admin/messages/${id.value}`, messageRequest)).data
       emit('message-edited', message)
 
       successMessage.value = 'Saved'

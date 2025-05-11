@@ -131,7 +131,7 @@ async function updateOrderStatusForSelection() {
       send_notification: sendNotification.value,
     }
 
-    const updatedOrders = (await axios.patch('/api/geru/admin/orders', body)).data
+    const updatedOrders = (await axios.patch('/api/admin/geru/orders', body)).data
 
     for (const order of updatedOrders) {
       selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
@@ -192,7 +192,7 @@ function toggleAllOrdersSelected() {
 async function updateOrderStatus(order: OrderGeRu, newOrderStatus: OrderStatusGeRu) {
   try {
     const body: OrderGeRuPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
-    const updatedOrder = (await axios.patch(`/api/geru/admin/orders/${order.id}`, body)).data
+    const updatedOrder = (await axios.patch(`/api/admin/geru/orders/${order.id}`, body)).data
     order.status = updatedOrder.status
   } catch (ex) {
     errorMessage.value = 'Something went wrong. Please try again later.'

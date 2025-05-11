@@ -130,7 +130,7 @@ async function registerOrder() {
         })
       }
 
-      await axios.post('api/public/orders', userOrderRequest)
+      await axios.post('/api/public/orders', userOrderRequest)
 
       orderRegistered.value = true
       userOrderCookie.value = userOrderRequest

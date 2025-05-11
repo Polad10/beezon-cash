@@ -29,7 +29,7 @@ async function addMessage() {
         order_status: orderStatus.value!,
       }
 
-      const message: MessageGeRu = (await axios.post('/api/geru/admin/messages', MessageRequest)).data
+      const message: MessageGeRu = (await axios.post('/api/admin/geru/messages', MessageRequest)).data
       emit('message-created', message)
 
       successMessage.value = 'Message added'

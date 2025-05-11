@@ -126,7 +126,7 @@ async function editOrder() {
         })
       }
 
-      const order: Order = (await axios.put(`/api/orders/${id.value}`, orderRequest)).data
+      const order: Order = (await axios.put(`/api/admin/orders/${id.value}`, orderRequest)).data
       emit('order-edited', order)
 
       successMessage.value = 'Saved'

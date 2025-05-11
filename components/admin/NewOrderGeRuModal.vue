@@ -63,7 +63,7 @@ async function addOrder() {
         send_notification: sendNotification.value,
       }
 
-      const order: OrderGeRu = (await axios.post('/api/geru/admin/orders', orderRequest)).data
+      const order: OrderGeRu = (await axios.post('/api/admin/geru/orders', orderRequest)).data
       emit('order-created', order)
 
       successMessage.value = 'Order added'

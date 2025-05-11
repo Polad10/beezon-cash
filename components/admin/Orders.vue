@@ -140,7 +140,7 @@ async function handleOrderStatusUpdateConfirmedForSelection() {
       send_notification: sendNotification.value,
     }
 
-    const updatedOrders = (await axios.patch('/api/orders', body)).data
+    const updatedOrders = (await axios.patch('/api/admin/orders', body)).data
 
     for (const order of updatedOrders) {
       selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
@@ -201,7 +201,7 @@ function toggleAllOrdersSelected() {
 async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
   try {
     const body: OrderPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
-    const updatedOrder = (await axios.patch(`/api/orders/${order.id}`, body)).data
+    const updatedOrder = (await axios.patch(`/api/admin/orders/${order.id}`, body)).data
     order.status = updatedOrder.status
   } catch (ex) {
     errorMessage.value = 'Something went wrong. Please try again later.'

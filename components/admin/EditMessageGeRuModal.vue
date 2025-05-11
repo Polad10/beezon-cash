@@ -30,7 +30,7 @@ async function saveMessage() {
         order_status: orderStatus.value!,
       }
 
-      const message: MessageGeRu = (await axios.put(`/api/geru/admin/messages/${id.value}`, MessageRequest)).data
+      const message: MessageGeRu = (await axios.put(`/api/admin/geru/messages/${id.value}`, MessageRequest)).data
       emit('message-edited', message)
 
       successMessage.value = 'Saved'

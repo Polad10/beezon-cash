@@ -75,10 +75,10 @@ onMounted(async () => {
 
 async function retrieveMe() {
   try {
-    const me = (await axios.get<User | null>('/api/me', headers)).data
+    const me = (await axios.get<User | null>('/api/client/me', headers)).data
 
     if (me) {
-      const ordersData = (await axios.get<Order[]>('/api/me/orders', headers)).data
+      const ordersData = (await axios.get<Order[]>('/api/client/orders', headers)).data
       me.balance = new Decimal(me.balance)
 
       user.value = me
@@ -153,7 +153,7 @@ async function applyBonus(orderId: string, bonus: Decimal) {
     }
 
     const result = (
-      await axios.post<{ user: User; order: Order }>(`api/me/orders/${orderId}/bonus`, { amount: bonus }, headers)
+      await axios.post<{ user: User; order: Order }>(`api/client/orders/${orderId}/bonus`, { amount: bonus }, headers)
     ).data
 
     user.value!.balance = new Decimal(result.user.balance)

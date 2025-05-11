@@ -32,7 +32,7 @@ async function addUser() {
         invited_by: invitedBy.value || undefined,
       }
 
-      const user: User = (await axios.post('/api/users', userRequest)).data
+      const user: User = (await axios.post('/api/admin/users', userRequest)).data
       emit('user-created', user)
 
       successMessage.value = 'User added'

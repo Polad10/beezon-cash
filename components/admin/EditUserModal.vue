@@ -42,7 +42,7 @@ async function editUser() {
         userRequest.balance = newBalance
       }
 
-      const user: User = (await axios.put(`/api/users/${id.value}`, userRequest)).data
+      const user: User = (await axios.put(`/api/admin/users/${id.value}`, userRequest)).data
       emit('user-edited', user)
 
       successMessage.value = 'Saved'

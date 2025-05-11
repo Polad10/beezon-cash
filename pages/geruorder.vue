@@ -62,7 +62,7 @@ async function registerOrder() {
         hint_price: hintPrice.value,
       }
 
-      await axios.post('/api/geru/public/orders', userOrderRequest)
+      await axios.post('/api/public/geru/orders', userOrderRequest)
 
       orderRegistered.value = true
       userOrderCookie.value = userOrderRequest
