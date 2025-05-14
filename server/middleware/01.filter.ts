@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const blockPatterns = ['.php', '.js', '.css', '../', '.env']
 
   if (blockPatterns.some((pattern) => url.includes(pattern))) {
-    event.node.res.statusCode = HttpStatusCode.Forbidden
+    setResponseStatus(event, 403)
     return send(event, 'Forbidden')
   }
 })
