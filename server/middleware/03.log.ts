@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   let extra = {
     headers: getHeaders(event),
-    ip: getRequestIP(event),
+    ip: getRequestIP(event, { xForwardedFor: true }),
     body: null,
   }
 

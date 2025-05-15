@@ -6,7 +6,7 @@ const rateLimiter = new RateLimiterMemory({
 })
 
 export default defineEventHandler(async (event) => {
-  const ip = getRequestIP(event) || ''
+  const ip = getRequestIP(event, { xForwardedFor: true }) || ''
 
   try {
     await rateLimiter.consume(ip)
