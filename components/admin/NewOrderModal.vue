@@ -47,6 +47,26 @@ const errorMessage = ref('')
 const successMessage = ref('')
 const modalRef = ref<HTMLDialogElement | null>(null)
 
+const formattedWeight = computed(() => {
+	return formatNumber(weight.value)
+})
+
+const formattedAdditionalCost = computed(() => {
+	return formatNumber(additionalCost.value)
+})
+
+const formattedPartnerCost = computed(() => {
+	return formatNumber(partnerCost.value)
+})
+
+const formattedOriginalPrice = computed(() => {
+	return formatNumber(originalPrice.value)
+})
+
+const formattedCurrentPrice = computed(() => {
+	return formatNumber(currentPrice.value)
+})
+
 const fuseUsersOptions = {
 	keys: ['tg_username', 'last_name', 'first_name'],
 	threshold: 0.1,
@@ -59,12 +79,12 @@ async function addOrder() {
 				status: status.value!,
 				user_id: selectedUser.value!.id,
 				weight_rounded: weightRounded.value,
-				original_price: originalPrice.value ? new Decimal(originalPrice.value) : undefined,
-				current_price: currentPrice.value ? new Decimal(currentPrice.value) : undefined,
+				original_price: formattedOriginalPrice.value ? new Decimal(formattedOriginalPrice.value) : undefined,
+				current_price: formattedCurrentPrice.value ? new Decimal(formattedCurrentPrice.value) : undefined,
 				city: city.value || undefined,
-				weight: weight.value ? new Decimal(weight.value) : undefined,
-				additional_cost: additionalCost.value ? new Decimal(additionalCost.value) : undefined,
-				partner_cost: partnerCost.value ? new Decimal(partnerCost.value) : undefined,
+				weight: formattedWeight.value ? new Decimal(formattedWeight.value) : undefined,
+				additional_cost: formattedAdditionalCost.value ? new Decimal(formattedAdditionalCost.value) : undefined,
+				partner_cost: formattedPartnerCost.value ? new Decimal(formattedPartnerCost.value) : undefined,
 				description: description.value || undefined,
 				order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
 				order_tracks: [],
@@ -155,27 +175,27 @@ function validateForm() {
 		showUserInputError.value = true
 	}
 
-	if (weight.value && !isValidDecimal(weight.value)) {
+	if (formattedWeight.value && !isValidDecimal(formattedWeight.value)) {
 		valid = false
 		showWeightInputError.value = true
 	}
 
-	if (additionalCost.value && !isValidDecimal(additionalCost.value)) {
+	if (formattedAdditionalCost.value && !isValidDecimal(formattedAdditionalCost.value)) {
 		valid = false
 		showAdditionalCostInputError.value = true
 	}
 
-	if (originalPrice.value && !isValidDecimal(originalPrice.value)) {
+	if (formattedOriginalPrice.value && !isValidDecimal(formattedOriginalPrice.value)) {
 		valid = false
 		showOriginalPriceInputError.value = true
 	}
 
-	if (currentPrice.value && !isValidDecimal(currentPrice.value)) {
+	if (formattedCurrentPrice.value && !isValidDecimal(formattedCurrentPrice.value)) {
 		valid = false
 		showCurrentPriceInputError.value = true
 	}
 
-	if (partnerCost.value && !isValidDecimal(partnerCost.value)) {
+	if (formattedPartnerCost.value && !isValidDecimal(formattedPartnerCost.value)) {
 		valid = false
 		showPartnerCostInputError.value = true
 	}
@@ -227,12 +247,12 @@ function resetFieldErrors() {
 function calculatePrice() {
 	let valid = true
 
-	if (weight.value && !isValidDecimal(weight.value)) {
+	if (formattedWeight.value && !isValidDecimal(formattedWeight.value)) {
 		valid = false
 		showWeightInputError.value = true
 	}
 
-	if (additionalCost.value && !isValidDecimal(additionalCost.value)) {
+	if (formattedAdditionalCost.value && !isValidDecimal(formattedAdditionalCost.value)) {
 		valid = false
 		showAdditionalCostInputError.value = true
 	}
@@ -244,13 +264,15 @@ function calculatePrice() {
 		return
 	}
 
-	const additionalCostDecimal = additionalCost.value ? new Decimal(additionalCost.value) : new Decimal(0)
+	const additionalCostDecimal = formattedAdditionalCost.value
+		? new Decimal(formattedAdditionalCost.value)
+		: new Decimal(0)
 
 	originalPrice.value = currentPrice.value = roundedWeight.value.mul(18).add(additionalCostDecimal).toString()
 }
 
 const roundedWeight = computed(() => {
-	if (weight.value && !isValidDecimal(weight.value)) {
+	if (formattedWeight.value && !isValidDecimal(formattedWeight.value)) {
 		errorMessage.value = 'Please fill valid values'
 		showWeightInputError.value = true
 		showToast(showErrorToast)
@@ -258,14 +280,14 @@ const roundedWeight = computed(() => {
 		return new Decimal(0)
 	}
 
-	let finalWeight = weight.value ? new Decimal(weight.value) : new Decimal(0)
+	let finalWeight = formattedWeight.value ? new Decimal(formattedWeight.value) : new Decimal(0)
 
 	if (weightRounded.value) {
 		if (finalWeight.lte(0.5)) {
 			return new Decimal(1)
 		}
 
-		const weightValueString = weight.value.toString()
+		const weightValueString = formattedWeight.value.toString()
 		const weightDecimalsString = weightValueString.includes('.') ? weightValueString.split('.')[1] : '0'
 		const zeroPrefixedWeightDecimalsString = `0.${weightDecimalsString}`
 		const weightDecimals = new Decimal(zeroPrefixedWeightDecimalsString)
