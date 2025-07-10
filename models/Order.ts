@@ -4,58 +4,61 @@ import type { City } from './City'
 import type { OrderTypeMapping, OrderTypeMappingRequest } from './OrderTypeMapping'
 import type { OrderTrack, OrderTrackRequest } from './OrderTrack'
 import type { User } from './User'
+import type { PaymentMethod } from '~/enums/PaymentMethod'
 
 export interface Order {
-  id: string
-  date: Date
-  end_date?: Date
-  original_price: Decimal
-  current_price: Decimal
-  status: OrderStatus
-  bonus_received: Decimal
-  user_id: string
-  code: number
-  city: City
-  weight: Decimal
-  weight_rounded: boolean
-  additional_cost: Decimal
-  partner_cost: Decimal
-  description: string
-  user?: User
-  order_type_mappings: OrderTypeMapping[]
-  order_tracks: OrderTrack[]
+	id: string
+	date: Date
+	end_date?: Date
+	original_price: Decimal
+	current_price: Decimal
+	status: OrderStatus
+	bonus_received: Decimal
+	user_id: string
+	code: number
+	city: City
+	weight: Decimal
+	weight_rounded: boolean
+	additional_cost: Decimal
+	partner_cost: Decimal
+	description: string
+	user?: User
+	payment_method: PaymentMethod
+	order_type_mappings: OrderTypeMapping[]
+	order_tracks: OrderTrack[]
 }
 
 export interface OrderRequest {
-  original_price?: Decimal
-  current_price?: Decimal
-  status: OrderStatus
-  bonus_received?: Decimal
-  user_id: string
-  city?: City
-  weight?: Decimal
-  weight_rounded: boolean
-  additional_cost?: Decimal
-  partner_cost?: Decimal
-  description?: string
-  order_type_mappings: OrderTypeMappingRequest[]
-  order_tracks: OrderTrackRequest[]
-  send_notification?: boolean
+	original_price?: Decimal
+	current_price?: Decimal
+	status: OrderStatus
+	bonus_received?: Decimal
+	user_id: string
+	city?: City
+	weight?: Decimal
+	weight_rounded: boolean
+	additional_cost?: Decimal
+	partner_cost?: Decimal
+	description?: string
+	order_type_mappings: OrderTypeMappingRequest[]
+	order_tracks: OrderTrackRequest[]
+	send_notification?: boolean
 }
 
 export interface NewOrderRequest {
-  city?: City
-  description: string
-  order_tracks: OrderTrackRequest[]
-  order_type_mappings: OrderTypeMappingRequest[]
+	city?: City
+	description: string
+	order_tracks: OrderTrackRequest[]
+	order_type_mappings: OrderTypeMappingRequest[]
 }
 
 export interface OrderPatchRequest {
-  status: OrderStatus
-  send_notification?: boolean
+	status?: OrderStatus
+	payment_method?: PaymentMethod
+	send_notification?: boolean
 }
 
 export interface OrderBatchPatchRequest {
-  patches: { id: string; status: OrderStatus }[]
-  send_notification?: boolean
+	patches: { id: string; status: OrderStatus }[]
+	send_notification?: boolean
 }

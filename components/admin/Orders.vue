@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import type { Order, OrderBatchPatchRequest, OrderPatchRequest } from '~/models/Order'
-import { OrderStatus, toAdminDisplayString, toAdminColorCode } from '~/models/OrderStatus'
+import {
+	OrderStatus,
+	toAdminDisplayString as orderStatusToAdminDisplayString,
+	toAdminColorCode,
+} from '~/models/OrderStatus'
+import { PaymentMethod, toAdminColorCode as paymentMethodToAdminColorCode } from '~/enums/PaymentMethod'
 import { toDisplayString as cityToDisplayString } from '~/models/City'
 import ConfirmActionModal from '~/components/admin/ConfirmActionModal.vue'
 import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
@@ -10,27 +15,29 @@ import axios from 'axios'
 import Fuse from 'fuse.js'
 import Decimal from 'decimal.js'
 import type { User } from '~/models/User'
+import StatusDropdown from './StatusDropdown.vue'
+import PaymentMethodDropdown from './PaymentMethodDropdown.vue'
 
 const props = defineProps({
-  allOrders: {
-    type: Array<Order>,
-    required: true,
-  },
-  allUsers: {
-    type: Array<User>,
-    required: true,
-  },
+	allOrders: {
+		type: Array<Order>,
+		required: true,
+	},
+	allUsers: {
+		type: Array<User>,
+		required: true,
+	},
 })
 
 const emit = defineEmits(['order-deleted'])
 
 const fuseOrdersOptions = {
-  keys: ['user.tg_username', 'user.last_name', 'user.first_name', 'code', 'description', 'order_tracks.track_number'],
-  threshold: 0.1,
+	keys: ['user.tg_username', 'user.last_name', 'user.first_name', 'code', 'description', 'order_tracks.track_number'],
+	threshold: 0.1,
 }
 
 let fuseOrders = computed(() => {
-  return new Fuse(props.allOrders, fuseOrdersOptions)
+	return new Fuse(props.allOrders, fuseOrdersOptions)
 })
 
 const newOrderModalRef = ref<typeof NewOrderModal | null>(null)
@@ -51,291 +58,316 @@ const errorMessage = ref('')
 const showErrorToast = ref(false)
 
 onBeforeMount(() => {
-  props.allOrders.forEach((order) => {
-    processOrderValues(order)
-  })
+	props.allOrders.forEach((order) => {
+		processOrderValues(order)
+	})
 })
 
 const orders = computed(() => {
-  let result = []
+	let result = []
 
-  // search
-  if (!orderSearch.value) {
-    sortOrders()
-    result = [...props.allOrders]
-  } else {
-    result = fuseOrders.value.search(orderSearch.value).map((result) => result.item)
-  }
+	// search
+	if (!orderSearch.value) {
+		sortOrders()
+		result = [...props.allOrders]
+	} else {
+		result = fuseOrders.value.search(orderSearch.value).map((result) => result.item)
+	}
 
-  // filter by order status
-  if (orderStatusFilter.value.size > 0) {
-    result = result.filter((order) => orderStatusFilter.value.has(order.status))
-  }
+	// filter by order status
+	if (orderStatusFilter.value.size > 0) {
+		result = result.filter((order) => orderStatusFilter.value.has(order.status))
+	}
 
-  return result
+	return result
 })
 
 const pageNr = computed(() => {
-  currentPageNr.value = Math.min(currentPageNr.value, maxPageNr.value)
-  return currentPageNr.value
+	currentPageNr.value = Math.min(currentPageNr.value, maxPageNr.value)
+	return currentPageNr.value
 })
 
 const maxPageNr = computed(() => {
-  return Math.max(Math.ceil(orders.value!.length / rowsPerPage), 1)
+	return Math.max(Math.ceil(orders.value!.length / rowsPerPage), 1)
 })
 
 const pageOrders = computed(() => {
-  return orders.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
+	return orders.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
 })
 
 function setPageNr(newPageNr: number) {
-  currentPageNr.value = newPageNr
+	currentPageNr.value = newPageNr
 }
 
 function sortOrders() {
-  props.allOrders.sort((a, b) => b.code - a.code)
+	props.allOrders.sort((a, b) => b.code - a.code)
 }
 
 function openConfirmModal() {
-  confirmActionModalRef.value?.open()
+	confirmActionModalRef.value?.open()
 }
 
 function handleOrderCreated(order: Order) {
-  processOrderValues(order)
-  props.allOrders.push(order)
+	processOrderValues(order)
+	props.allOrders.push(order)
 }
 
 function handleOrderEdited(order: Order) {
-  const localOrder = props.allOrders.find((o) => o.id === order.id)
+	const localOrder = props.allOrders.find((o) => o.id === order.id)
 
-  if (localOrder) {
-    processOrderValues(order)
-    Object.assign(localOrder, order)
-  }
+	if (localOrder) {
+		processOrderValues(order)
+		Object.assign(localOrder, order)
+	}
 }
 
 async function deleteOrder(order: Order) {
-  emit('order-deleted', order)
+	emit('order-deleted', order)
 }
 
 function processOrderValues(order: Order) {
-  order.date = new Date(order.date)
-  order.end_date = order.end_date ? new Date(order.end_date) : undefined
-  order.current_price = new Decimal(order.current_price)
-  order.original_price = new Decimal(order.original_price)
-  order.bonus_received = new Decimal(order.bonus_received)
-  order.weight = new Decimal(order.weight)
-  order.additional_cost = new Decimal(order.additional_cost)
-  order.partner_cost = new Decimal(order.partner_cost)
-  order.user = props.allUsers.find((u) => u.id === order.user_id)
+	order.date = new Date(order.date)
+	order.end_date = order.end_date ? new Date(order.end_date) : undefined
+	order.current_price = new Decimal(order.current_price)
+	order.original_price = new Decimal(order.original_price)
+	order.bonus_received = new Decimal(order.bonus_received)
+	order.weight = new Decimal(order.weight)
+	order.additional_cost = new Decimal(order.additional_cost)
+	order.partner_cost = new Decimal(order.partner_cost)
+	order.user = props.allUsers.find((u) => u.id === order.user_id)
 }
 
 async function handleOrderStatusUpdateConfirmedForSelection() {
-  try {
-    const body: OrderBatchPatchRequest = {
-      patches: selectedOrders.value.map((order) => ({
-        id: order.id,
-        status: selectedOrderStatusToSet.value!,
-      })),
-      send_notification: sendNotification.value,
-    }
+	try {
+		const body: OrderBatchPatchRequest = {
+			patches: selectedOrders.value.map((order) => ({
+				id: order.id,
+				status: selectedOrderStatusToSet.value!,
+			})),
+			send_notification: sendNotification.value,
+		}
 
-    const updatedOrders = (await axios.patch('/api/admin/orders', body)).data
+		const updatedOrders = (await axios.patch('/api/admin/orders', body)).data
 
-    for (const order of updatedOrders) {
-      selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
-    }
-  } catch (ex) {
-    errorMessage.value = 'Something went wrong. Please try again later.'
-    showToast(showErrorToast)
-  } finally {
-    confirmActionModalRef.value?.close()
-  }
+		for (const order of updatedOrders) {
+			selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
+		}
+	} catch (ex) {
+		errorMessage.value = 'Something went wrong. Please try again later.'
+		showToast(showErrorToast)
+	} finally {
+		confirmActionModalRef.value?.close()
+	}
 }
 
 function handleOrderStatusUpdateClosed() {
-  selectedOrderStatusToSet.value = null
+	selectedOrderStatusToSet.value = null
 }
 
 function exportToCSV() {
-  const bom = '\uFEFF'
-  const headers = [
-    'Номер заказа',
-    'Фамилия',
-    'Имя',
-    'Вес без округления',
-    'Начальная сумма',
-    'Конечная сумма',
-    'Дата завершения заказа',
-  ]
-  const rows: string[] = []
+	const bom = '\uFEFF'
+	const headers = [
+		'Номер заказа',
+		'Фамилия',
+		'Имя',
+		'Вес без округления',
+		'Начальная сумма',
+		'Конечная сумма',
+		'Дата завершения заказа',
+	]
+	const rows: string[] = []
 
-  for (const order of orders.value) {
-    const row = [
-      order.code,
-      order.user?.last_name,
-      order.user?.first_name,
-      order.weight,
-      order.original_price,
-      order.current_price,
-      order.end_date?.toLocaleDateString(),
-    ].join(',')
-    rows.push(row)
-  }
+	for (const order of orders.value) {
+		const row = [
+			order.code,
+			order.user?.last_name,
+			order.user?.first_name,
+			order.weight,
+			order.original_price,
+			order.current_price,
+			order.end_date?.toLocaleDateString(),
+		].join(',')
+		rows.push(row)
+	}
 
-  const data = [headers, rows.join('\n')].join('\n')
-  const blob = new Blob([bom + data], { type: 'text/csv' })
+	const data = [headers, rows.join('\n')].join('\n')
+	const blob = new Blob([bom + data], { type: 'text/csv' })
 
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'orders.csv'
+	const url = URL.createObjectURL(blob)
+	const a = document.createElement('a')
+	a.href = url
+	a.download = 'orders.csv'
 
-  a.click()
+	a.click()
 }
 
 function toggleAllOrdersSelected() {
-  selectedOrders.value = allOrdersSelected.value ? [...orders.value] : []
+	selectedOrders.value = allOrdersSelected.value ? [...orders.value] : []
 }
 
 async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
-  try {
-    const body: OrderPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
-    const updatedOrder = (await axios.patch(`/api/admin/orders/${order.id}`, body)).data
-    order.status = updatedOrder.status
-  } catch (ex) {
-    errorMessage.value = 'Something went wrong. Please try again later.'
-    showToast(showErrorToast)
-  }
+	try {
+		const body: OrderPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
+		const updatedOrder = (await axios.patch(`/api/admin/orders/${order.id}`, body)).data
+		order.status = updatedOrder.status
+	} catch (ex) {
+		errorMessage.value = 'Something went wrong. Please try again later.'
+		showToast(showErrorToast)
+	}
+}
+
+async function updatePaymentMethod(order: Order, newPaymentMethod: PaymentMethod) {
+	try {
+		const body: OrderPatchRequest = { payment_method: newPaymentMethod, send_notification: sendNotification.value }
+		const updatedOrder = (await axios.patch(`/api/admin/orders/${order.id}`, body)).data
+		order.payment_method = updatedOrder.payment_method
+	} catch (ex) {
+		errorMessage.value = 'Something went wrong. Please try again later.'
+		showToast(showErrorToast)
+	}
 }
 </script>
 
 <template>
-  <div class="flex flex-col grow">
-    <div class="flex flex-row min-h-12 mr-3 justify-between items-center">
-      <span class="text-2xl font-bold">Orders &nbsp;&nbsp; RU - GE</span>
-      <div class="flex flex-row gap-5">
-        <label class="label cursor-pointer gap-2 p-0">
-          <input type="checkbox" class="checkbox checkbox-sm" v-model="sendNotification" />
-          <span class="label-text">Send notification</span>
-        </label>
-        <AdminStatusDropdown
-          class="select-sm"
-          placeholder="Change status"
-          form-control-class="w-fit"
-          v-model="selectedOrderStatusToSet"
-          :disabled="selectedOrders.length == 0"
-          @change="openConfirmModal"
-        />
-        <button class="btn btn-sm" @click="exportToCSV">
-          Export CSV
-          <ion-icon name="download-outline" class="text-base"></ion-icon>
-        </button>
-        <div class="dropdown dropdown-end">
-          <div tabindex="0" role="button" class="btn btn-sm mb-1">
-            {{ orderStatusFilter.size > 0 ? `Selected ${orderStatusFilter.size}` : 'All stages' }}
-            <ion-icon name="filter-outline" class="text-base"></ion-icon>
-          </div>
-          <ul tabindex="0" class="menu dropdown-content rounded-box z-[1] p-2 shadow w-52 bg-white">
-            <li v-for="status in Object.values(OrderStatus).filter((v) => typeof v == 'number')">
-              <label class="label cursor-pointer">
-                <span class="label-text">{{ toAdminDisplayString(status) }}</span>
-                <input type="checkbox" class="checkbox checkbox-sm" :value="status" v-model="orderStatusFilter" />
-              </label>
-            </li>
-          </ul>
-        </div>
-        <label
-          class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
-        >
-          <input type="text" class="grow" placeholder="Search" v-model="orderSearch" />
-          <ion-icon name="search-outline"></ion-icon>
-        </label>
-        <button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
-      </div>
-    </div>
-    <div class="flex flex-col bg-white mr-3 mb-5 grow">
-      <table class="table table-sm">
-        <thead>
-          <tr class="bg-base-200">
-            <th>
-              <label class="label cursor-pointer">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-sm"
-                  v-model="allOrdersSelected"
-                  @change="toggleAllOrdersSelected"
-                />
-              </label>
-            </th>
-            <th>ORDER CODE</th>
-            <th>STATUS</th>
-            <th>USER</th>
-            <th>TELEGRAM</th>
-            <th>WEIGHT</th>
-            <th>PRICE</th>
-            <th>FINAL PRICE</th>
-            <th>CITY</th>
-            <th>CREATION DATE</th>
-            <th>DELIVERY DATE</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="order in pageOrders" :key="order.id">
-            <td>
-              <label class="label cursor-pointer">
-                <input type="checkbox" class="checkbox checkbox-sm" :value="order" v-model="selectedOrders" />
-              </label>
-            </td>
-            <td>{{ order.code }}</td>
-            <td>
-              <AdminStatusDropdown
-                :model-value="order.status"
-                class="select-sm"
-                :class="[`bg-[${toAdminColorCode(order.status)}]`, 'focus:bg-white', 'focus:text-black']"
-                form-control-class="w-fit"
-                @update:model-value="(val: OrderStatus) => updateOrderStatus(order, val)"
-              />
-            </td>
-            <td>{{ order.user?.first_name }} {{ order.user?.last_name }}</td>
-            <td>{{ order.user?.tg_username }}</td>
-            <td>{{ order.weight }}</td>
-            <td>{{ order.original_price }}</td>
-            <td>{{ order.current_price }}</td>
-            <td>{{ cityToDisplayString(order.city) }}</td>
-            <td>{{ order.date.toLocaleDateString() }}</td>
-            <td>{{ order.end_date?.toLocaleDateString() }}</td>
-            <td>
-              <div class="flex flex-row gap-2">
-                <button class="btn btn-sm text-gray-500 btn-square btn-outline" @click="editOrderModalRef?.open(order)">
-                  <ion-icon name="pencil"></ion-icon>
-                </button>
-                <button
-                  class="btn btn-sm text-gray-500 btn-square btn-outline"
-                  @click="confirmDeleteModalRef?.open(() => deleteOrder(order))"
-                >
-                  <ion-icon name="trash"></ion-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
-    <AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" :users="allUsers" />
-    <AdminEditOrderModal ref="editOrderModalRef" @order-edited="handleOrderEdited" :users="allUsers" />
-    <AdminConfirmActionModal
-      ref="confirmActionModalRef"
-      @confirmed="handleOrderStatusUpdateConfirmedForSelection"
-      @closed="handleOrderStatusUpdateClosed"
-    >
-      <p>
-        New status: <b>{{ toAdminDisplayString(selectedOrderStatusToSet!) }}</b>
-      </p>
-    </AdminConfirmActionModal>
-    <AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
-    <Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
-  </div>
+	<div class="flex flex-col grow">
+		<div class="flex flex-row min-h-12 mr-3 justify-between items-center">
+			<span class="text-2xl font-bold">Orders &nbsp;&nbsp; RU - GE</span>
+			<div class="flex flex-row gap-5">
+				<label class="label cursor-pointer gap-2 p-0">
+					<input type="checkbox" class="checkbox checkbox-sm" v-model="sendNotification" />
+					<span class="label-text">Send notification</span>
+				</label>
+				<AdminStatusDropdown
+					class="select-sm"
+					placeholder="Change status"
+					form-control-class="w-fit"
+					v-model="selectedOrderStatusToSet"
+					:disabled="selectedOrders.length == 0"
+					@change="openConfirmModal"
+				/>
+				<button class="btn btn-sm" @click="exportToCSV">
+					Export CSV
+					<ion-icon name="download-outline" class="text-base"></ion-icon>
+				</button>
+				<div class="dropdown dropdown-end">
+					<div tabindex="0" role="button" class="btn btn-sm mb-1">
+						{{ orderStatusFilter.size > 0 ? `Selected ${orderStatusFilter.size}` : 'All stages' }}
+						<ion-icon name="filter-outline" class="text-base"></ion-icon>
+					</div>
+					<ul tabindex="0" class="menu dropdown-content rounded-box z-[1] p-2 shadow w-52 bg-white">
+						<li v-for="status in Object.values(OrderStatus).filter((v) => typeof v == 'number')">
+							<label class="label cursor-pointer">
+								<span class="label-text">{{ orderStatusToAdminDisplayString(status) }}</span>
+								<input type="checkbox" class="checkbox checkbox-sm" :value="status" v-model="orderStatusFilter" />
+							</label>
+						</li>
+					</ul>
+				</div>
+				<label
+					class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
+				>
+					<input type="text" class="grow" placeholder="Search" v-model="orderSearch" />
+					<ion-icon name="search-outline"></ion-icon>
+				</label>
+				<button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
+			</div>
+		</div>
+		<div class="flex flex-col bg-white mr-3 mb-5 grow">
+			<table class="table table-sm">
+				<thead>
+					<tr class="bg-base-200">
+						<th>
+							<label class="label cursor-pointer">
+								<input
+									type="checkbox"
+									class="checkbox checkbox-sm"
+									v-model="allOrdersSelected"
+									@change="toggleAllOrdersSelected"
+								/>
+							</label>
+						</th>
+						<th>ORDER CODE</th>
+						<th>STATUS</th>
+						<th>USER</th>
+						<th>TELEGRAM</th>
+						<th>WEIGHT</th>
+						<th>PRICE</th>
+						<th>FINAL PRICE</th>
+						<th>CITY</th>
+						<th>PAID WITH</th>
+						<th>CREATION DATE</th>
+						<th>DELIVERY DATE</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="order in pageOrders" :key="order.id">
+						<td>
+							<label class="label cursor-pointer">
+								<input type="checkbox" class="checkbox checkbox-sm" :value="order" v-model="selectedOrders" />
+							</label>
+						</td>
+						<td>{{ order.code }}</td>
+						<td>
+							<StatusDropdown
+								:model-value="order.status"
+								class="select-sm"
+								:class="[`bg-[${toAdminColorCode(order.status)}]`, 'focus:bg-white', 'focus:text-black']"
+								form-control-class="w-fit"
+								@update:model-value="(val: OrderStatus) => updateOrderStatus(order, val)"
+							/>
+						</td>
+						<td>{{ order.user?.first_name }} {{ order.user?.last_name }}</td>
+						<td>{{ order.user?.tg_username }}</td>
+						<td>{{ order.weight }}</td>
+						<td>{{ order.original_price }}</td>
+						<td>{{ order.current_price }}</td>
+						<td>{{ cityToDisplayString(order.city) }}</td>
+						<td>
+							<PaymentMethodDropdown
+								:model-value="order.payment_method"
+								class="select-sm"
+								:class="[
+									`bg-[${paymentMethodToAdminColorCode(order.payment_method)}]`,
+									'focus:bg-white',
+									'focus:text-black',
+								]"
+								form-control-class="w-fit"
+								@update:model-value="(val: PaymentMethod) => updatePaymentMethod(order, val)"
+							/>
+						</td>
+						<td>{{ order.date.toLocaleDateString() }}</td>
+						<td>{{ order.end_date?.toLocaleDateString() }}</td>
+						<td>
+							<div class="flex flex-row gap-2">
+								<button class="btn btn-sm text-gray-500 btn-square btn-outline" @click="editOrderModalRef?.open(order)">
+									<ion-icon name="pencil"></ion-icon>
+								</button>
+								<button
+									class="btn btn-sm text-gray-500 btn-square btn-outline"
+									@click="confirmDeleteModalRef?.open(() => deleteOrder(order))"
+								>
+									<ion-icon name="trash"></ion-icon>
+								</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
+		<AdminNewOrderModal ref="newOrderModalRef" @order-created="handleOrderCreated" :users="allUsers" />
+		<AdminEditOrderModal ref="editOrderModalRef" @order-edited="handleOrderEdited" :users="allUsers" />
+		<AdminConfirmActionModal
+			ref="confirmActionModalRef"
+			@confirmed="handleOrderStatusUpdateConfirmedForSelection"
+			@closed="handleOrderStatusUpdateClosed"
+		>
+			<p>
+				New status: <b>{{ orderStatusToAdminDisplayString(selectedOrderStatusToSet!) }}</b>
+			</p>
+		</AdminConfirmActionModal>
+		<AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
+		<Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
+	</div>
 </template>
