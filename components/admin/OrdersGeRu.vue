@@ -119,6 +119,7 @@ function processOrderValues(order: OrderGeRu) {
 	order.current_price = new Decimal(order.current_price)
 	order.weight = new Decimal(order.weight)
 	order.created_at = new Date(order.created_at)
+	order.payment_date = order.payment_date ? new Date(order.payment_date) : null
 	order.delivered_at = order.delivered_at ? new Date(order.delivered_at) : null
 	order.user = props.allUsers.find((u) => u.id === order.user_id)
 }
@@ -281,6 +282,7 @@ async function updatePaymentMethod(order: OrderGeRu, newPaymentMethod: PaymentMe
 						<th>TRACK NUMBER</th>
 						<th>PAID WITH</th>
 						<th>CREATION DATE</th>
+						<th>PAYMENT DATE</th>
 						<th>DELIVERY DATE</th>
 						<th></th>
 					</tr>
@@ -321,6 +323,7 @@ async function updatePaymentMethod(order: OrderGeRu, newPaymentMethod: PaymentMe
 							/>
 						</td>
 						<td>{{ order.created_at.toLocaleDateString() }}</td>
+						<td>{{ order.payment_date?.toLocaleDateString() }}</td>
 						<td>{{ order.delivered_at?.toLocaleDateString() }}</td>
 						<td>
 							<div class="flex flex-row gap-2">

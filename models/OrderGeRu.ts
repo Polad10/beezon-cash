@@ -22,6 +22,7 @@ export interface OrderGeRu {
 	delivered_at: Date | null
 	user?: User
 	payment_method: PaymentMethod
+	payment_date: Date | null
 }
 
 export interface OrderGeRuRequest {

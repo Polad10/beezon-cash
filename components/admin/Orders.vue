@@ -127,6 +127,7 @@ async function deleteOrder(order: Order) {
 
 function processOrderValues(order: Order) {
 	order.date = new Date(order.date)
+	order.payment_date = order.payment_date ? new Date(order.payment_date) : null
 	order.end_date = order.end_date ? new Date(order.end_date) : undefined
 	order.current_price = new Decimal(order.current_price)
 	order.original_price = new Decimal(order.original_price)
@@ -296,6 +297,7 @@ async function updatePaymentMethod(order: Order, newPaymentMethod: PaymentMethod
 						<th>CITY</th>
 						<th>PAID WITH</th>
 						<th>CREATION DATE</th>
+						<th>PAYMENT DATE</th>
 						<th>DELIVERY DATE</th>
 						<th></th>
 					</tr>
@@ -337,6 +339,7 @@ async function updatePaymentMethod(order: Order, newPaymentMethod: PaymentMethod
 							/>
 						</td>
 						<td>{{ order.date.toLocaleDateString() }}</td>
+						<td>{{ order.payment_date?.toLocaleDateString() }}</td>
 						<td>{{ order.end_date?.toLocaleDateString() }}</td>
 						<td>
 							<div class="flex flex-row gap-2">

@@ -26,6 +26,7 @@ export interface Order {
 	payment_method: PaymentMethod
 	order_type_mappings: OrderTypeMapping[]
 	order_tracks: OrderTrack[]
+	payment_date: Date | null
 }
 
 export interface OrderRequest {
