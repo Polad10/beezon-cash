@@ -2,7 +2,11 @@
 import Decimal from 'decimal.js'
 import Fuse from 'fuse.js'
 import { OrderStatusGeRu, toAdminColorCode, toAdminDisplayString } from '~/enums/OrderStatusGeRu'
-import { PaymentMethod, toAdminColorCode as paymentMethodToAdminColorCode } from '~/enums/PaymentMethod'
+import {
+	PaymentMethod,
+	toAdminDisplayString as paymentMethodToAdminDisplayString,
+	toAdminColorCode as paymentMethodToAdminColorCode,
+} from '~/enums/PaymentMethod'
 import ConfirmActionModal from '~/components/admin/ConfirmActionModal.vue'
 import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
 import type { OrderGeRu, OrderGeRuBatchPatchRequest, OrderGeRuPatchRequest } from '~/models/OrderGeRu'
@@ -161,6 +165,8 @@ function exportToCSV() {
 		'Начальная сумма',
 		'Конечная сумма',
 		'Дата завершения заказа',
+		'Способ оплаты',
+		'Дата оплаты',
 	]
 	const rows: string[] = []
 
@@ -173,6 +179,8 @@ function exportToCSV() {
 			order.original_price,
 			order.current_price,
 			order.delivered_at?.toLocaleDateString(),
+			paymentMethodToAdminDisplayString(order.payment_method),
+			order.payment_date?.toLocaleDateString(),
 		].join(',')
 		rows.push(row)
 	}

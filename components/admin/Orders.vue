@@ -5,7 +5,11 @@ import {
 	toAdminDisplayString as orderStatusToAdminDisplayString,
 	toAdminColorCode,
 } from '~/models/OrderStatus'
-import { PaymentMethod, toAdminColorCode as paymentMethodToAdminColorCode } from '~/enums/PaymentMethod'
+import {
+	PaymentMethod,
+	toAdminDisplayString as paymentMethodToAdminDisplayString,
+	toAdminColorCode as paymentMethodToAdminColorCode,
+} from '~/enums/PaymentMethod'
 import { toDisplayString as cityToDisplayString } from '~/models/City'
 import ConfirmActionModal from '~/components/admin/ConfirmActionModal.vue'
 import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
@@ -175,6 +179,8 @@ function exportToCSV() {
 		'Начальная сумма',
 		'Конечная сумма',
 		'Дата завершения заказа',
+		'Способ оплаты',
+		'Дата оплаты',
 	]
 	const rows: string[] = []
 
@@ -187,6 +193,8 @@ function exportToCSV() {
 			order.original_price,
 			order.current_price,
 			order.end_date?.toLocaleDateString(),
+			paymentMethodToAdminDisplayString(order.payment_method),
+			order.payment_date?.toLocaleDateString(),
 		].join(',')
 		rows.push(row)
 	}
