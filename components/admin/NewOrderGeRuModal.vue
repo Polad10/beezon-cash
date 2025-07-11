@@ -5,6 +5,8 @@ import type { OrderStatusGeRu } from '~/enums/OrderStatusGeRu'
 import type { User } from '~/models/User'
 import StatusGeRuDropdown from './StatusGeRuDropdown.vue'
 import type { OrderGeRu, OrderGeRuRequest } from '~/models/OrderGeRu'
+import PaymentMethodDropdown from './PaymentMethodDropdown.vue'
+import { PaymentMethod } from '~/enums/PaymentMethod'
 
 const props = defineProps<{
 	users: User[]
@@ -23,6 +25,7 @@ const price = ref('')
 const hintPrice = ref('')
 const cdekTrackNumber = ref('')
 const description = ref('')
+const paymentMethod = ref<PaymentMethod | null>(null)
 const sendNotification = ref(false)
 
 const showErrorToast = ref(false)
@@ -68,6 +71,7 @@ async function addOrder() {
 				receiver_phone_nr: receiverPhoneNr.value,
 				receiver_address: receiverAddress.value,
 				cdek_track_nr: cdekTrackNumber.value,
+				payment_method: paymentMethod.value || undefined,
 				send_notification: sendNotification.value,
 			}
 
@@ -151,6 +155,7 @@ function resetFieldValues() {
 	price.value = ''
 	cdekTrackNumber.value = ''
 	description.value = ''
+	paymentMethod.value = null
 	sendNotification.value = false
 }
 
@@ -285,12 +290,23 @@ defineExpose({ open })
 						</button>
 					</div>
 					<Input type="text" label="Hint price" placeholder="50.25" v-model="hintPrice" />
-					<Input type="text" label="Track number" placeholder="123456789" v-model="cdekTrackNumber" />
 					<Textarea
 						label="Description"
 						placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 						v-model="description"
 					/>
+					<div class="collapse collapse-arrow">
+						<input type="checkbox" />
+						<div class="collapse-title text-lg font-medium pl-0">Additional info</div>
+						<div class="collapse-content pl-0 flex flex-col gap-2">
+							<PaymentMethodDropdown
+								label="Payment method"
+								placeholder="Select a payment method"
+								v-model="paymentMethod"
+							/>
+							<Input type="text" label="Track number" placeholder="123456789" v-model="cdekTrackNumber" />
+						</div>
+					</div>
 				</div>
 				<div class="modal-action flex-col items-end">
 					<div class="flex flex-row gap-2">

@@ -7,6 +7,8 @@ import { OrderStatus } from '~/models/OrderStatus'
 import { OrderType, toDisplayString as orderTypeToDisplayString } from '~/models/OrderTypeMapping'
 import { DeliveryProvider, toDisplayString as deliveryProviderToDisplayString } from '~/models/OrderTrack'
 import type { User } from '~/models/User'
+import PaymentMethodDropdown from './PaymentMethodDropdown.vue'
+import { PaymentMethod } from '~/enums/PaymentMethod'
 
 const props = defineProps<{
 	users: User[]
@@ -31,6 +33,7 @@ const postTrackNumber = ref('')
 const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
 const dpdTrackNumber = ref('')
+const paymentMethod = ref<PaymentMethod | null>(null)
 const sendNotification = ref(false)
 
 const showErrorToast = ref(false)
@@ -86,6 +89,7 @@ async function addOrder() {
 				additional_cost: formattedAdditionalCost.value ? new Decimal(formattedAdditionalCost.value) : undefined,
 				partner_cost: formattedPartnerCost.value ? new Decimal(formattedPartnerCost.value) : undefined,
 				description: description.value || undefined,
+				payment_method: paymentMethod.value || undefined,
 				order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
 				order_tracks: [],
 				send_notification: sendNotification.value,
@@ -231,6 +235,7 @@ function resetFieldValues() {
 	boxberryTrackNumber.value = ''
 	post5TrackNumber.value = ''
 	dpdTrackNumber.value = ''
+	paymentMethod.value = null
 	sendNotification.value = false
 }
 
@@ -378,6 +383,11 @@ defineExpose({ open })
 						<input type="checkbox" />
 						<div class="collapse-title text-lg font-medium pl-0">Additional info</div>
 						<div class="collapse-content pl-0 flex flex-col gap-2">
+							<PaymentMethodDropdown
+								label="Payment method"
+								placeholder="Select a payment method"
+								v-model="paymentMethod"
+							/>
 							<div class="flex flex-row gap-3">
 								<label class="label cursor-pointer justify-normal gap-2">
 									<input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Drugs" v-model="orderTypes" />

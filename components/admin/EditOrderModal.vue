@@ -6,6 +6,8 @@ import type { Order, OrderRequest } from '~/models/Order'
 import { OrderStatus } from '~/models/OrderStatus'
 import { OrderType, toDisplayString as orderTypeToDisplayString } from '~/models/OrderTypeMapping'
 import { DeliveryProvider, toDisplayString as deliveryProviderToDisplayString } from '~/models/OrderTrack'
+import PaymentMethodDropdown from './PaymentMethodDropdown.vue'
+import { PaymentMethod } from '~/enums/PaymentMethod'
 
 import type { User } from '~/models/User'
 
@@ -33,6 +35,7 @@ const postTrackNumber = ref('')
 const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
 const dpdTrackNumber = ref('')
+const paymentMethod = ref<PaymentMethod | null>(null)
 const sendNotification = ref(false)
 
 const showErrorToast = ref(false)
@@ -90,6 +93,7 @@ async function editOrder() {
 				description: description.value,
 				order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
 				order_tracks: [],
+				payment_method: paymentMethod.value || undefined,
 				send_notification: sendNotification.value,
 			}
 
@@ -224,6 +228,7 @@ function open(order: Order) {
 	description.value = order.description
 	orderTypes.value = order.order_type_mappings.map((mapping) => mapping.order_type)
 	deliveryProviders.value = order.order_tracks.map((mapping) => mapping.delivery_provider)
+	paymentMethod.value = order.payment_method
 	cdekTrackNumber.value =
 		order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.CDEK)?.track_number || ''
 	postTrackNumber.value =
@@ -383,6 +388,11 @@ defineExpose({ open })
 						<input type="checkbox" />
 						<div class="collapse-title text-lg font-medium pl-0">Additional info</div>
 						<div class="collapse-content pl-0 flex flex-col gap-2">
+							<PaymentMethodDropdown
+								label="Payment method"
+								placeholder="Select a payment method"
+								v-model="paymentMethod"
+							/>
 							<div class="flex flex-row gap-3">
 								<label class="label cursor-pointer justify-normal gap-2">
 									<input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Drugs" v-model="orderTypes" />

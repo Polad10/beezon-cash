@@ -38,6 +38,7 @@ export interface OrderGeRuRequest {
 	receiver_phone_nr: string
 	receiver_address: string
 	cdek_track_nr?: string
+	payment_method?: PaymentMethod
 	send_notification?: boolean
 }
 
