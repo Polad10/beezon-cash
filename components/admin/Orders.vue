@@ -181,6 +181,7 @@ function exportToCSV() {
 		'Дата завершения заказа',
 		'Способ оплаты',
 		'Дата оплаты',
+		'Курс',
 	]
 	const rows: string[] = []
 
@@ -195,6 +196,7 @@ function exportToCSV() {
 			order.end_date?.toLocaleDateString(),
 			paymentMethodToAdminDisplayString(order.payment_method),
 			order.payment_date?.toLocaleDateString(),
+			order.exchange_rate,
 		].join(',')
 		rows.push(row)
 	}
