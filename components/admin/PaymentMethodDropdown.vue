@@ -15,7 +15,7 @@ const model = defineModel()
 </script>
 
 <template>
-	<label class="form-control" :class="formControlClass">
+	<label class="form-control flex-1 min-w-32" :class="formControlClass">
 		<div v-if="label" class="label">
 			<span class="label-text">{{ label }}</span>
 		</div>

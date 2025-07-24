@@ -7,6 +7,8 @@ import type { OrderStatus } from '~/models/OrderStatus'
 import { DeliveryProvider, toDisplayString as deliveryProviderToDisplayString } from '~/models/OrderTrack'
 import { OrderType, toDisplayString as orderTypeToDisplayString } from '~/models/OrderTypeMapping'
 import type { User } from '~/models/User'
+import PaymentMethodDropdown from './PaymentMethodDropdown.vue'
+import StatusDropdown from './StatusDropdown.vue'
 
 const props = defineProps<{
 	title: string
@@ -43,6 +45,7 @@ const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
 const dpdTrackNumber = ref('')
 const paymentMethod = ref<PaymentMethod | null>(null)
+const exchangeRate = ref('')
 const sendNotification = ref(false)
 
 const showStatusInputError = ref(false)
@@ -52,6 +55,7 @@ const showAdditionalCostInputError = ref(false)
 const showOriginalPriceInputError = ref(false)
 const showCurrentPriceInputError = ref(false)
 const showPartnerCostInputError = ref(false)
+const showExchangeRateInputError = ref(false)
 
 const showErrorToast = ref(false)
 
@@ -75,6 +79,7 @@ function open(order: Order | undefined) {
 		additionalCost.value = order.additional_cost.toString()
 		partnerCost.value = order.partner_cost.toString()
 		description.value = order.description
+		exchangeRate.value = order.exchange_rate?.toString() || ''
 		orderTypes.value = order.order_type_mappings.map((mapping) => mapping.order_type)
 		deliveryProviders.value = order.order_tracks.map((mapping) => mapping.delivery_provider)
 		paymentMethod.value = order.payment_method
@@ -105,6 +110,7 @@ function resetFieldValues() {
 	additionalCost.value = ''
 	partnerCost.value = ''
 	description.value = ''
+	exchangeRate.value = ''
 	orderTypes.value = []
 	deliveryProviders.value = []
 	cdekTrackNumber.value = ''
@@ -124,6 +130,7 @@ function resetFieldErrors() {
 	showOriginalPriceInputError.value = false
 	showCurrentPriceInputError.value = false
 	showPartnerCostInputError.value = false
+	showExchangeRateInputError.value = false
 }
 
 const formattedWeight = computed(() => {
@@ -144,6 +151,10 @@ const formattedOriginalPrice = computed(() => {
 
 const formattedCurrentPrice = computed(() => {
 	return formatNumber(currentPrice.value)
+})
+
+const formattedExchangeRate = computed(() => {
+	return formatNumber(exchangeRate.value)
 })
 
 const roundedWeight = computed(() => {
@@ -218,6 +229,7 @@ function submit() {
 			weight: formattedWeight.value ? new Decimal(formattedWeight.value) : undefined,
 			additional_cost: formattedAdditionalCost.value ? new Decimal(formattedAdditionalCost.value) : undefined,
 			partner_cost: formattedPartnerCost.value ? new Decimal(formattedPartnerCost.value) : undefined,
+			exchange_rate: formattedExchangeRate.value ? new Decimal(formattedExchangeRate.value) : undefined,
 			description: description.value || undefined,
 			payment_method: paymentMethod.value || undefined,
 			order_type_mappings: orderTypes.value.map((orderType) => ({ order_type: orderType })),
@@ -324,6 +336,11 @@ function validateForm() {
 		showPartnerCostInputError.value = true
 	}
 
+	if (formattedExchangeRate.value && !isValidDecimal(formattedExchangeRate.value)) {
+		valid = false
+		showExchangeRateInputError.value = true
+	}
+
 	return valid
 }
 </script>
@@ -331,169 +348,171 @@ function validateForm() {
 <template>
 	<div>
 		<dialog class="modal" ref="modalRef">
-			<div class="modal-box">
+			<div class="modal-box w-3/4 max-w-7xl">
 				<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="close">✕</button>
 				<p class="text-2xl text-center">{{ title }}</p>
 				<div class="divider"></div>
 				<div class="flex flex-col gap-2">
-					<SelectWithSearch
-						placeholder="Select a user"
-						:options="users"
-						:fuse-options="fuseUsersOptions"
-						:class="{ 'input-error': showUserInputError }"
-						:get-option-string="getUserNameAndTelegram"
-						v-model="selectedUser"
-					/>
-					<AdminStatusDropdown label="Status *" :class="{ 'select-error': showStatusInputError }" v-model="status" />
-					<div>
+					<div class="flex flex-row gap-2">
+						<SelectWithSearch
+							placeholder="Select a user"
+							:options="users"
+							:fuse-options="fuseUsersOptions"
+							:class="{ 'input-error': showUserInputError }"
+							:get-option-string="getUserNameAndTelegram"
+							v-model="selectedUser"
+						/>
+						<StatusDropdown label="Status *" :class="{ 'select-error': showStatusInputError }" v-model="status" />
+						<PaymentMethodDropdown
+							label="Payment method"
+							placeholder="Select a payment method"
+							v-model="paymentMethod"
+						/>
 						<Input
 							type="text"
-							label="Weight"
-							placeholder="0"
-							v-model="weight"
-							:class="{ 'input-error': showWeightInputError }"
+							label="Exchange rate"
+							placeholder="9.9"
+							v-model="exchangeRate"
+							:class="{ 'input-error': showExchangeRateInputError }"
 						/>
-						<label class="label cursor-pointer justify-normal gap-2">
-							<input type="checkbox" class="checkbox checkbox-xs" v-model="weightRounded" />
-							<span
-								class="label-text text-xs"
-								v-html="weightRounded ? `Rounded weight: <b>${roundedWeight}</b>` : 'Round weight'"
-							></span>
-						</label>
 					</div>
-					<Input
-						type="text"
-						label="Additional cost"
-						placeholder="0"
-						v-model="additionalCost"
-						:class="{ 'input-error': showAdditionalCostInputError }"
-					/>
-					<div class="flex flex-row items-end gap-2">
+					<div class="flex flex-row gap-2">
+						<CityDropdown label="City" placeholder="Select a city" v-model="city" />
 						<Input
 							type="text"
-							label="Original price"
-							placeholder="50.25"
-							v-model="originalPrice"
-							:class="{ 'input-error': showOriginalPriceInputError }"
+							label="Partner cost"
+							placeholder="0"
+							v-model="partnerCost"
+							:class="{ 'input-error': showPartnerCostInputError }"
 						/>
-						<button class="btn text-2xl btn-square btn-outline" @click="calculatePrice">
+						<Input type="text" label="Partner tracking number" placeholder="0" disabled />
+						<Input
+							type="text"
+							label="Additional cost"
+							placeholder="0"
+							v-model="additionalCost"
+							:class="{ 'input-error': showAdditionalCostInputError }"
+						/>
+					</div>
+					<div class="divider"></div>
+					<div class="flex flex-row gap-2">
+						<div class="flex flex-row flex-1 gap-2">
+							<div class="flex-1">
+								<Input
+									type="text"
+									label="Weight"
+									placeholder="0"
+									v-model="weight"
+									:class="{ 'input-error': showWeightInputError }"
+								/>
+								<label class="label cursor-pointer justify-normal gap-2">
+									<input type="checkbox" class="checkbox checkbox-xs" v-model="weightRounded" />
+									<span
+										class="label-text text-xs"
+										v-html="weightRounded ? `Rounded weight: <b>${roundedWeight}</b>` : 'Round weight'"
+									></span>
+								</label>
+							</div>
+							<Input
+								type="text"
+								label="Original price"
+								placeholder="50.25"
+								v-model="originalPrice"
+								:class="{ 'input-error': showOriginalPriceInputError }"
+							/>
+							<Input
+								type="text"
+								label="Current price"
+								placeholder="50.25"
+								v-model="currentPrice"
+								:class="{ 'input-error': showCurrentPriceInputError }"
+							/>
+						</div>
+						<button class="btn text-2xl btn-square btn-outline self-center mt-1" @click="calculatePrice">
 							<ion-icon name="calculator-outline"></ion-icon>
 						</button>
 					</div>
-					<Input
-						type="text"
-						label="Current price"
-						placeholder="50.25"
-						v-model="currentPrice"
-						:class="{ 'input-error': showCurrentPriceInputError }"
-					/>
-					<CityDropdown label="City" placeholder="Select a city" v-model="city" />
-					<Input
-						type="text"
-						label="Partner cost"
-						placeholder="0"
-						v-model="partnerCost"
-						:class="{ 'input-error': showPartnerCostInputError }"
-					/>
-					<div class="collapse collapse-arrow">
-						<input type="checkbox" />
-						<div class="collapse-title text-lg font-medium pl-0">Additional info</div>
-						<div class="collapse-content pl-0 flex flex-col gap-2">
-							<PaymentMethodDropdown
-								label="Payment method"
-								placeholder="Select a payment method"
-								v-model="paymentMethod"
-							/>
-							<div class="flex flex-row gap-3">
-								<label class="label cursor-pointer justify-normal gap-2">
-									<input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Drugs" v-model="orderTypes" />
-									<span class="label-text">{{ orderTypeToDisplayString(OrderType.Drugs) }}</span>
-								</label>
-								<label class="label cursor-pointer justify-normal gap-2">
-									<input
-										type="checkbox"
-										class="checkbox checkbox-sm"
-										:value="OrderType.Electronics"
-										v-model="orderTypes"
-									/>
-									<span class="label-text">{{ orderTypeToDisplayString(OrderType.Electronics) }}</span>
-								</label>
-								<label class="label cursor-pointer justify-normal gap-2">
-									<input
-										type="checkbox"
-										class="checkbox checkbox-sm"
-										:value="OrderType.Commercial"
-										v-model="orderTypes"
-									/>
-									<span class="label-text">{{ orderTypeToDisplayString(OrderType.Commercial) }}</span>
-								</label>
-							</div>
-							<Textarea
-								label="Description"
-								placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-								v-model="description"
-							/>
-							<div class="flex flex-row gap-x-1 flex-wrap">
-								<label class="label cursor-pointer justify-normal gap-2 font-light">
-									<input
-										type="checkbox"
-										class="checkbox checkbox-sm"
-										:value="DeliveryProvider.Ozon"
-										v-model="deliveryProviders"
-									/>
-									<span>{{ deliveryProviderToDisplayString(DeliveryProvider.Ozon) }}</span>
-								</label>
-								<label class="label cursor-pointer justify-normal gap-2 font-light">
-									<input
-										type="checkbox"
-										class="checkbox checkbox-sm"
-										:value="DeliveryProvider.Wilbderries"
-										v-model="deliveryProviders"
-									/>
-									<span>{{ deliveryProviderToDisplayString(DeliveryProvider.Wilbderries) }}</span>
-								</label>
-								<label class="label cursor-pointer justify-normal gap-2 font-light">
-									<input
-										type="checkbox"
-										class="checkbox checkbox-sm"
-										:value="DeliveryProvider.Cold"
-										v-model="deliveryProviders"
-									/>
-									<span>{{ deliveryProviderToDisplayString(DeliveryProvider.Cold) }}</span>
-								</label>
-							</div>
-							<Input
-								type="text"
-								:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.CDEK)}`"
-								placeholder="123456789"
-								v-model="cdekTrackNumber"
-							/>
-							<Input
-								type="text"
-								:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.PostRussia)}`"
-								placeholder="123456789"
-								v-model="postTrackNumber"
-							/>
-							<Input
-								type="text"
-								:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.Boxberry)}`"
-								placeholder="123456789"
-								v-model="boxberryTrackNumber"
-							/>
-							<Input
-								type="text"
-								:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.POST5)}`"
-								placeholder="123456789"
-								v-model="post5TrackNumber"
-							/>
-							<Input
-								type="text"
-								:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.DPD)}`"
-								placeholder="123456789"
-								v-model="dpdTrackNumber"
-							/>
-						</div>
+					<div class="divider"></div>
+					<div class="flex flex-row gap-2">
+						<label class="label cursor-pointer justify-normal gap-2">
+							<input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Drugs" v-model="orderTypes" />
+							<span class="label-text">{{ orderTypeToDisplayString(OrderType.Drugs) }}</span>
+						</label>
+						<label class="label cursor-pointer justify-normal gap-2">
+							<input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Electronics" v-model="orderTypes" />
+							<span class="label-text">{{ orderTypeToDisplayString(OrderType.Electronics) }}</span>
+						</label>
+						<label class="label cursor-pointer justify-normal gap-2">
+							<input type="checkbox" class="checkbox checkbox-sm" :value="OrderType.Commercial" v-model="orderTypes" />
+							<span class="label-text">{{ orderTypeToDisplayString(OrderType.Commercial) }}</span>
+						</label>
 					</div>
+					<div class="flex flex-row gap-2">
+						<Input
+							type="text"
+							:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.CDEK)}`"
+							placeholder="123456789"
+							v-model="cdekTrackNumber"
+						/>
+						<Input
+							type="text"
+							:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.PostRussia)}`"
+							placeholder="123456789"
+							v-model="postTrackNumber"
+						/>
+						<Input
+							type="text"
+							:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.Boxberry)}`"
+							placeholder="123456789"
+							v-model="boxberryTrackNumber"
+						/>
+						<Input
+							type="text"
+							:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.POST5)}`"
+							placeholder="123456789"
+							v-model="post5TrackNumber"
+						/>
+						<Input
+							type="text"
+							:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.DPD)}`"
+							placeholder="123456789"
+							v-model="dpdTrackNumber"
+						/>
+					</div>
+					<div class="flex flex-row gap-2">
+						<label class="label cursor-pointer justify-normal gap-2">
+							<input
+								type="checkbox"
+								class="checkbox checkbox-sm"
+								:value="DeliveryProvider.Ozon"
+								v-model="deliveryProviders"
+							/>
+							<span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Ozon) }}</span>
+						</label>
+						<label class="label cursor-pointer justify-normal gap-2">
+							<input
+								type="checkbox"
+								class="checkbox checkbox-sm"
+								:value="DeliveryProvider.Wilbderries"
+								v-model="deliveryProviders"
+							/>
+							<span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Wilbderries) }}</span>
+						</label>
+						<label class="label cursor-pointer justify-normal gap-2">
+							<input
+								type="checkbox"
+								class="checkbox checkbox-sm"
+								:value="DeliveryProvider.Cold"
+								v-model="deliveryProviders"
+							/>
+							<span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Cold) }}</span>
+						</label>
+					</div>
+					<Textarea
+						label="Description"
+						placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+						v-model="description"
+					/>
 				</div>
 				<div class="modal-action flex-col items-end">
 					<div class="flex flex-row gap-2">

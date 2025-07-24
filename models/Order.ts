@@ -25,6 +25,7 @@ export interface Order {
 	user?: User
 	payment_method: PaymentMethod
 	payment_date: Date | null
+	exchange_rate: Decimal | null
 	order_type_mappings: OrderTypeMapping[]
 	order_tracks: OrderTrack[]
 }
@@ -42,6 +43,7 @@ export interface OrderRequest {
 	partner_cost?: Decimal
 	description?: string
 	payment_method?: PaymentMethod
+	exchange_rate?: Decimal
 	order_type_mappings: OrderTypeMappingRequest[]
 	order_tracks: OrderTrackRequest[]
 	send_notification?: boolean
