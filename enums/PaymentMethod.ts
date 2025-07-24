@@ -29,6 +29,6 @@ export function toAdminColorCode(paymentMethod: PaymentMethod) {
 		case PaymentMethod.Tinkoff:
 			return '#FFD6B9'
 		case PaymentMethod.Cash:
-			return '#8ae5dc'
+			return '#D5F0CA'
 	}
 }
