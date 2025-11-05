@@ -214,7 +214,11 @@ function calculatePrice() {
 		? new Decimal(formattedAdditionalCost.value)
 		: new Decimal(0)
 
-	originalPrice.value = currentPrice.value = roundedWeight.value.mul(18).add(additionalCostDecimal).toString()
+	if (roundedWeight.value.lessThan(1.5)) {
+		originalPrice.value = currentPrice.value = new Decimal(27).add(additionalCostDecimal).toString()
+	} else {
+		originalPrice.value = currentPrice.value = roundedWeight.value.mul(18).add(additionalCostDecimal).toString()
+	}
 }
 
 function submit() {
