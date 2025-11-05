@@ -10,7 +10,6 @@ import { TelegramEntityErrorType } from '~/enums/exceptions/TelegramEntityErrorT
 import DeliveryProviderInput from '~/components/new-order-form/DeliveryProviderInput.vue'
 import OrderTypeInput from '~/components/new-order-form/OrderTypeInput.vue'
 import CityInput from '~/components/new-order-form/CityInput.vue'
-import FormInput from '~/components/new-order-form/FormInput.vue'
 import DescriptionInput from '~/components/new-order-form/DescriptionInput.vue'
 import DataProcessAgreement from '~/components/DataProcessAgreement.vue'
 import PrivacyPolicyAgreement from '~/components/PrivacyPolicyAgreement.vue'
@@ -20,6 +19,7 @@ const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie', 
 const modalRef = ref<HTMLDialogElement | null>(null)
 const dataProcessAgreementRef = ref<typeof DataProcessAgreement | null>(null)
 const privacyPolicyAgreementRef = ref<typeof PrivacyPolicyAgreement | null>(null)
+const deliveryProviderInputRef = ref<typeof DeliveryProviderInput | null>(null)
 
 const firstName = ref(userOrderCookie.value?.first_name || '')
 const lastName = ref(userOrderCookie.value?.last_name || '')
@@ -31,6 +31,7 @@ const postTrackNumber = ref('')
 const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
 const dpdTrackNumber = ref('')
+const aptekaRuTrackNumber = ref('')
 const inviteCode = ref(userOrderCookie.value?.invite_code || '')
 const city = ref<City | null>(userOrderCookie.value?.city || null)
 const deliveryProviders = ref<DeliveryProvider[]>([])
@@ -47,12 +48,6 @@ const showLastNameInputError = ref(false)
 const showPhoneNrInputError = ref(false)
 const showTgUsernameInputError = ref(false)
 const showDescriptionInputError = ref(false)
-const showCdekTrackNumberInputError = ref(false)
-const showPostTrackNumberInputError = ref(false)
-const showBoxberryTrackNumberInputError = ref(false)
-const showPost5TrackNumberInputError = ref(false)
-const showDpdTrackNumberInputError = ref(false)
-const showDeliveryProviderInputError = ref(false)
 const showTermsAcceptedInputError = ref(false)
 const showErrorToast = ref(false)
 
@@ -130,6 +125,13 @@ async function registerOrder() {
 				})
 			}
 
+			if (aptekaRuTrackNumber.value) {
+				userOrderRequest.order_tracks.push({
+					delivery_provider: DeliveryProvider.AptekaRu,
+					track_number: aptekaRuTrackNumber.value,
+				})
+			}
+
 			await axios.post('/api/public/orders', userOrderRequest)
 
 			orderRegistered.value = true
@@ -186,34 +188,8 @@ function validateForm() {
 		showDescriptionInputError.value = true
 	}
 
-	if (deliveryProviders.value.length === 0) {
-		showDeliveryProviderInputError.value = true
+	if (!deliveryProviderInputRef.value?.validate()) {
 		valid = false
-	}
-
-	if (deliveryProviders.value.includes(DeliveryProvider.CDEK) && !cdekTrackNumber.value) {
-		valid = false
-		showCdekTrackNumberInputError.value = true
-	}
-
-	if (deliveryProviders.value.includes(DeliveryProvider.PostRussia) && !postTrackNumber.value) {
-		valid = false
-		showPostTrackNumberInputError.value = true
-	}
-
-	if (deliveryProviders.value.includes(DeliveryProvider.POST5) && !post5TrackNumber.value) {
-		valid = false
-		showPost5TrackNumberInputError.value = true
-	}
-
-	if (deliveryProviders.value.includes(DeliveryProvider.Boxberry) && !boxberryTrackNumber.value) {
-		valid = false
-		showBoxberryTrackNumberInputError.value = true
-	}
-
-	if (deliveryProviders.value.includes(DeliveryProvider.DPD) && !dpdTrackNumber.value) {
-		valid = false
-		showDpdTrackNumberInputError.value = true
 	}
 
 	if (!termsAccepted.value) {
@@ -230,12 +206,7 @@ function resetFieldErrors() {
 	showPhoneNrInputError.value = false
 	showTgUsernameInputError.value = false
 	showDescriptionInputError.value = false
-	showCdekTrackNumberInputError.value = false
-	showPostTrackNumberInputError.value = false
-	showBoxberryTrackNumberInputError.value = false
-	showPost5TrackNumberInputError.value = false
-	showDpdTrackNumberInputError.value = false
-	showDeliveryProviderInputError.value = false
+	deliveryProviderInputRef.value?.resetErrors()
 	showTermsAcceptedInputError.value = false
 }
 </script>
@@ -289,39 +260,16 @@ function resetFieldErrors() {
 					/>
 					<CityInput v-model="city" />
 					<DeliveryProviderInput
+						ref="deliveryProviderInputRef"
 						label="Где нам нужно будет получить заказ? *"
 						v-model="deliveryProviders"
-						:show-input-error="showDeliveryProviderInputError"
-					/>
-					<FormInput
-						v-if="deliveryProviders.includes(DeliveryProvider.CDEK)"
-						label="Трек-номер CDEK *"
-						v-model="cdekTrackNumber"
-						:show-input-error="showCdekTrackNumberInputError"
-					/>
-					<FormInput
-						v-if="deliveryProviders.includes(DeliveryProvider.PostRussia)"
-						label="Трек-номер Почты России *"
-						v-model="postTrackNumber"
-						:show-input-error="showPostTrackNumberInputError"
-					/>
-					<FormInput
-						v-if="deliveryProviders.includes(DeliveryProvider.POST5)"
-						label="Трек-номер 5POST *"
-						v-model="post5TrackNumber"
-						:show-input-error="showPost5TrackNumberInputError"
-					/>
-					<FormInput
-						v-if="deliveryProviders.includes(DeliveryProvider.Boxberry)"
-						label="Трек-номер Boxberry *"
-						v-model="boxberryTrackNumber"
-						:show-input-error="showBoxberryTrackNumberInputError"
-					/>
-					<FormInput
-						v-if="deliveryProviders.includes(DeliveryProvider.DPD)"
-						label="Трек-номер DPD *"
-						v-model="dpdTrackNumber"
-						:show-input-error="showDpdTrackNumberInputError"
+						v-model:cdekTrackNumber="cdekTrackNumber"
+						v-model:postTrackNumber="postTrackNumber"
+						v-model:boxberryTrackNumber="boxberryTrackNumber"
+						v-model:post5TrackNumber="post5TrackNumber"
+						v-model:dpdTrackNumber="dpdTrackNumber"
+						v-model:apteka-ru-track-number="aptekaRuTrackNumber"
+						:show-asterisk="true"
 					/>
 					<DescriptionInput
 						v-model="description"

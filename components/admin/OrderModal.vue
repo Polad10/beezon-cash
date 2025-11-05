@@ -44,6 +44,7 @@ const postTrackNumber = ref('')
 const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
 const dpdTrackNumber = ref('')
+const aptekaRuTrackNumber = ref('')
 const paymentMethod = ref<PaymentMethod | null>(null)
 const exchangeRate = ref('')
 const sendNotification = ref(false)
@@ -93,6 +94,8 @@ function open(order: Order | undefined) {
 			order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.POST5)?.track_number || ''
 		dpdTrackNumber.value =
 			order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.DPD)?.track_number || ''
+		aptekaRuTrackNumber.value =
+			order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.AptekaRu)?.track_number || ''
 		sendNotification.value = false
 	}
 
@@ -118,6 +121,7 @@ function resetFieldValues() {
 	boxberryTrackNumber.value = ''
 	post5TrackNumber.value = ''
 	dpdTrackNumber.value = ''
+	aptekaRuTrackNumber.value = ''
 	paymentMethod.value = null
 	sendNotification.value = false
 }
@@ -291,6 +295,13 @@ function submit() {
 			orderRequest.order_tracks.push({
 				delivery_provider: DeliveryProvider.DPD,
 				track_number: dpdTrackNumber.value,
+			})
+		}
+
+		if (aptekaRuTrackNumber.value) {
+			orderRequest.order_tracks.push({
+				delivery_provider: DeliveryProvider.AptekaRu,
+				track_number: aptekaRuTrackNumber.value,
 			})
 		}
 
@@ -481,6 +492,12 @@ function validateForm() {
 							:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.DPD)}`"
 							placeholder="123456789"
 							v-model="dpdTrackNumber"
+						/>
+						<Input
+							type="text"
+							:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.AptekaRu)}`"
+							placeholder="123456789"
+							v-model="aptekaRuTrackNumber"
 						/>
 					</div>
 					<div class="flex flex-row gap-2">
