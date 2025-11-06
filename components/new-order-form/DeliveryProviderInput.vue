@@ -76,6 +76,54 @@ function resetErrors() {
 	showDpdTrackNumberInputError.value = false
 	showAptekaRuTrackNumberInputError.value = false
 }
+
+function sanitizeTrackNumber(value: string): string {
+	// Remove all characters except letters and numbers
+	return value.replace(/[^a-zA-Z0-9]/g, '')
+}
+
+// Watch and sanitize track numbers
+watch(cdekTrackNumber, (newValue) => {
+	const sanitized = sanitizeTrackNumber(newValue)
+	if (sanitized !== newValue) {
+		cdekTrackNumber.value = sanitized
+	}
+})
+
+watch(postTrackNumber, (newValue) => {
+	const sanitized = sanitizeTrackNumber(newValue)
+	if (sanitized !== newValue) {
+		postTrackNumber.value = sanitized
+	}
+})
+
+watch(boxberryTrackNumber, (newValue) => {
+	const sanitized = sanitizeTrackNumber(newValue)
+	if (sanitized !== newValue) {
+		boxberryTrackNumber.value = sanitized
+	}
+})
+
+watch(post5TrackNumber, (newValue) => {
+	const sanitized = sanitizeTrackNumber(newValue)
+	if (sanitized !== newValue) {
+		post5TrackNumber.value = sanitized
+	}
+})
+
+watch(dpdTrackNumber, (newValue) => {
+	const sanitized = sanitizeTrackNumber(newValue)
+	if (sanitized !== newValue) {
+		dpdTrackNumber.value = sanitized
+	}
+})
+
+watch(aptekaRuTrackNumber, (newValue) => {
+	const sanitized = sanitizeTrackNumber(newValue)
+	if (sanitized !== newValue) {
+		aptekaRuTrackNumber.value = sanitized
+	}
+})
 </script>
 
 <template>
