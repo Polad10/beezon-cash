@@ -36,6 +36,7 @@ const weight = ref('')
 const weightRounded = ref(true)
 const additionalCost = ref('')
 const partnerCost = ref('')
+const partnerTrackNumber = ref('')
 const description = ref('')
 const orderTypes = ref<OrderType[]>([])
 const deliveryProviders = ref<DeliveryProvider[]>([])
@@ -79,6 +80,7 @@ function open(order: Order | undefined) {
 		weightRounded.value = order.weight_rounded
 		additionalCost.value = order.additional_cost.toString()
 		partnerCost.value = order.partner_cost.toString()
+		partnerTrackNumber.value = order.partner_track_number || ''
 		description.value = order.description
 		exchangeRate.value = order.exchange_rate?.toString() || ''
 		orderTypes.value = order.order_type_mappings.map((mapping) => mapping.order_type)
@@ -112,6 +114,7 @@ function resetFieldValues() {
 	weightRounded.value = false
 	additionalCost.value = ''
 	partnerCost.value = ''
+	partnerTrackNumber.value = ''
 	description.value = ''
 	exchangeRate.value = ''
 	orderTypes.value = []
@@ -237,6 +240,7 @@ function submit() {
 			weight: formattedWeight.value ? new Decimal(formattedWeight.value) : undefined,
 			additional_cost: formattedAdditionalCost.value ? new Decimal(formattedAdditionalCost.value) : undefined,
 			partner_cost: formattedPartnerCost.value ? new Decimal(formattedPartnerCost.value) : undefined,
+			partner_track_number: partnerTrackNumber.value,
 			exchange_rate: formattedExchangeRate.value ? new Decimal(formattedExchangeRate.value) : undefined,
 			description: description.value || undefined,
 			payment_method: paymentMethod.value || undefined,
@@ -400,7 +404,7 @@ function validateForm() {
 							v-model="partnerCost"
 							:class="{ 'input-error': showPartnerCostInputError }"
 						/>
-						<Input type="text" label="Partner tracking number" placeholder="0" disabled />
+						<Input type="text" label="Partner tracking number" placeholder="0" v-model="partnerTrackNumber" />
 						<Input
 							type="text"
 							label="Additional cost"

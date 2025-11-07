@@ -21,6 +21,7 @@ export interface Order {
 	weight_rounded: boolean
 	additional_cost: Decimal
 	partner_cost: Decimal
+	partner_track_number?: string
 	description: string
 	user?: User
 	payment_method: PaymentMethod
@@ -41,6 +42,7 @@ export interface OrderRequest {
 	weight_rounded: boolean
 	additional_cost?: Decimal
 	partner_cost?: Decimal
+	partner_track_number?: string
 	description?: string
 	payment_method?: PaymentMethod
 	exchange_rate?: Decimal
