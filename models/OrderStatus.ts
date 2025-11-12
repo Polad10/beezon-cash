@@ -44,7 +44,7 @@ export function toClientDisplayString(orderStatus: OrderStatus) {
 		case OrderStatus.New:
 			return 'Создан'
 		case OrderStatus.WarehouseRF:
-			return 'Передается в доставку'
+			return 'На складе в РФ'
 		case OrderStatus.Courier1:
 		case OrderStatus.Courier2:
 		case OrderStatus.Waiting:
