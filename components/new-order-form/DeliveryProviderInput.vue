@@ -79,7 +79,7 @@ function resetErrors() {
 
 function sanitizeTrackNumber(value: string): string {
 	// Remove all characters except letters and numbers
-	return value.replace(/[^a-zA-Z0-9]/g, '')
+	return value.replace(/[^a-zA-Z0-9-]/g, '')
 }
 
 // Watch and sanitize track numbers
