@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import axios from 'axios'
 import type { City } from '~/models/City'
-import { DeliveryProvider } from '~/models/OrderTrack'
+import { DeliveryProvider, type OrderTrackRequest } from '~/models/OrderTrack'
 import { OrderType } from '~/models/OrderTypeMapping'
 import DeliveryProviderInput from '~/components/new-order-form/DeliveryProviderInput.vue'
 import OrderTypeInput from '~/components/new-order-form/OrderTypeInput.vue'
@@ -20,14 +20,9 @@ const modalRef = ref<HTMLDialogElement | null>(null)
 const deliveryProviderInputRef = ref<typeof DeliveryProviderInput | null>(null)
 
 const description = ref('')
-const cdekTrackNumber = ref('')
-const postTrackNumber = ref('')
-const boxberryTrackNumber = ref('')
-const post5TrackNumber = ref('')
-const dpdTrackNumber = ref('')
-const aptekaRuTrackNumber = ref('')
+const trackNumber = ref('')
 const city = ref<City | null>(null)
-const deliveryProviders = ref<DeliveryProvider[]>([])
+const selectedDeliveryProvider = ref<DeliveryProvider | null>(null)
 const orderTypes = ref<OrderType[]>([])
 
 const loading = ref(false)
@@ -48,64 +43,17 @@ async function registerOrder() {
 				order_tracks: [],
 			}
 
-			if (deliveryProviders.value.includes(DeliveryProvider.Ozon)) {
-				orderRequest.order_tracks.push({
-					delivery_provider: DeliveryProvider.Ozon,
-				})
-			}
+			if (selectedDeliveryProvider.value != null) {
+				const track: OrderTrackRequest = {
+					delivery_provider: selectedDeliveryProvider.value,
+				}
 
-			if (deliveryProviders.value.includes(DeliveryProvider.Wilbderries)) {
-				orderRequest.order_tracks.push({
-					delivery_provider: DeliveryProvider.Wilbderries,
-				})
-			}
+				// Add track number if provided
+				if (trackNumber.value) {
+					track.track_number = trackNumber.value
+				}
 
-			if (deliveryProviders.value.includes(DeliveryProvider.Cold)) {
-				orderRequest.order_tracks.push({
-					delivery_provider: DeliveryProvider.Cold,
-				})
-			}
-
-			if (cdekTrackNumber.value) {
-				orderRequest.order_tracks.push({
-					delivery_provider: DeliveryProvider.CDEK,
-					track_number: cdekTrackNumber.value,
-				})
-			}
-
-			if (postTrackNumber.value) {
-				orderRequest.order_tracks.push({
-					delivery_provider: DeliveryProvider.PostRussia,
-					track_number: postTrackNumber.value,
-				})
-			}
-
-			if (boxberryTrackNumber.value) {
-				orderRequest.order_tracks.push({
-					delivery_provider: DeliveryProvider.Boxberry,
-					track_number: boxberryTrackNumber.value,
-				})
-			}
-
-			if (post5TrackNumber.value) {
-				orderRequest.order_tracks.push({
-					delivery_provider: DeliveryProvider.POST5,
-					track_number: post5TrackNumber.value,
-				})
-			}
-
-			if (dpdTrackNumber.value) {
-				orderRequest.order_tracks.push({
-					delivery_provider: DeliveryProvider.DPD,
-					track_number: dpdTrackNumber.value,
-				})
-			}
-
-			if (aptekaRuTrackNumber.value) {
-				orderRequest.order_tracks.push({
-					delivery_provider: DeliveryProvider.AptekaRu,
-					track_number: aptekaRuTrackNumber.value,
-				})
+				orderRequest.order_tracks.push(track)
 			}
 
 			const headers = {
@@ -153,14 +101,9 @@ function open() {
 	resetFieldErrors()
 
 	description.value = ''
-	cdekTrackNumber.value = ''
-	postTrackNumber.value = ''
-	boxberryTrackNumber.value = ''
-	post5TrackNumber.value = ''
-	dpdTrackNumber.value = ''
-	aptekaRuTrackNumber.value = ''
+	trackNumber.value = ''
 	city.value = null
-	deliveryProviders.value = []
+	selectedDeliveryProvider.value = null
 	orderTypes.value = []
 
 	loading.value = false
@@ -181,13 +124,8 @@ function open() {
 					<DeliveryProviderInput
 						ref="deliveryProviderInputRef"
 						label="Где нам нужно будет получить заказ?"
-						v-model="deliveryProviders"
-						v-model:cdekTrackNumber="cdekTrackNumber"
-						v-model:postTrackNumber="postTrackNumber"
-						v-model:boxberryTrackNumber="boxberryTrackNumber"
-						v-model:post5TrackNumber="post5TrackNumber"
-						v-model:dpdTrackNumber="dpdTrackNumber"
-						v-model:apteka-ru-track-number="aptekaRuTrackNumber"
+						v-model="selectedDeliveryProvider"
+						v-model:track-number="trackNumber"
 						:show-asterisk="false"
 					/>
 					<DescriptionInput
