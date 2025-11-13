@@ -55,8 +55,9 @@ export function toClientDisplayString(orderStatus: OrderStatus) {
 		case OrderStatus.WarehouseTbilisi:
 			return 'Готов к выдаче'
 		case OrderStatus.ReadyForDeliveryByPony:
-		case OrderStatus.WaitingForDeliveryByPony:
 			return 'На складе в Тбилиси'
+		case OrderStatus.WaitingForDeliveryByPony:
+			return 'Передано в DELIVO'
 		case OrderStatus.Delivered:
 			return 'Доставлен'
 	}
