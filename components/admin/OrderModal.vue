@@ -18,11 +18,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['order-submitted'])
 
-const fuseUsersOptions = {
-	keys: ['tg_username', 'last_name', 'first_name'],
-	threshold: 0.1,
-}
-
 defineExpose({ open, close })
 
 const modalRef = ref<HTMLDialogElement | null>(null)
@@ -376,7 +371,7 @@ function validateForm() {
 						<SelectWithSearch
 							placeholder="Select a user"
 							:options="users"
-							:fuse-options="fuseUsersOptions"
+							:fuse-options="fuseSelectUserOptions"
 							:class="{ 'input-error': showUserInputError }"
 							:get-option-string="getUserNameAndTelegram"
 							v-model="selectedUser"

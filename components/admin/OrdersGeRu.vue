@@ -24,13 +24,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['order-deleted'])
 
-const fuseOrdersOptions = {
-	keys: ['user.tg_username', 'user.last_name', 'user.first_name', 'code', 'description', 'cdek_track_nr'],
-	threshold: 0.1,
-}
-
 let fuseOrders = computed(() => {
-	return new Fuse(props.allOrders, fuseOrdersOptions)
+	return new Fuse(props.allOrders, fuseGeRuOrdersOptions)
 })
 
 const newOrderModalRef = ref<typeof NewOrderGeRuModal | null>(null)

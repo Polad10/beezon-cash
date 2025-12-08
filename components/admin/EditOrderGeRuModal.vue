@@ -43,11 +43,6 @@ const errorMessage = ref('')
 const successMessage = ref('')
 const modalRef = ref<HTMLDialogElement | null>(null)
 
-const fuseUsersOptions = {
-	keys: ['tg_username', 'last_name', 'first_name'],
-	threshold: 0.1,
-}
-
 const formattedWeight = computed(() => {
 	return formatNumber(weight.value)
 })
@@ -234,7 +229,7 @@ defineExpose({ open })
 					<SelectWithSearch
 						placeholder="Select a user"
 						:options="users"
-						:fuse-options="fuseUsersOptions"
+						:fuse-options="fuseSelectUserOptions"
 						:class="{ 'input-error': showUserInputError }"
 						:get-option-string="getUserNameAndTelegram"
 						v-model="selectedUser"
