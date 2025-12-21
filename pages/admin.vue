@@ -21,9 +21,22 @@ enum ActiveTab {
 	Settings,
 }
 
+const orderStartDate = ref(getDefaultOrderStartDate())
+const orderGeRuStartDate = ref(getDefaultOrderStartDate())
+
 const users = (await useFetch<User[]>('/api/admin/users')).data
-const orders = (await useFetch<Order[]>('/api/admin/orders')).data
-const ordersGeRu = (await useFetch<OrderGeRu[]>('/api/admin/geru/orders')).data
+const orders = (
+	await useFetch<Order[]>('/api/admin/orders', {
+		query: { startDate: orderStartDate },
+		watch: [orderStartDate],
+	})
+).data
+const ordersGeRu = (
+	await useFetch<OrderGeRu[]>('/api/admin/geru/orders?startDate', {
+		query: { startDate: orderGeRuStartDate },
+		watch: [orderGeRuStartDate],
+	})
+).data
 const messages = (await useFetch<Message[]>('/api/admin/messages')).data
 const messagesGeRu = (await useFetch<MessageGeRu[]>('/api/admin/geru/messages')).data
 const transactions = (await useFetch<Transaction[]>('/api/admin/transactions')).data
@@ -44,6 +57,21 @@ onMounted(() => {
 		}
 	}
 })
+
+function getDefaultOrderStartDate() {
+	const date = new Date()
+	date.setMonth(date.getMonth() - 2)
+
+	return date.toISOString().split('T')[0]
+}
+
+function updateOrderStartDate(newStartDate: string) {
+	orderStartDate.value = newStartDate
+}
+
+function updateOrderGeRuStartDate(newStartDate: string) {
+	orderGeRuStartDate.value = newStartDate
+}
 
 function setActiveTab(tab: ActiveTab) {
 	activeTab.value = tab
@@ -164,6 +192,8 @@ async function handleSettingsUpdated(updatedSetting: Setting) {
 					v-if="activeTab === ActiveTab.Orders"
 					:all-orders="orders!"
 					:all-users="users!"
+					:start-date="orderStartDate"
+					@start-date-updated="updateOrderStartDate"
 					@order-deleted="deleteOrder"
 				/>
 			</KeepAlive>
@@ -173,6 +203,8 @@ async function handleSettingsUpdated(updatedSetting: Setting) {
 					v-if="activeTab === ActiveTab.OrdersGeRu"
 					:all-orders="ordersGeRu!"
 					:all-users="users!"
+					:start-date="orderGeRuStartDate"
+					@start-date-updated="updateOrderGeRuStartDate"
 					@order-deleted="deleteGeRuOrder"
 				/>
 			</KeepAlive>

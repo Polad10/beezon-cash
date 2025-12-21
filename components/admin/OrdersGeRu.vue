@@ -20,9 +20,10 @@ import axios from 'axios'
 const props = defineProps<{
 	allOrders: Array<OrderGeRu>
 	allUsers: Array<User>
+	startDate: string
 }>()
 
-const emit = defineEmits(['order-deleted'])
+const emit = defineEmits(['order-deleted', 'start-date-updated'])
 
 let fuseOrders = computed(() => {
 	return new Fuse(props.allOrders, fuseGeRuOrdersOptions)
@@ -41,14 +42,23 @@ const sendNotification = ref(false)
 const selectedOrderStatusToSet = ref<OrderStatusGeRu | null>(null)
 const selectedOrders = ref<OrderGeRu[]>([])
 const allOrdersSelected = ref(false)
+const startDate = ref(props.startDate)
 
 const errorMessage = ref('')
 const showErrorToast = ref(false)
 
-onBeforeMount(() => {
-	props.allOrders.forEach((order) => {
-		processOrderValues(order)
-	})
+watch(
+	() => props.allOrders,
+	() => {
+		props.allOrders.forEach((order) => {
+			processOrderValues(order)
+		})
+	},
+	{ immediate: true }
+)
+
+watch(startDate, (newStartDate) => {
+	emit('start-date-updated', newStartDate)
 })
 
 const orders = computed(() => {
@@ -252,6 +262,18 @@ async function updatePaymentMethod(order: OrderGeRu, newPaymentMethod: PaymentMe
 							</label>
 						</li>
 					</ul>
+				</div>
+				<div class="dropdown dropdown-end">
+					<div tabindex="0" role="button" class="btn btn-sm mb-1">
+						Filters
+						<ion-icon name="options-outline" class="text-base"></ion-icon>
+					</div>
+					<div tabindex="0" class="dropdown-content rounded-box z-[1] p-4 shadow bg-white w-64">
+						<div class="flex flex-row items-center gap-2">
+							<span class="text-sm">Start date</span>
+							<Input type="date" class="input-sm" v-model="startDate" />
+						</div>
+					</div>
 				</div>
 				<label
 					class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"

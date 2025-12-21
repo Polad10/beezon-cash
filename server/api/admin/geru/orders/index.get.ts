@@ -2,23 +2,26 @@ import axios from 'axios'
 import { LogLevel } from '~/models/LogLevel'
 
 export default defineEventHandler(async (event) => {
-  try {
-    const orders = (
-      await axios.get(`${process.env.BEEZON_API_URL}/admin/geru/orders`, {
-        headers: { Authorization: `Bearer ${process.env.BEEZON_API_SECRET}` },
-      })
-    ).data
+	try {
+		const query = getQuery(event)
 
-    return orders
-  } catch (ex) {
-    const error = ex as Error
+		const orders = (
+			await axios.get(`${process.env.BEEZON_API_URL}/admin/geru/orders`, {
+				params: query,
+				headers: { Authorization: `Bearer ${process.env.BEEZON_API_SECRET}` },
+			})
+		).data
 
-    const logExtra = {
-      cause: error.cause,
-      stack: error.stack,
-    }
+		return orders
+	} catch (ex) {
+		const error = ex as Error
 
-    log(event.context.correlationId, LogLevel.ERROR, error.message, logExtra)
-    throw ex
-  }
+		const logExtra = {
+			cause: error.cause,
+			stack: error.stack,
+		}
+
+		log(event.context.correlationId, LogLevel.ERROR, error.message, logExtra)
+		throw ex
+	}
 })
