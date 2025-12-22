@@ -6,212 +6,227 @@ import { toColorCode, toDisplayString, toTextColorCode, TransactionType } from '
 import type { User } from '~/models/User'
 
 const props = defineProps<{
-  allTransactions: Transaction[]
-  orders: Order[]
-  users: User[]
+	allTransactions: Transaction[]
+	orders: Order[]
+	users: User[]
+	startDate: string
+	endDate: string
 }>()
 
-onBeforeMount(() => {
-  props.allTransactions.forEach((transaction) => {
-    transaction.datetime = new Date(transaction.datetime)
-    transaction.amount = new Decimal(transaction.amount)
-  })
-
-  props.allTransactions.sort((a, b) => {
-    return b.datetime.getTime() - a.datetime.getTime()
-  })
-
-  props.orders.forEach((order) => {
-    if (order.end_date) {
-      order.end_date = new Date(order.end_date)
-    }
-  })
-})
+const emit = defineEmits(['start-date-updated', 'end-date-updated'])
 
 const rowsPerPage = 100
-
 const currentPageNr = ref(1)
-const startDate = ref('')
-const endDate = ref('')
+const startDate = ref(props.startDate)
+const endDate = ref(props.endDate)
+
+watch(
+	[() => props.allTransactions, () => props.orders],
+	() => {
+		props.allTransactions.forEach((transaction) => {
+			transaction.datetime = new Date(transaction.datetime)
+			transaction.amount = new Decimal(transaction.amount)
+		})
+
+		props.allTransactions.sort((a, b) => {
+			return b.datetime.getTime() - a.datetime.getTime()
+		})
+
+		props.orders.forEach((order) => {
+			if (order.end_date) {
+				order.end_date = new Date(order.end_date)
+			}
+		})
+	},
+	{ immediate: true }
+)
+
+watch(startDate, (newStartDate) => {
+	emit('start-date-updated', newStartDate)
+})
+
+watch(endDate, (newEndDate) => {
+	emit('end-date-updated', newEndDate)
+})
 
 const pageNr = computed(() => {
-  currentPageNr.value = Math.min(currentPageNr.value, maxPageNr.value)
-  return currentPageNr.value
+	currentPageNr.value = Math.min(currentPageNr.value, maxPageNr.value)
+	return currentPageNr.value
 })
 
 const maxPageNr = computed(() => {
-  return Math.max(Math.ceil(props.allTransactions.length / rowsPerPage), 1)
+	return Math.max(Math.ceil(props.allTransactions.length / rowsPerPage), 1)
 })
 
 const startDateTime = computed(() => {
-  if (!startDate.value) {
-    return null
-  }
+	if (!startDate.value) {
+		return null
+	}
 
-  return new Date(`${startDate.value}T00:00:00.000`)
+	return new Date(`${startDate.value}T00:00:00.000`)
 })
 
 const endDateTime = computed(() => {
-  if (!endDate.value) {
-    return null
-  }
+	if (!endDate.value) {
+		return null
+	}
 
-  return new Date(`${endDate.value}T23:59:59.999`)
+	return new Date(`${endDate.value}T23:59:59.999`)
 })
 
 const transactions = computed(() => {
-  let result = props.allTransactions
+	let result = props.allTransactions
 
-  if (startDateTime.value) {
-    result = result.filter((r) => r.datetime >= startDateTime.value!)
-  }
+	if (startDateTime.value) {
+		result = result.filter((r) => r.datetime >= startDateTime.value!)
+	}
 
-  if (endDateTime.value) {
-    result = result.filter((r) => r.datetime <= endDateTime.value!)
-  }
+	if (endDateTime.value) {
+		result = result.filter((r) => r.datetime <= endDateTime.value!)
+	}
 
-  return result
+	return result
 })
 
 const pageTransactions = computed(() => {
-  return transactions.value.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
+	return transactions.value.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
 })
 
 const deliveredOrders = computed(() => {
-  let orders = props.orders.filter((o) => o.end_date)
+	let orders = props.orders.filter((o) => o.end_date)
 
-  if (startDateTime.value) {
-    orders = orders.filter((o) => o.end_date! >= startDateTime.value!)
-  }
+	if (startDateTime.value) {
+		orders = orders.filter((o) => o.end_date! >= startDateTime.value!)
+	}
 
-  if (endDateTime.value) {
-    orders = orders.filter((o) => o.end_date! <= endDateTime.value!)
-  }
+	if (endDateTime.value) {
+		orders = orders.filter((o) => o.end_date! <= endDateTime.value!)
+	}
 
-  return orders
+	return orders
 })
 
 const deliveredWeight = computed(() => {
-  let weight = new Decimal(0)
+	let weight = new Decimal(0)
 
-  for (const order of deliveredOrders.value) {
-    weight = weight.add(order.weight)
-  }
+	for (const order of deliveredOrders.value) {
+		weight = weight.add(order.weight)
+	}
 
-  return weight
+	return weight
 })
 
 const income = computed(() => {
-  let income = new Decimal(0)
+	let income = new Decimal(0)
 
-  for (const order of deliveredOrders.value) {
-    income = income.add(order.original_price)
-  }
+	for (const order of deliveredOrders.value) {
+		income = income.add(order.original_price)
+	}
 
-  return income
+	return income
 })
 
 const bonusesAdded = computed(() => {
-  let bonuses = new Decimal(0)
+	let bonuses = new Decimal(0)
 
-  for (const transaction of transactions.value) {
-    if (transaction.type == TransactionType.Deposit) {
-      bonuses = bonuses.add(transaction.amount)
-    }
-  }
+	for (const transaction of transactions.value) {
+		if (transaction.type == TransactionType.Deposit) {
+			bonuses = bonuses.add(transaction.amount)
+		}
+	}
 
-  return bonuses
+	return bonuses
 })
 
 const bonusesWithdrawn = computed(() => {
-  let bonuses = new Decimal(0)
+	let bonuses = new Decimal(0)
 
-  for (const transaction of transactions.value) {
-    if (transaction.type == TransactionType.Withdrawal) {
-      bonuses = bonuses.add(transaction.amount)
-    }
-  }
+	for (const transaction of transactions.value) {
+		if (transaction.type == TransactionType.Withdrawal) {
+			bonuses = bonuses.add(transaction.amount)
+		}
+	}
 
-  return bonuses
+	return bonuses
 })
 
 function setPageNr(newPageNr: number) {
-  currentPageNr.value = newPageNr
+	currentPageNr.value = newPageNr
 }
 
 function getUserName(transaction: Transaction) {
-  const user = props.users.find((u) => u.id === transaction.user_id)
+	const user = props.users.find((u) => u.id === transaction.user_id)
 
-  return `${user?.first_name} ${user?.last_name}`
+	return `${user?.first_name} ${user?.last_name}`
 }
 </script>
 
 <template>
-  <div class="flex flex-col grow">
-    <div class="flex flex-row min-h-12 mr-3 justify-between items-center">
-      <span class="text-2xl font-bold">Analytics</span>
-      <div class="flex flex-row gap-5">
-        <div class="flex flex-row items-center gap-2">
-          <span class="text-sm">Start date</span>
-          <Input type="date" class="input-sm" v-model="startDate" />
-        </div>
-        <div class="flex flex-row items-center gap-2">
-          <span class="text-sm">End date</span>
-          <Input type="date" class="input-sm" v-model="endDate" />
-        </div>
-      </div>
-    </div>
-    <div class="mr-3 mb-5 stats shadow min-h-24">
-      <div class="stat place-items-center">
-        <div class="stat-title">Delivered (kg)</div>
-        <div class="stat-value">{{ deliveredWeight }}</div>
-      </div>
-      <div class="stat place-items-center">
-        <div class="stat-title">Income (₾)</div>
-        <div class="stat-value">{{ income }}</div>
-      </div>
-      <div class="stat place-items-center">
-        <div class="stat-title">Bonuses added (₾)</div>
-        <div class="stat-value">{{ bonusesAdded }}</div>
-      </div>
-      <div class="stat place-items-center">
-        <div class="stat-title">Bonuses withdrawn (₾)</div>
-        <div class="stat-value">{{ bonusesWithdrawn }}</div>
-      </div>
-    </div>
-    <div class="flex flex-col bg-white mr-3 mb-5 grow">
-      <table class="table table-sm">
-        <thead>
-          <tr class="bg-base-200">
-            <th>DATE</th>
-            <th>REASON</th>
-            <th>CLIENT</th>
-            <th>ACTION</th>
-            <th>AMOUNT</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="transaction in pageTransactions" :key="transaction.id">
-            <td>{{ transaction.datetime.toLocaleDateString() }}</td>
-            <td>{{ transaction.reason }}</td>
-            <td>{{ getUserName(transaction) }}</td>
-            <td>
-              <div
-                class="badge badge-outline rounded-lg p-3"
-                :class="[`bg-[${toColorCode(transaction.type)}]`, `text-[${toTextColorCode(transaction.type)}]`]"
-              >
-                {{ toDisplayString(transaction.type) }}
-              </div>
-            </td>
-            <td>
-              <span v-if="transaction.type == TransactionType.Withdrawal">- </span>
-              <span v-else>+ </span>
-              {{ transaction.amount }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
-  </div>
+	<div class="flex flex-col grow">
+		<div class="flex flex-row min-h-12 mr-3 justify-between items-center">
+			<span class="text-2xl font-bold">Analytics</span>
+			<div class="flex flex-row gap-5">
+				<div class="flex flex-row items-center gap-2">
+					<span class="text-sm">Start date</span>
+					<Input type="date" class="input-sm" v-model="startDate" />
+				</div>
+				<div class="flex flex-row items-center gap-2">
+					<span class="text-sm">End date</span>
+					<Input type="date" class="input-sm" v-model="endDate" />
+				</div>
+			</div>
+		</div>
+		<div class="mr-3 mb-5 stats shadow min-h-24">
+			<div class="stat place-items-center">
+				<div class="stat-title">Delivered (kg)</div>
+				<div class="stat-value">{{ deliveredWeight }}</div>
+			</div>
+			<div class="stat place-items-center">
+				<div class="stat-title">Income (₾)</div>
+				<div class="stat-value">{{ income }}</div>
+			</div>
+			<div class="stat place-items-center">
+				<div class="stat-title">Bonuses added (₾)</div>
+				<div class="stat-value">{{ bonusesAdded }}</div>
+			</div>
+			<div class="stat place-items-center">
+				<div class="stat-title">Bonuses withdrawn (₾)</div>
+				<div class="stat-value">{{ bonusesWithdrawn }}</div>
+			</div>
+		</div>
+		<div class="flex flex-col bg-white mr-3 mb-5 grow">
+			<table class="table table-sm">
+				<thead>
+					<tr class="bg-base-200">
+						<th>DATE</th>
+						<th>REASON</th>
+						<th>CLIENT</th>
+						<th>ACTION</th>
+						<th>AMOUNT</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="transaction in pageTransactions" :key="transaction.id">
+						<td>{{ transaction.datetime.toLocaleDateString() }}</td>
+						<td>{{ transaction.reason }}</td>
+						<td>{{ getUserName(transaction) }}</td>
+						<td>
+							<div
+								class="badge badge-outline rounded-lg p-3"
+								:class="[`bg-[${toColorCode(transaction.type)}]`, `text-[${toTextColorCode(transaction.type)}]`]"
+							>
+								{{ toDisplayString(transaction.type) }}
+							</div>
+						</td>
+						<td>
+							<span v-if="transaction.type == TransactionType.Withdrawal">- </span>
+							<span v-else>+ </span>
+							{{ transaction.amount }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
+	</div>
 </template>
