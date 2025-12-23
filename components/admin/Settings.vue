@@ -37,6 +37,7 @@ async function save() {
 			successMessage.value = 'Settings updated'
 			showToast(showSuccessToast)
 		} catch (ex) {
+			logError(ex)
 			errorMessage.value = 'Something went wrong. Please try again later.'
 			showToast(showErrorToast)
 		} finally {

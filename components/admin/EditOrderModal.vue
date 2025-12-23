@@ -31,6 +31,7 @@ async function editOrder(orderRequest: OrderRequest) {
 
 		close()
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}

@@ -157,6 +157,7 @@ async function handleOrderStatusUpdateConfirmedForSelection() {
 			selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
 		}
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	} finally {
@@ -221,6 +222,7 @@ async function updateOrderStatus(order: Order, newOrderStatus: OrderStatus) {
 		const updatedOrder = (await axios.patch(`/api/admin/orders/${order.id}`, body)).data
 		order.status = updatedOrder.status
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}
@@ -232,6 +234,7 @@ async function updatePaymentMethod(order: Order, newPaymentMethod: PaymentMethod
 		const updatedOrder = (await axios.patch(`/api/admin/orders/${order.id}`, body)).data
 		order.payment_method = updatedOrder.payment_method
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}

@@ -96,6 +96,7 @@ async function registerOrder() {
 				return showToast(showErrorToast)
 			}
 
+			logError(ex)
 			errorMessage.value = 'Что-то пошло не так. Пожалуйста, попробуйте чуть позже.'
 			showToast(showErrorToast)
 		} finally {

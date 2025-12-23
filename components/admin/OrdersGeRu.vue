@@ -149,6 +149,7 @@ async function updateOrderStatusForSelection() {
 			selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
 		}
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	} finally {
@@ -211,6 +212,7 @@ async function updateOrderStatus(order: OrderGeRu, newOrderStatus: OrderStatusGe
 		const updatedOrder = (await axios.patch(`/api/admin/geru/orders/${order.id}`, body)).data
 		order.status = updatedOrder.status
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}
@@ -222,6 +224,7 @@ async function updatePaymentMethod(order: OrderGeRu, newPaymentMethod: PaymentMe
 		const updatedOrder = (await axios.patch(`/api/admin/geru/orders/${order.id}`, body)).data
 		order.payment_method = updatedOrder.payment_method
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}

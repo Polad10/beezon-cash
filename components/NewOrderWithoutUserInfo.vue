@@ -65,6 +65,7 @@ async function registerOrder() {
 			modalRef.value?.close()
 			emit('order-created', order)
 		} catch (ex) {
+			logError(ex)
 			errorMessage.value = 'Что-то пошло не так. Пожалуйста, попробуйте чуть позже.'
 			showToast(showErrorToast)
 		} finally {

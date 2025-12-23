@@ -111,6 +111,7 @@ async function deleteUser(user: User) {
 		users.value = users.value!.filter((u) => u.id !== user.id)
 		orders.value = orders.value!.filter((o) => o.user_id !== user.id)
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}
@@ -121,6 +122,7 @@ async function deleteOrder(order: Order) {
 		await axios.delete(`/api/admin/orders/${order.id}`)
 		orders.value = orders.value?.filter((o) => o.id !== order.id)!
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}
@@ -131,6 +133,7 @@ async function deleteGeRuOrder(order: OrderGeRu) {
 		await axios.delete(`/api/admin/geru/orders/${order.id}`)
 		ordersGeRu.value = ordersGeRu.value?.filter((o) => o.id !== order.id)!
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}
@@ -141,6 +144,7 @@ async function deleteMessage(message: Message) {
 		await axios.delete(`/api/admin/messages/${message.id}`)
 		messages.value = messages.value?.filter((m) => m.id !== message.id)!
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}
@@ -151,6 +155,7 @@ async function deleteGeRuMessage(message: MessageGeRu) {
 		await axios.delete(`/api/admin/geru/messages/${message.id}`)
 		messagesGeRu.value = messagesGeRu.value?.filter((m) => m.id !== message.id)!
 	} catch (ex) {
+		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
 		showToast(showErrorToast)
 	}
