@@ -94,15 +94,14 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
 				<div class="divider opacity-50 m-0"></div>
 				<div class="flex flex-row justify-between">
 					<span class="text-base font-medium">Использовать бонусы</span>
+					<ion-icon v-if="bonusApplied" name="checkmark-circle" class="text-3xl text-success"></ion-icon>
 					<input
-						v-if="!bonusApplied"
+						v-else
 						type="checkbox"
 						class="toggle border-gray-300 bg-gray-300 checked:bg-blue-800 [--tglbg:white] checked:[--tglbg:white] checked:border-blue-800"
 						@change="toggleShowBonusInput"
 						v-model="bonusToggleChecked"
 					/>
-					<ion-icon v-else-if="bonusApplied" name="checkmark-circle" class="text-3xl text-success"></ion-icon>
-					<ion-icon v-else name="close-circle" class="text-3xl text-error"></ion-icon>
 				</div>
 			</div>
 			<div class="mt-3 collapse rounded-none" :class="{ 'collapse-open': showBonusInput }">
