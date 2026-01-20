@@ -6,7 +6,6 @@ import type { User } from '~/models/User'
 import type { Order } from '~/models/Order'
 import Decimal from 'decimal.js'
 import type NewOrderWithoutUserInfo from '~/components/NewOrderWithoutUserInfo.vue'
-import { LogLevel } from '~/models/LogLevel'
 
 enum Tab {
 	Home,
