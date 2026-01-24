@@ -55,47 +55,49 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
 </script>
 
 <template>
-	<div class="card card-compact bg-neutral-100 mb-3" @click="() => emit('order-clicked', order)">
+	<div class="card card-compact bg-neutral-100 mb-3">
 		<div class="card-body">
-			<div class="flex flex-row justify-between items-center">
-				<div>
-					<div
-						:class="[
-							'badge',
-							`bg-[${toClientColorCode(order.status)}]`,
-							`border-[${toClientColorCode(order.status)}]`,
-							'font-semibold',
-							'h-7',
-							'rounded-lg',
-						]"
-					>
-						{{ toClientDisplayString(order.status) }}
+			<div @click="() => emit('order-clicked', order)">
+				<div class="flex flex-row justify-between items-center">
+					<div>
+						<div
+							:class="[
+								'badge',
+								`bg-[${toClientColorCode(order.status)}]`,
+								`border-[${toClientColorCode(order.status)}]`,
+								'font-semibold',
+								'h-7',
+								'rounded-lg',
+							]"
+						>
+							{{ toClientDisplayString(order.status) }}
+						</div>
+						<div
+							v-if="order.bonus_received && order.bonus_received.greaterThan(0)"
+							class="badge bg-[#5EA650] border-[#5EA650] text-white text-xs ml-2"
+						>
+							+ {{ order.bonus_received }}
+						</div>
 					</div>
-					<div
-						v-if="order.bonus_received && order.bonus_received.greaterThan(0)"
-						class="badge bg-[#5EA650] border-[#5EA650] text-white text-xs ml-2"
-					>
-						+ {{ order.bonus_received }}
+					<ion-icon name="chevron-forward" size="small"></ion-icon>
+				</div>
+				<div class="flex flex-row justify-between mt-2">
+					<div class="flex flex-col">
+						<p class="font-bold text-lg leading-none">Заказ #{{ order.code }}</p>
+						<p class="font-thin opacity-50 leading-none">
+							{{ order.date.toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' }) }}
+						</p>
 					</div>
-				</div>
-				<ion-icon name="chevron-forward" size="small"></ion-icon>
-			</div>
-			<div class="flex flex-row justify-between">
-				<div class="flex flex-col">
-					<p class="font-bold text-lg leading-none">Заказ #{{ order.code }}</p>
-					<p class="font-thin opacity-50 leading-none">
-						{{ order.date.toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' }) }}
-					</p>
-				</div>
-				<div>
-					<span
-						v-if="bonusApplied"
-						class="font-semibold text-2xl leading-none mr-2 line-through decoration-2 opacity-50"
-						>{{ order.original_price }}</span
-					>
-					<span class="font-semibold text-2xl leading-none"
-						>{{ order.status >= OrderStatus.ReadyForDeliveryInTbilisi ? order.current_price : 0 }} ₾</span
-					>
+					<div>
+						<span
+							v-if="bonusApplied"
+							class="font-semibold text-2xl leading-none mr-2 line-through decoration-2 opacity-50"
+							>{{ order.original_price }}</span
+						>
+						<span class="font-semibold text-2xl leading-none"
+							>{{ order.status >= OrderStatus.ReadyForDeliveryInTbilisi ? order.current_price : 0 }} ₾</span
+						>
+					</div>
 				</div>
 			</div>
 			<div v-if="orderStatusEligibleForBonus(order.status)">

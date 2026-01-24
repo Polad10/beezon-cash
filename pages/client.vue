@@ -204,272 +204,263 @@ function handleOrderClicked(order: Order) {
 		<Signup v-else-if="!user" :init-data-raw="initDataRaw!" @user-signed-up="handleUserSignedUp" />
 		<div v-else>
 			<div class="text-black">
-				<div class="bg-white min-h-screen">
-					<div role="tablist" class="tabs tabs-bordered grid-cols-3 pt-2 min-h-screen content-start">
-						<a
-							role="tab"
-							class="tab text-lg font-light content-end leading-tight pb-1.5 text-black h-16"
-							:class="{ 'tab-active': activeTab == Tab.Home }"
+				<div class="flex flex-col bg-white h-screen">
+					<div class="flex flex-row pt-2">
+						<div
+							class="flex flex-col flex-1 items-center gap-2"
+							:class="{ 'text-blue-700 font-bold border-b-2 border-blue-700': activeTab === Tab.Home }"
 							@click="activeTab = Tab.Home"
 						>
-							<div class="flex flex-col items-center gap-2">
-								<ion-icon name="home-outline" class="text-2xl"></ion-icon>
-								Главная
-							</div>
-						</a>
-						<div role="tabpanel" class="tab-content container mx-auto pt-7 px-5 min-h-screen">
-							<div id="profile-card" class="flex flex-col justify-between h-64 bg-blue-700 rounded-2xl p-6 text-white">
-								<div class="flex flex-row justify-between">
-									<div class="flex flex-col">
-										<p>Ваш бонусный баланс</p>
-										<p class="text-3xl font-semibold">₾ {{ user.balance }}</p>
-									</div>
-									<img src="public/georgia-flag.svg" width="60" />
-								</div>
-								<div class="flex flex-row mt-7 text-center text-sm justify-center gap-16">
-									<div class="flex flex-col w-12 items-center gap-2" @click="newOrderRef?.open()">
-										<button class="btn btn-circle text-2xl">
-											<ion-icon name="add-outline"></ion-icon>
-										</button>
-										<p>Оформить заказ</p>
-									</div>
-									<a href="https://t.me/Beezon_manager_ge">
-										<div class="flex flex-col w-12 items-center gap-2">
-											<button class="btn btn-circle text-2xl">
-												<ion-icon name="paper-plane-outline"></ion-icon>
-											</button>
-											<p>Написать менеджеру</p>
-										</div>
-									</a>
-									<a href="https://beezon.store/" target="_blank">
-										<div class="flex flex-col w-12 items-center gap-2">
-											<button class="btn btn-circle text-2xl">
-												<ion-icon name="storefront-outline"></ion-icon>
-											</button>
-											<p>Открыть Beezmarket</p>
-										</div>
-									</a>
-								</div>
-							</div>
-							<div class="flex flex-row gap-5 mt-5">
-								<a class="btn flex-1" href="https://t.me/beezon_logistics/145">Инструкции</a>
-								<a class="btn flex-1" href="https://t.me/beezon_logistic">Общий чат</a>
-							</div>
+							<ion-icon name="home-outline" class="text-2xl"></ion-icon>
+							Главная
 						</div>
-						<a
-							role="tab"
-							class="tab text-lg font-light content-end leading-tight pb-1.5 text-black"
-							:class="{ 'tab-active': activeTab == Tab.Orders }"
+						<div
+							class="flex flex-col flex-1 items-center gap-2"
+							:class="{ 'text-blue-700 font-bold border-b-2 border-blue-700': activeTab === Tab.Orders }"
 							@click="activeTab = Tab.Orders"
 						>
-							<div class="flex flex-col items-center gap-2">
-								<ion-icon name="heart-outline" class="text-2xl"></ion-icon>
-								Заказы
-							</div></a
+							<ion-icon name="heart-outline" class="text-2xl"></ion-icon>
+							Заказы
+						</div>
+						<div
+							class="flex flex-col flex-1 items-center gap-2"
+							:class="{ 'text-blue-700 font-bold border-b-2 border-blue-700': activeTab === Tab.Promo }"
+							@click="activeTab = Tab.Promo"
 						>
-						<div role="tabpanel" class="tab-content p-5 min-h-screen h-screen">
-							<div v-if="selectedOrder">
-								<div class="flex flex-row font-semibold items-center">
-									<ion-icon name="chevron-back" size="small"></ion-icon>
-									<p class="mx-auto">Подробнее о заказе</p>
+							<ion-icon name="ticket-outline" class="text-2xl"></ion-icon>
+							Промокод
+						</div>
+					</div>
+					<div v-if="activeTab === Tab.Home" class="flex flex-col flex-1 container mx-auto pt-7 px-5">
+						<div id="profile-card" class="flex flex-col justify-between h-64 bg-blue-700 rounded-2xl p-6 text-white">
+							<div class="flex flex-row justify-between">
+								<div class="flex flex-col">
+									<p>Ваш бонусный баланс</p>
+									<p class="text-3xl font-semibold">₾ {{ user.balance }}</p>
 								</div>
-								<div class="flex flex-row justify-center gap-2 text-xs mt-3">
-									<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full max-w-32">
-										<ion-icon name="cog-outline" size="small"></ion-icon>
-										<p>Изменить</p>
-									</div>
-									<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full max-w-32">
-										<ion-icon name="help-circle-outline" size="small"></ion-icon>
-										<p>Вопросы</p>
-									</div>
-									<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full max-w-32 text-red-700">
-										<ion-icon name="close-circle-outline" size="small"></ion-icon>
-										<p>Отменить</p>
-									</div>
+								<img src="public/georgia-flag.svg" width="60" />
+							</div>
+							<div class="flex flex-row mt-7 text-center text-sm justify-center gap-16">
+								<div class="flex flex-col w-12 items-center gap-2" @click="newOrderRef?.open()">
+									<button class="btn btn-circle text-2xl">
+										<ion-icon name="add-outline"></ion-icon>
+									</button>
+									<p>Оформить заказ</p>
 								</div>
-								<div class="flex flex-col mt-3 bg-gray-100 p-5 rounded-xl">
-									<div class="flex flex-row items-center justify-between">
-										<div class="flex flex-col">
-											<p class="font-semibold">Заказ #{{ selectedOrder.code }}</p>
-											<p class="text-sm font-light opacity-50">{{ formatDateRu(selectedOrder.date) }}</p>
-										</div>
-										<div :class="[`bg-[${toClientColorCode(selectedOrder.status)}]`]" class="py-2 px-5 rounded-xl">
-											{{ toClientDisplayString(selectedOrder.status) }}
-										</div>
+								<a href="https://t.me/Beezon_manager_ge">
+									<div class="flex flex-col w-12 items-center gap-2">
+										<button class="btn btn-circle text-2xl">
+											<ion-icon name="paper-plane-outline"></ion-icon>
+										</button>
+										<p>Написать менеджеру</p>
 									</div>
-									<a
-										class="flex flex-row items-center justify-between bg-white rounded-xl p-3 mt-5"
-										href="https://www.google.com/maps/place/Beezon+logistics/@41.7265147,44.785746,17z/data=!4m6!3m5!1s0x404473a4430e402b:0x6155e02b388b210c!8m2!3d41.7265147!4d44.7883209!16s%2Fg%2F11x0kv8y0k?entry=ttu&g_ep=EgoyMDI2MDEyMC4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<div clas="flex flex-col">
-											<div class="flex flex-row items-center text-xs font-semibold opacity-60">
-												<ion-icon name="navigate-outline" class="mr-1"></ion-icon>
-												Пункт выдачи в Тбилиси
-											</div>
-											<div class="mt-2">
-												<p class="font-semibold">Проспект Акакия Церетели, 12</p>
-												<p class="text-xs">Каждый день с 11 до 19:00</p>
-											</div>
-										</div>
-										<ion-icon name="chevron-forward" size="small"></ion-icon>
-									</a>
-									<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
-										<div class="flex flex-row items-center text-xs font-semibold opacity-60">
-											<ion-icon name="bag-handle-outline" class="mr-1"></ion-icon>
-											Откуда заказ?
-										</div>
-										<div class="mt-2">
-											<p class="font-semibold">
-												{{ toDisplayString(selectedOrder.order_tracks[0].delivery_provider) }}
-											</p>
-											<p v-if="selectedOrder.order_tracks[0].track_number" class="text-xs">
-												# {{ selectedOrder.order_tracks[0].track_number }}
-											</p>
-										</div>
+								</a>
+								<a href="https://beezon.store/" target="_blank">
+									<div class="flex flex-col w-12 items-center gap-2">
+										<button class="btn btn-circle text-2xl">
+											<ion-icon name="storefront-outline"></ion-icon>
+										</button>
+										<p>Открыть Beezmarket</p>
 									</div>
-									<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
-										<div class="flex flex-row items-center text-xs font-semibold opacity-60">
-											<ion-icon name="cube-outline" class="mr-1"></ion-icon>
-											Что в заказе?
-										</div>
-										<div class="mt-2">
-											<p class="text-xs">
-												{{ selectedOrder.description }}
-											</p>
-										</div>
-									</div>
-									<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
-										<div class="flex flex-row items-center text-xs font-semibold opacity-60">
-											<ion-icon name="flash-outline" class="mr-1"></ion-icon>
-											В заказе есть эти категории товаров?
-											<ion-icon name="information-circle" class="text-base ml-2 text-rose-500"></ion-icon>
-										</div>
-										<div class="flex flex-col text-xs gap-1 mt-2">
-											<div class="flex flex-row items-center">
-												<input
-													type="checkbox"
-													:checked="orderTypesOfSelectedOrder.includes(OrderType.Drugs)"
-													class="checkbox checkbox-xs checkbox-secondary mr-2 pointer-events-none"
-												/>
-												Лекарства и БАДы для людей и животных
-											</div>
-											<div class="flex flex-row items-center">
-												<input
-													type="checkbox"
-													:checked="orderTypesOfSelectedOrder.includes(OrderType.Electronics)"
-													class="checkbox checkbox-xs checkbox-secondary mr-2 pointer-events-none"
-												/>
-												Товары дороже 300 лари за 1 штуку
-											</div>
-											<div class="flex flex-row items-center">
-												<input
-													type="checkbox"
-													:checked="orderTypesOfSelectedOrder.includes(OrderType.Commercial)"
-													class="checkbox checkbox-xs checkbox-secondary mr-2 pointer-events-none"
-												/>
-												От 5 повторяющихся единиц товара
-											</div>
-										</div>
-									</div>
-									<div class="divider opacity-50"></div>
-									<div class="flex flex-col p-3">
-										<div class="text-xs">
-											<div class="flex flex-row justify-between">
-												<p>Доставка до Тбилиси</p>
-												<p>{{ selectedOrder.original_price }} ₾</p>
-											</div>
-											<div class="flex flex-row justify-between">
-												<p>Доставка по Грузии</p>
-												<p>{{ selectedOrder.partner_cost }} ₾</p>
-											</div>
-											<div class="flex flex-row justify-between">
-												<p>Дополнительные услуги</p>
-												<p>{{ selectedOrder.additional_cost }} ₾</p>
-											</div>
-											<div v-if="discountOfSelectedOrder.gt(0)" class="flex flex-row justify-between">
-												<p>Скидка</p>
-												<p class="text-green-700">- {{ discountOfSelectedOrder }} ₾</p>
-											</div>
-										</div>
-										<div class="flex flex-row justify-between font-bold mt-5">
-											<p>Итого к оплате</p>
-											<p>{{ selectedOrder.current_price.add(selectedOrder.partner_cost) }} ₾</p>
-										</div>
-									</div>
+								</a>
+							</div>
+						</div>
+						<div class="flex flex-row gap-5 mt-5">
+							<a class="btn flex-1" href="https://t.me/beezon_logistics/145">Инструкции</a>
+							<a class="btn flex-1" href="https://t.me/beezon_logistic">Общий чат</a>
+						</div>
+					</div>
+					<div v-if="activeTab === Tab.Orders" class="flex flex-col flex-1 container mx-auto p-5">
+						<div v-if="selectedOrder" class="flex flex-col flex-1">
+							<div class="flex flex-row font-semibold items-center">
+								<ion-icon name="chevron-back" size="small"></ion-icon>
+								<p class="mx-auto">Подробнее о заказе</p>
+							</div>
+							<div class="flex flex-row justify-center gap-2 text-xs mt-3">
+								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full max-w-32">
+									<ion-icon name="cog-outline" size="small"></ion-icon>
+									<p>Изменить</p>
+								</div>
+								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full max-w-32">
+									<ion-icon name="help-circle-outline" size="small"></ion-icon>
+									<p>Вопросы</p>
+								</div>
+								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full max-w-32 text-red-700">
+									<ion-icon name="close-circle-outline" size="small"></ion-icon>
+									<p>Отменить</p>
 								</div>
 							</div>
-							<div v-else>
-								<OrderItem
-									v-for="order in computedOrders"
-									:key="order.id"
-									:order="order"
-									:apply-bonus="applyBonus"
-									@order-clicked="handleOrderClicked"
-								/>
-								<div v-if="computedOrders.length == 0" class="flex flex-col items-center h-full mt-24">
-									<div class="flex flex-col w-64 text-center items-center">
-										<img src="public/orders-empty.svg" class="w-36" />
-										<p class="mt-7">Здесь будет история ваших заказов</p>
-										<button class="btn btn-ghost text-blue-800 text-lg mt-7" @click="newOrderRef?.open()">
-											Оформить первый заказ
-										</button>
+							<div class="flex flex-col flex-1 my-3 bg-gray-100 p-5 rounded-xl">
+								<div class="flex flex-row items-center justify-between">
+									<div class="flex flex-col">
+										<p class="font-semibold">Заказ #{{ selectedOrder.code }}</p>
+										<p class="text-sm font-light opacity-50">{{ formatDateRu(selectedOrder.date) }}</p>
+									</div>
+									<div :class="[`bg-[${toClientColorCode(selectedOrder.status)}]`]" class="py-2 px-5 rounded-xl">
+										{{ toClientDisplayString(selectedOrder.status) }}
+									</div>
+								</div>
+								<a
+									class="flex flex-row items-center justify-between bg-white rounded-xl p-3 mt-5"
+									href="https://www.google.com/maps/place/Beezon+logistics/@41.7265147,44.785746,17z/data=!4m6!3m5!1s0x404473a4430e402b:0x6155e02b388b210c!8m2!3d41.7265147!4d44.7883209!16s%2Fg%2F11x0kv8y0k?entry=ttu&g_ep=EgoyMDI2MDEyMC4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<div clas="flex flex-col">
+										<div class="flex flex-row items-center text-xs font-semibold opacity-60">
+											<ion-icon name="navigate-outline" class="mr-1"></ion-icon>
+											Пункт выдачи в Тбилиси
+										</div>
+										<div class="mt-2">
+											<p class="font-semibold">Проспект Акакия Церетели, 12</p>
+											<p class="text-xs">Каждый день с 11 до 19:00</p>
+										</div>
+									</div>
+									<ion-icon name="chevron-forward" size="small"></ion-icon>
+								</a>
+								<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
+									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
+										<ion-icon name="bag-handle-outline" class="mr-1"></ion-icon>
+										Откуда заказ?
+									</div>
+									<div class="mt-2">
+										<p class="font-semibold">
+											{{ toDisplayString(selectedOrder.order_tracks[0].delivery_provider) }}
+										</p>
+										<p v-if="selectedOrder.order_tracks[0].track_number" class="text-xs">
+											# {{ selectedOrder.order_tracks[0].track_number }}
+										</p>
+									</div>
+								</div>
+								<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
+									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
+										<ion-icon name="cube-outline" class="mr-1"></ion-icon>
+										Что в заказе?
+									</div>
+									<div class="mt-2">
+										<p class="text-xs">
+											{{ selectedOrder.description }}
+										</p>
+									</div>
+								</div>
+								<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
+									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
+										<ion-icon name="flash-outline" class="mr-1"></ion-icon>
+										В заказе есть эти категории товаров?
+										<ion-icon name="information-circle" class="text-base ml-2 text-rose-500"></ion-icon>
+									</div>
+									<div class="flex flex-col text-xs gap-1 mt-2">
+										<div class="flex flex-row items-center">
+											<input
+												type="checkbox"
+												:checked="orderTypesOfSelectedOrder.includes(OrderType.Drugs)"
+												class="checkbox checkbox-xs checkbox-secondary mr-2 pointer-events-none"
+											/>
+											Лекарства и БАДы для людей и животных
+										</div>
+										<div class="flex flex-row items-center">
+											<input
+												type="checkbox"
+												:checked="orderTypesOfSelectedOrder.includes(OrderType.Electronics)"
+												class="checkbox checkbox-xs checkbox-secondary mr-2 pointer-events-none"
+											/>
+											Товары дороже 300 лари за 1 штуку
+										</div>
+										<div class="flex flex-row items-center">
+											<input
+												type="checkbox"
+												:checked="orderTypesOfSelectedOrder.includes(OrderType.Commercial)"
+												class="checkbox checkbox-xs checkbox-secondary mr-2 pointer-events-none"
+											/>
+											От 5 повторяющихся единиц товара
+										</div>
+									</div>
+								</div>
+								<div class="divider opacity-50"></div>
+								<div class="flex flex-col mt-auto p-3">
+									<div class="text-xs">
+										<div class="flex flex-row justify-between">
+											<p>Доставка до Тбилиси</p>
+											<p>{{ selectedOrder.original_price }} ₾</p>
+										</div>
+										<div class="flex flex-row justify-between">
+											<p>Доставка по Грузии</p>
+											<p>{{ selectedOrder.partner_cost }} ₾</p>
+										</div>
+										<div class="flex flex-row justify-between">
+											<p>Дополнительные услуги</p>
+											<p>{{ selectedOrder.additional_cost }} ₾</p>
+										</div>
+										<div v-if="discountOfSelectedOrder.gt(0)" class="flex flex-row justify-between">
+											<p>Скидка</p>
+											<p class="text-green-700">- {{ discountOfSelectedOrder }} ₾</p>
+										</div>
+									</div>
+									<div class="flex flex-row justify-between font-bold mt-5">
+										<p>Итого к оплате</p>
+										<p>{{ selectedOrder.current_price.add(selectedOrder.partner_cost) }} ₾</p>
 									</div>
 								</div>
 							</div>
 						</div>
-						<a
-							role="tab"
-							class="tab text-lg font-light content-end leading-tight pb-1.5 text-black"
-							:class="{ 'tab-active': activeTab == Tab.Promo }"
-							@click="activeTab = Tab.Promo"
-						>
-							<div class="flex flex-col items-center gap-2">
-								<ion-icon name="ticket-outline" class="text-2xl"></ion-icon>
-								Промокод
-							</div></a
-						>
-						<div role="tabpanel" class="tab-content p-5 min-h-screen">
-							<div class="flex flex-col items-center">
-								<p class="text-xl font-regular text-center">Ваш промокод</p>
-								<button
-									class="btn btn-wide bg-accent text-xl mt-2 px-5 rounded-2xl hover:bg-accent-content"
-									@click="copyReferralCode"
-								>
-									<div class="mx-auto text-white">{{ user.referral_code }}</div>
-									<ion-icon name="copy-outline" class="text-white z-10"></ion-icon>
-								</button>
+						<div v-else>
+							<OrderItem
+								v-for="order in computedOrders"
+								:key="order.id"
+								:order="order"
+								:apply-bonus="applyBonus"
+								@order-clicked="handleOrderClicked"
+							/>
+							<div v-if="computedOrders.length == 0" class="flex flex-col items-center h-full mt-24">
+								<div class="flex flex-col w-64 text-center items-center">
+									<img src="public/orders-empty.svg" class="w-36" />
+									<p class="mt-7">Здесь будет история ваших заказов</p>
+									<button class="btn btn-ghost text-blue-800 text-lg mt-7" @click="newOrderRef?.open()">
+										Оформить первый заказ
+									</button>
+								</div>
 							</div>
-							<div class="flex justify-center">
-								<ul class="steps steps-vertical mt-5 gap-3">
-									<li class="step step-secondary">
-										<div>
-											<p class="font-semibold text-lg text-left">Отправляете промокод</p>
-											<p class="font-thin text-base text-left leading-none">
-												Скопируйте свой промокод и отправьте его другу любым удобным способом
-											</p>
-										</div>
-									</li>
-									<li class="step step-secondary">
-										<div>
-											<p class="font-semibold text-lg text-left">Друг регистрируется</p>
-											<p class="font-thin text-base text-left leading-none">
-												Вводит ваш промокод при заполнении формы приема заказа и получает свой заказ в Грузии
-											</p>
-										</div>
-									</li>
-									<li class="step step-secondary" data-content="🎉">
-										<div>
-											<p class="font-semibold text-lg text-left">Получаете бонусы</p>
-											<p class="font-thin text-base text-left leading-none">
-												Начисляем <span class="font-medium">10 лари</span> на баланс за первый завершенный заказ вашего
-												друга
-											</p>
-										</div>
-									</li>
-								</ul>
-							</div>
+						</div>
+					</div>
+					<div v-if="activeTab === Tab.Promo" class="flex flex-col flex-1 p-5">
+						<div class="flex flex-col items-center">
+							<p class="text-xl font-regular text-center">Ваш промокод</p>
+							<button
+								class="btn btn-wide bg-accent text-xl mt-2 px-5 rounded-2xl hover:bg-accent-content"
+								@click="copyReferralCode"
+							>
+								<div class="mx-auto text-white">{{ user.referral_code }}</div>
+								<ion-icon name="copy-outline" class="text-white z-10"></ion-icon>
+							</button>
+						</div>
+						<div class="flex justify-center">
+							<ul class="steps steps-vertical mt-5 gap-3">
+								<li class="step step-secondary">
+									<div>
+										<p class="font-semibold text-lg text-left">Отправляете промокод</p>
+										<p class="font-thin text-base text-left leading-none">
+											Скопируйте свой промокод и отправьте его другу любым удобным способом
+										</p>
+									</div>
+								</li>
+								<li class="step step-secondary">
+									<div>
+										<p class="font-semibold text-lg text-left">Друг регистрируется</p>
+										<p class="font-thin text-base text-left leading-none">
+											Вводит ваш промокод при заполнении формы приема заказа и получает свой заказ в Грузии
+										</p>
+									</div>
+								</li>
+								<li class="step step-secondary" data-content="🎉">
+									<div>
+										<p class="font-semibold text-lg text-left">Получаете бонусы</p>
+										<p class="font-thin text-base text-left leading-none">
+											Начисляем <span class="font-medium">10 лари</span> на баланс за первый завершенный заказ вашего
+											друга
+										</p>
+									</div>
+								</li>
+							</ul>
 						</div>
 					</div>
 					<div v-if="copyToastVisible" class="toast toast-center">
