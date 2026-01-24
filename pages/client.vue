@@ -273,7 +273,7 @@ function handleOrderClicked(order: Order) {
 					<div v-if="activeTab === Tab.Orders" class="flex flex-col flex-1 container mx-auto p-5">
 						<div v-if="selectedOrder" class="flex flex-col flex-1">
 							<div class="flex flex-row font-semibold items-center">
-								<ion-icon name="chevron-back" size="small"></ion-icon>
+								<ion-icon name="chevron-back" size="small" @click="() => (selectedOrder = null)"></ion-icon>
 								<p class="mx-auto">Подробнее о заказе</p>
 							</div>
 							<div class="flex flex-row justify-center gap-2 text-xs mt-3">
@@ -323,7 +323,7 @@ function handleOrderClicked(order: Order) {
 										<ion-icon name="bag-handle-outline" class="mr-1"></ion-icon>
 										Откуда заказ?
 									</div>
-									<div class="mt-2">
+									<div class="mt-2" v-if="selectedOrder.order_tracks[0]">
 										<p class="font-semibold">
 											{{ toDisplayString(selectedOrder.order_tracks[0].delivery_provider) }}
 										</p>
