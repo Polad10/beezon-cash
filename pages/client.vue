@@ -277,15 +277,15 @@ function handleOrderClicked(order: Order) {
 								<p class="mx-auto">Подробнее о заказе</p>
 							</div>
 							<div class="flex flex-row justify-center gap-2 text-xs mt-3">
-								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full max-w-32">
+								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full">
 									<ion-icon name="cog-outline" size="small"></ion-icon>
 									<p>Изменить</p>
 								</div>
-								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full max-w-32">
+								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full">
 									<ion-icon name="help-circle-outline" size="small"></ion-icon>
 									<p>Вопросы</p>
 								</div>
-								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full max-w-32 text-red-700">
+								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full text-red-700">
 									<ion-icon name="close-circle-outline" size="small"></ion-icon>
 									<p>Отменить</p>
 								</div>
