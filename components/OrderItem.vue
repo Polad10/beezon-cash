@@ -113,29 +113,29 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
 						v-model="bonusToggleChecked"
 					/>
 				</div>
-			</div>
-			<div class="mt-3 collapse rounded-none" :class="{ 'collapse-open': showBonusInput }">
-				<div class="collapse-content p-0">
-					<label class="input input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center">
-						<span>₾</span>
-						<input
-							type="number"
-							class="grow ml-2"
-							:placeholder="`Не более ${getMaxDiscountAmount(order)}`"
-							v-model="bonus"
-							enterkeyhint="done"
-							@keydown.enter=";($event.target as HTMLInputElement).blur()"
-						/>
-					</label>
-					<div class="flex flex-row justify-between mt-2 mx-4">
-						<button class="btn btn-ghost text-error text-base font-medium" @click="closeBonusInput">Отменить</button>
-						<button
-							:disabled="!bonus"
-							class="btn btn-ghost text-accent text-base font-medium disabled:bg-transparent"
-							@click="applyBonus"
-						>
-							Сохранить
-						</button>
+				<div class="mt-3 collapse rounded-none" :class="{ 'collapse-open': showBonusInput }">
+					<div class="collapse-content p-0">
+						<label class="input input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center">
+							<span>₾</span>
+							<input
+								type="number"
+								class="grow ml-2"
+								:placeholder="`Не более ${getMaxDiscountAmount(order)}`"
+								v-model="bonus"
+								enterkeyhint="done"
+								@keydown.enter=";($event.target as HTMLInputElement).blur()"
+							/>
+						</label>
+						<div class="flex flex-row justify-between mt-2 mx-4">
+							<button class="btn btn-ghost text-error text-base font-medium" @click="closeBonusInput">Отменить</button>
+							<button
+								:disabled="!bonus"
+								class="btn btn-ghost text-accent text-base font-medium disabled:bg-transparent"
+								@click="applyBonus"
+							>
+								Сохранить
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
