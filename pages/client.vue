@@ -347,7 +347,12 @@ function handleOrderClicked(order: Order) {
 									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
 										<ion-icon name="flash-outline" class="mr-1"></ion-icon>
 										В заказе есть эти категории товаров?
-										<ion-icon name="information-circle" class="text-base ml-2 text-rose-500"></ion-icon>
+										<div
+											class="tooltip before:text-xs before:w-auto before:bg-black before:text-white"
+											data-tip="На данные категории товаров распроостраняются дополнительные наценки помимо общего тарифа! "
+										>
+											<ion-icon name="information-circle" class="text-base ml-2 text-rose-500"></ion-icon>
+										</div>
 									</div>
 									<div class="flex flex-col text-xs gap-1 mt-2">
 										<div class="flex flex-row items-center">
