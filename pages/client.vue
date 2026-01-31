@@ -6,9 +6,12 @@ import type { User } from '~/models/User'
 import type { Order } from '~/models/Order'
 import Decimal from 'decimal.js'
 import type NewOrderWithoutUserInfo from '~/components/NewOrderWithoutUserInfo.vue'
-import { toClientColorCode, toClientDisplayString } from '~/models/OrderStatus'
-import { toDisplayString } from '~/models/OrderTrack'
+import type EditOrderWithoutUserInfo from '~/components/EditOrderWithoutUserInfo.vue'
+import type ConfirmDeleteModal from '~/components/ConfirmDeleteModal.vue'
+import { OrderStatus, toClientColorCode, toClientDisplayString } from '~/models/OrderStatus'
+import { toDisplayString as toOrderDisplayString } from '~/models/OrderTrack'
 import { OrderType } from '~/models/OrderTypeMapping'
+import { City, toDisplayString } from '~/models/City'
 
 enum Tab {
 	Home,
@@ -21,22 +24,29 @@ let headers = {}
 const activeTab = ref<Tab>(Tab.Home)
 const initDataRaw = ref<string | undefined>(undefined)
 const copyToastVisible = ref(false)
-const customErrorToasVisible = ref(false)
+const customErrorToastVisible = ref(false)
 const customErrorMessage = ref('')
 const errorToastVisible = ref(false)
-const showOrderCreatedToast = ref(false)
+const showSuccessToast = ref(false)
+const successToastMessage = ref('')
 const loading = ref(true)
 const loadingError = ref(false)
 
 const user = ref<User | null>(null)
 const orders = ref<Order[]>([])
-const selectedOrder = ref<Order | null>(null)
+const selectedOrderId = ref<string | null>(null)
 
 const newOrderRef = ref<typeof NewOrderWithoutUserInfo | null>(null)
+const editOrderRef = ref<typeof EditOrderWithoutUserInfo | null>(null)
+const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
 
 const computedOrders = computed(() => {
 	orders.value.forEach(processOrder)
 	return orders.value.sort((a, b) => b.code - a.code)
+})
+
+const selectedOrder = computed(() => {
+	return computedOrders.value.find((o) => o.id === selectedOrderId.value)
 })
 
 const orderTypesOfSelectedOrder = computed(() => {
@@ -108,17 +118,17 @@ function processOrder(order: Order) {
 
 function showBonusBalanceExceededToast() {
 	customErrorMessage.value = 'Вы списываете больше бонусов, чем есть на балансе'
-	showToast(customErrorToasVisible)
+	showToast(customErrorToastVisible)
 }
 
 function showMaxDiscountAmountExceededToast(maxDiscountAmount: Decimal) {
 	customErrorMessage.value = `Для данного заказа вы можете списать не более ${maxDiscountAmount} лари`
-	showToast(customErrorToasVisible)
+	showToast(customErrorToastVisible)
 }
 
 function showBonusIsZeroToast() {
 	customErrorMessage.value = 'Сумма должна быть > 0'
-	showToast(customErrorToasVisible)
+	showToast(customErrorToastVisible)
 }
 
 function showErrorToast() {
@@ -185,11 +195,42 @@ async function handleUserSignedUp() {
 async function handleOrderCreated(order: Order) {
 	activeTab.value = Tab.Orders
 	orders.value.push(order)
-	showToast(showOrderCreatedToast)
+
+	successToastMessage.value = 'Заказ оформлен!'
+	showToast(showSuccessToast)
+}
+
+async function handleSelectedOrderEdited(order: Order) {
+	const orderIndex = orders.value.findIndex((o) => o.id === order.id)
+
+	if (orderIndex >= 0) {
+		orders.value.splice(orderIndex, 1, order)
+	}
+
+	successToastMessage.value = 'Заказ обновлен!'
+	showToast(showSuccessToast)
+}
+
+async function deleteSelectedOrder() {
+	try {
+		if (!selectedOrder.value) {
+			return
+		}
+
+		await axios.delete(`api/client/orders/${selectedOrder.value.id}`, headers)
+
+		orders.value = orders.value.filter((o) => o.id !== selectedOrder.value!.id)
+
+		successToastMessage.value = 'Заказ удален!'
+		showToast(showSuccessToast)
+	} catch (err) {
+		logError(err)
+		showToast(errorToastVisible)
+	}
 }
 
 function handleOrderClicked(order: Order) {
-	selectedOrder.value = order
+	selectedOrderId.value = order.id
 }
 </script>
 
@@ -273,19 +314,30 @@ function handleOrderClicked(order: Order) {
 					<div v-if="activeTab === Tab.Orders" class="flex flex-col flex-1 container mx-auto p-5">
 						<div v-if="selectedOrder" class="flex flex-col flex-1">
 							<div class="flex flex-row font-semibold items-center">
-								<ion-icon name="chevron-back" size="small" @click="() => (selectedOrder = null)"></ion-icon>
+								<ion-icon name="chevron-back" size="small" @click="() => (selectedOrderId = null)"></ion-icon>
 								<p class="mx-auto">Подробнее о заказе</p>
 							</div>
 							<div class="flex flex-row justify-center gap-2 text-xs mt-3">
-								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full">
-									<ion-icon name="cog-outline" size="small"></ion-icon>
+								<div
+									class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full"
+									:class="{ 'pointer-events-none opacity-50': selectedOrder.status > OrderStatus.WarehouseRF }"
+									@click="editOrderRef?.open(selectedOrder)"
+								>
+									<ion-icon name="pencil-outline" size="small"></ion-icon>
 									<p>Изменить</p>
 								</div>
-								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full">
+								<a
+									class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full"
+									:href="`http://t.me/Beezon_manager_ge?text=${encodeURIComponent(`Здравствуйте. У меня вопрос по заказу #${selectedOrder.code}`)}.`"
+								>
 									<ion-icon name="help-circle-outline" size="small"></ion-icon>
 									<p>Вопросы</p>
-								</div>
-								<div class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full text-red-700">
+								</a>
+								<div
+									class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full text-red-700"
+									:class="{ 'pointer-events-none opacity-50': selectedOrder.status !== OrderStatus.New }"
+									@click="() => confirmDeleteModalRef?.open()"
+								>
 									<ion-icon name="close-circle-outline" size="small"></ion-icon>
 									<p>Отменить</p>
 								</div>
@@ -301,8 +353,9 @@ function handleOrderClicked(order: Order) {
 									</div>
 								</div>
 								<a
+									v-if="selectedOrder.city === City.Tbilisi || selectedOrder.city === City.Other"
 									class="flex flex-row items-center justify-between bg-white rounded-xl p-3 mt-5"
-									href="https://www.google.com/maps/place/Beezon+logistics/@41.7265147,44.785746,17z/data=!4m6!3m5!1s0x404473a4430e402b:0x6155e02b388b210c!8m2!3d41.7265147!4d44.7883209!16s%2Fg%2F11x0kv8y0k?entry=ttu&g_ep=EgoyMDI2MDEyMC4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"
+									href="https://maps.app.goo.gl/QU8LFfuXHzaSidDm6"
 									target="_blank"
 									rel="noopener noreferrer"
 								>
@@ -318,6 +371,15 @@ function handleOrderClicked(order: Order) {
 									</div>
 									<ion-icon name="chevron-forward" size="small"></ion-icon>
 								</a>
+								<div v-else class="flex flex-col bg-white rounded-xl p-3 mt-2">
+									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
+										<ion-icon name="navigate-outline" class="mr-1"></ion-icon>
+										Город получателя
+									</div>
+									<p class="font-semibold mt-2">
+										{{ toDisplayString(selectedOrder.city) }}
+									</p>
+								</div>
 								<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
 									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
 										<ion-icon name="bag-handle-outline" class="mr-1"></ion-icon>
@@ -325,7 +387,7 @@ function handleOrderClicked(order: Order) {
 									</div>
 									<div class="mt-2" v-if="selectedOrder.order_tracks[0]">
 										<p class="font-semibold">
-											{{ toDisplayString(selectedOrder.order_tracks[0].delivery_provider) }}
+											{{ toOrderDisplayString(selectedOrder.order_tracks[0].delivery_provider) }}
 										</p>
 										<p v-if="selectedOrder.order_tracks[0].track_number" class="text-xs">
 											# {{ selectedOrder.order_tracks[0].track_number }}
@@ -474,7 +536,7 @@ function handleOrderClicked(order: Order) {
 						</div>
 					</div>
 					<div
-						v-if="customErrorToasVisible"
+						v-if="customErrorToastVisible"
 						class="toast toast-top whitespace-normal z-10 flex-row justify-between w-full"
 					>
 						<div
@@ -493,14 +555,20 @@ function handleOrderClicked(order: Order) {
 						</div>
 					</div>
 					<Toast
-						v-if="showOrderCreatedToast"
+						v-if="showSuccessToast"
 						class="bg-green-200 border-green-400"
 						icon-name="checkmark-circle-outline"
 						icon-props="text-green-800"
-						message="Заказ оформлен!"
+						:message="successToastMessage"
 					/>
 				</div>
 				<NewOrderWithoutUserInfo ref="newOrderRef" :init-data-raw="initDataRaw!" @order-created="handleOrderCreated" />
+				<EditOrderWithoutUserInfo
+					ref="editOrderRef"
+					:init-data-raw="initDataRaw!"
+					@order-edited="handleSelectedOrderEdited"
+				/>
+				<ConfirmDeleteModal ref="confirmDeleteModalRef" @item-deleted="deleteSelectedOrder" />
 			</div>
 		</div>
 	</div>

@@ -89,8 +89,10 @@ watch(trackNumber, (newValue) => {
 })
 
 // Clear track number when switching providers
-watch(selectedDeliveryProvider, () => {
-	trackNumber.value = ''
+watch(selectedDeliveryProvider, (newValue) => {
+	if (newValue !== selectedDeliveryProvider.value) {
+		trackNumber.value = ''
+	}
 })
 </script>
 
