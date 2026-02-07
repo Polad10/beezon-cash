@@ -12,6 +12,7 @@ import { OrderStatus, toClientColorCode, toClientDisplayString } from '~/models/
 import { toDisplayString as toOrderDisplayString } from '~/models/OrderTrack'
 import { OrderType } from '~/models/OrderTypeMapping'
 import { City, toDisplayString } from '~/models/City'
+import Tooltip from '~/components/Tooltip.vue'
 
 enum Tab {
 	Home,
@@ -406,15 +407,18 @@ function handleOrderClicked(order: Order) {
 									</div>
 								</div>
 								<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
-									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
-										<ion-icon name="flash-outline" class="mr-1"></ion-icon>
-										В заказе есть эти категории товаров?
-										<div
-											class="tooltip before:text-xs before:w-auto before:bg-black before:text-white"
-											data-tip="На данные категории товаров распроостраняются дополнительные наценки помимо общего тарифа! "
-										>
-											<ion-icon name="information-circle" class="text-base ml-2 text-rose-500"></ion-icon>
+									<div class="flex flex-row text-xs font-semibold">
+										<div class="flex items-center opacity-60">
+											<ion-icon name="flash-outline" class="mr-1"></ion-icon>
+											В заказе есть эти категории товаров?
 										</div>
+										<Tooltip>
+											<ion-icon name="information-circle" class="text-base ml-2 text-rose-500"></ion-icon>
+
+											<template #content>
+												На данные категории товаров распроостраняются дополнительные наценки помимо общего тарифа!
+											</template>
+										</Tooltip>
 									</div>
 									<div class="flex flex-col text-xs gap-1 mt-2">
 										<div class="flex flex-row items-center">
