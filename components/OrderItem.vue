@@ -95,7 +95,10 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
 							>{{ order.original_price }}</span
 						>
 						<span class="font-semibold text-2xl leading-none"
-							>{{ order.status >= OrderStatus.ReadyForDeliveryInTbilisi ? order.current_price : 0 }} ₾</span
+							>{{
+								order.status >= OrderStatus.ReadyForDeliveryInTbilisi ? order.current_price.add(order.partner_cost) : 0
+							}}
+							₾</span
 						>
 					</div>
 				</div>
