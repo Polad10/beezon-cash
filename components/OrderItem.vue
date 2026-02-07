@@ -84,7 +84,7 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
 				<div class="flex flex-row justify-between mt-2">
 					<div class="flex flex-col">
 						<p class="font-bold text-lg leading-none">Заказ #{{ order.code }}</p>
-						<p class="font-thin opacity-50 leading-none">
+						<p class="font-thin opacity-50 leading-none mt-1">
 							{{ order.date.toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' }) }}
 						</p>
 					</div>
