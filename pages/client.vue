@@ -277,7 +277,16 @@ function handleOrderClicked(order: Order) {
 						<div id="profile-card" class="flex flex-col justify-between h-64 bg-blue-700 rounded-2xl p-6 text-white">
 							<div class="flex flex-row justify-between">
 								<div class="flex flex-col">
-									<p>Ваш бонусный баланс</p>
+									<div class="flex flex-row items-center">
+										<p>Ваш бонусный баланс</p>
+										<Tooltip class="bg-white/75 text-black">
+											<ion-icon name="information-circle" class="text-base ml-2 text-white" size="small"></ion-icon>
+
+											<template #content>
+												Применить бонусы можно на этапе, когда заказ <b>“Готов к выдаче”</b>
+											</template>
+										</Tooltip>
+									</div>
 									<p class="text-3xl font-semibold">₾ {{ user.balance }}</p>
 								</div>
 								<img src="public/georgia-flag.svg" width="60" />
@@ -412,7 +421,7 @@ function handleOrderClicked(order: Order) {
 											<ion-icon name="flash-outline" class="mr-1"></ion-icon>
 											В заказе есть эти категории товаров?
 										</div>
-										<Tooltip>
+										<Tooltip class="bg-[#2B3440] text-[#D7DDE4]">
 											<ion-icon name="information-circle" class="text-base ml-2 text-rose-500"></ion-icon>
 
 											<template #content>
