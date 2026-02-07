@@ -248,24 +248,24 @@ function handleOrderClicked(order: Order) {
 				<div class="flex flex-col bg-white h-screen">
 					<div class="flex flex-row pt-2">
 						<div
-							class="flex flex-col flex-1 items-center gap-2"
-							:class="{ 'text-blue-700 font-bold border-b-2 border-blue-700': activeTab === Tab.Home }"
+							class="flex flex-col flex-1 items-center gap-2 border-b-2"
+							:class="{ 'text-blue-700 font-bold border-blue-700': activeTab === Tab.Home }"
 							@click="activeTab = Tab.Home"
 						>
 							<ion-icon name="home-outline" class="text-2xl"></ion-icon>
 							Главная
 						</div>
 						<div
-							class="flex flex-col flex-1 items-center gap-2"
-							:class="{ 'text-blue-700 font-bold border-b-2 border-blue-700': activeTab === Tab.Orders }"
+							class="flex flex-col flex-1 items-center gap-2 border-b-2"
+							:class="{ 'text-blue-700 font-bold border-blue-700': activeTab === Tab.Orders }"
 							@click="activeTab = Tab.Orders"
 						>
 							<ion-icon name="heart-outline" class="text-2xl"></ion-icon>
 							Заказы
 						</div>
 						<div
-							class="flex flex-col flex-1 items-center gap-2"
-							:class="{ 'text-blue-700 font-bold border-b-2 border-blue-700': activeTab === Tab.Promo }"
+							class="flex flex-col flex-1 items-center gap-2 border-b-2"
+							:class="{ 'text-blue-700 font-bold border-blue-700': activeTab === Tab.Promo }"
 							@click="activeTab = Tab.Promo"
 						>
 							<ion-icon name="ticket-outline" class="text-2xl"></ion-icon>
