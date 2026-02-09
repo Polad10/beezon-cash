@@ -381,7 +381,7 @@ function handleOrderClicked(order: Order) {
 									</div>
 									<ion-icon name="chevron-forward" size="small"></ion-icon>
 								</a>
-								<div v-else class="flex flex-col bg-white rounded-xl p-3 mt-2">
+								<div v-else class="flex flex-col bg-white rounded-xl p-3 mt-5">
 									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
 										<ion-icon name="navigate-outline" class="mr-1"></ion-icon>
 										Город получателя
