@@ -358,7 +358,10 @@ function handleOrderClicked(order: Order) {
 										<p class="font-semibold">Заказ #{{ selectedOrder.code }}</p>
 										<p class="text-sm font-light opacity-50">{{ formatDateRu(selectedOrder.date) }}</p>
 									</div>
-									<div :class="[`bg-[${toClientColorCode(selectedOrder.status)}]`]" class="py-2 px-5 rounded-xl">
+									<div
+										:class="[`bg-[${toClientColorCode(selectedOrder.status)}]`]"
+										class="py-2 px-5 rounded-xl text-sm font-semibold"
+									>
 										{{ toClientDisplayString(selectedOrder.status) }}
 									</div>
 								</div>
