@@ -459,8 +459,8 @@ function handleOrderClicked(order: Order) {
 										</div>
 									</div>
 								</div>
-								<div class="divider opacity-50"></div>
-								<div class="flex flex-col mt-auto p-3">
+								<div class="divider opacity-50 my-auto"></div>
+								<div class="flex flex-col">
 									<div class="text-xs">
 										<div class="flex flex-row justify-between">
 											<p>Доставка до Тбилиси</p>
