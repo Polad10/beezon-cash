@@ -24,7 +24,6 @@ let headers = {}
 
 const activeTab = ref<Tab>(Tab.Home)
 const initDataRaw = ref<string | undefined>(undefined)
-const copyToastVisible = ref(false)
 const customErrorToastVisible = ref(false)
 const customErrorMessage = ref('')
 const errorToastVisible = ref(false)
@@ -136,9 +135,11 @@ function showErrorToast() {
 	showToast(errorToastVisible)
 }
 
-async function copyReferralCode() {
+async function copyReferralCodeToClipboard() {
 	await navigator.clipboard.writeText(user.value!.referral_code)
-	showToast(copyToastVisible)
+
+	successToastMessage.value = 'Промокод скопирован'
+	showToast(showSuccessToast)
 }
 
 async function applyBonus(orderId: string, bonus: Decimal) {
@@ -232,6 +233,13 @@ async function deleteSelectedOrder() {
 
 function handleOrderClicked(order: Order) {
 	selectedOrderId.value = order.id
+}
+
+async function copySelectedOrderCodeToClipboard() {
+	await navigator.clipboard.writeText(selectedOrder.value?.code.toString() || '')
+
+	successToastMessage.value = 'Номер заказа скопирован'
+	showToast(showSuccessToast)
 }
 </script>
 
@@ -355,7 +363,10 @@ function handleOrderClicked(order: Order) {
 							<div class="flex flex-col flex-1 my-3 bg-gray-100 p-5 rounded-xl">
 								<div class="flex flex-row items-center justify-between">
 									<div class="flex flex-col">
-										<p class="font-semibold">Заказ #{{ selectedOrder.code }}</p>
+										<div class="flex flex-row items-center font-semibold" @click="copySelectedOrderCodeToClipboard">
+											Заказ #{{ selectedOrder.code }}
+											<ion-icon class="ml-2" name="copy-outline"></ion-icon>
+										</div>
 										<p class="text-sm font-light opacity-50">{{ formatDateRu(selectedOrder.date) }}</p>
 									</div>
 									<div
@@ -510,7 +521,7 @@ function handleOrderClicked(order: Order) {
 							<p class="text-xl font-regular text-center">Ваш промокод</p>
 							<button
 								class="btn btn-wide bg-accent text-xl mt-2 px-5 rounded-2xl hover:bg-accent-content"
-								@click="copyReferralCode"
+								@click="copyReferralCodeToClipboard"
 							>
 								<div class="mx-auto text-white">{{ user.referral_code }}</div>
 								<ion-icon name="copy-outline" class="text-white z-10"></ion-icon>
@@ -544,11 +555,6 @@ function handleOrderClicked(order: Order) {
 									</div>
 								</li>
 							</ul>
-						</div>
-					</div>
-					<div v-if="copyToastVisible" class="toast toast-center">
-						<div class="alert bg-secondary text-sm font-bold p-2 flex items-center gap-y-0.5 object-center">
-							<span>Скопировано</span>
 						</div>
 					</div>
 					<div
