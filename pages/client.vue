@@ -327,7 +327,7 @@ function handleOrderClicked(order: Order) {
 								<ion-icon name="chevron-back" size="small" @click="() => (selectedOrderId = null)"></ion-icon>
 								<p class="mx-auto">Подробнее о заказе</p>
 							</div>
-							<div class="flex flex-row justify-center gap-2 text-xs mt-3">
+							<div class="flex flex-row justify-center gap-2 text-xs font-medium mt-3">
 								<div
 									class="flex flex-col items-center bg-gray-100 py-2 rounded-xl w-full"
 									:class="{ 'pointer-events-none opacity-50': selectedOrder.status > OrderStatus.WarehouseRF }"
@@ -373,7 +373,7 @@ function handleOrderClicked(order: Order) {
 									rel="noopener noreferrer"
 								>
 									<div clas="flex flex-col">
-										<div class="flex flex-row items-center text-xs font-semibold opacity-60">
+										<div class="flex flex-row items-center text-sm font-semibold opacity-60">
 											<ion-icon name="navigate-outline" class="mr-1"></ion-icon>
 											Пункт выдачи в Тбилиси
 										</div>
@@ -385,7 +385,7 @@ function handleOrderClicked(order: Order) {
 									<ion-icon name="chevron-forward" size="small"></ion-icon>
 								</a>
 								<div v-else class="flex flex-col bg-white rounded-xl p-3 mt-5">
-									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
+									<div class="flex flex-row items-center text-sm font-semibold opacity-60">
 										<ion-icon name="navigate-outline" class="mr-1"></ion-icon>
 										Город получателя
 									</div>
@@ -394,7 +394,7 @@ function handleOrderClicked(order: Order) {
 									</p>
 								</div>
 								<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
-									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
+									<div class="flex flex-row items-center text-sm opacity-60">
 										<ion-icon name="bag-handle-outline" class="mr-1"></ion-icon>
 										Откуда заказ?
 									</div>
@@ -408,7 +408,7 @@ function handleOrderClicked(order: Order) {
 									</div>
 								</div>
 								<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
-									<div class="flex flex-row items-center text-xs font-semibold opacity-60">
+									<div class="flex flex-row items-center text-sm font-semibold opacity-60">
 										<ion-icon name="cube-outline" class="mr-1"></ion-icon>
 										Что в заказе?
 									</div>
@@ -418,8 +418,8 @@ function handleOrderClicked(order: Order) {
 										</p>
 									</div>
 								</div>
-								<div class="flex flex-col bg-white rounded-xl p-3 mt-2">
-									<div class="flex flex-row text-xs font-semibold">
+								<div class="flex flex-col bg-white rounded-xl p-3 my-2">
+									<div class="flex flex-row text-sm font-semibold">
 										<div class="flex items-center opacity-60">
 											<ion-icon name="flash-outline" class="mr-1"></ion-icon>
 											В заказе есть эти категории товаров?
@@ -461,7 +461,7 @@ function handleOrderClicked(order: Order) {
 								</div>
 								<div class="divider opacity-50 my-auto"></div>
 								<div class="flex flex-col">
-									<div class="text-xs">
+									<div class="text-sm font-medium">
 										<div class="flex flex-row justify-between">
 											<p>Доставка до Тбилиси</p>
 											<p>{{ selectedOrder.original_price }} ₾</p>
