@@ -584,7 +584,11 @@ function handleOrderClicked(order: Order) {
 					:init-data-raw="initDataRaw!"
 					@order-edited="handleSelectedOrderEdited"
 				/>
-				<ConfirmDeleteModal ref="confirmDeleteModalRef" @item-deleted="deleteSelectedOrder" />
+				<ConfirmDeleteModal
+					label="Удалить данные о заказе?"
+					ref="confirmDeleteModalRef"
+					@item-deleted="deleteSelectedOrder"
+				/>
 			</div>
 		</div>
 	</div>
