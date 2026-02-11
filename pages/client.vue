@@ -413,7 +413,7 @@ function handleOrderClicked(order: Order) {
 										Что в заказе?
 									</div>
 									<div class="mt-2">
-										<p class="text-xs">
+										<p class="text-xs break-words">
 											{{ selectedOrder.description }}
 										</p>
 									</div>
