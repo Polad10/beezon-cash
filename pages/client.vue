@@ -13,6 +13,8 @@ import { toDisplayString as toOrderDisplayString } from '~/models/OrderTrack'
 import { OrderType } from '~/models/OrderTypeMapping'
 import { City, toDisplayString } from '~/models/City'
 import Tooltip from '~/components/Tooltip.vue'
+import { MapOption } from '~/models/MapOption'
+import type MapPickerModal from '~/components/MapPickerModal.vue'
 
 enum Tab {
 	Home,
@@ -39,6 +41,7 @@ const selectedOrderId = ref<string | null>(null)
 const newOrderRef = ref<typeof NewOrderWithoutUserInfo | null>(null)
 const editOrderRef = ref<typeof EditOrderWithoutUserInfo | null>(null)
 const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
+const mapPickerModalRef = ref<typeof MapPickerModal | null>(null)
 
 const computedOrders = computed(() => {
 	orders.value.forEach(processOrder)
@@ -241,6 +244,27 @@ async function copySelectedOrderCodeToClipboard() {
 	successToastMessage.value = 'Номер заказа скопирован'
 	showToast(showSuccessToast)
 }
+
+function openMap() {
+	const mapOption = sessionStorage.getItem('mapOption') as MapOption | null
+
+	if (mapOption != null) {
+		openMapOption(mapOption)
+	} else {
+		mapPickerModalRef.value?.open()
+	}
+}
+
+function openMapOption(mapOption: MapOption) {
+	let url = 'https://maps.app.goo.gl/QU8LFfuXHzaSidDm6'
+
+	if (mapOption === MapOption.Yandex) {
+		url = 'https://yandex.ru/maps/-/CLhhiCJY'
+	}
+
+	sessionStorage.setItem('mapOption', mapOption)
+	window.open(url, '_blank', 'noopener,noreferrer')
+}
 </script>
 
 <template>
@@ -376,10 +400,10 @@ async function copySelectedOrderCodeToClipboard() {
 										{{ toClientDisplayString(selectedOrder.status) }}
 									</div>
 								</div>
-								<a
+								<div
 									v-if="selectedOrder.city === City.Tbilisi || selectedOrder.city === City.Other"
 									class="flex flex-row items-center justify-between bg-white rounded-xl p-3 mt-5"
-									href="https://maps.app.goo.gl/QU8LFfuXHzaSidDm6"
+									@click="openMap"
 									target="_blank"
 									rel="noopener noreferrer"
 								>
@@ -394,7 +418,7 @@ async function copySelectedOrderCodeToClipboard() {
 										</div>
 									</div>
 									<ion-icon name="chevron-forward" size="small"></ion-icon>
-								</a>
+								</div>
 								<div v-else class="flex flex-col bg-white rounded-xl p-3 mt-5">
 									<div class="flex flex-row items-center text-sm font-semibold opacity-60">
 										<ion-icon name="navigate-outline" class="mr-1"></ion-icon>
@@ -595,6 +619,7 @@ async function copySelectedOrderCodeToClipboard() {
 					ref="confirmDeleteModalRef"
 					@item-deleted="deleteSelectedOrder"
 				/>
+				<MapPickerModal ref="mapPickerModalRef" @map-chosen="openMapOption" />
 			</div>
 		</div>
 	</div>
