@@ -516,7 +516,10 @@ function openMapOption(mapOption: MapOption) {
 									</div>
 									<div class="flex flex-row justify-between font-bold mt-5">
 										<p>Итого к оплате</p>
-										<p>{{ selectedOrder.current_price.add(selectedOrder.partner_cost) }} ₾</p>
+										<p>
+											{{ getFinalPrice(selectedOrder) }}
+											₾
+										</p>
 									</div>
 								</div>
 							</div>

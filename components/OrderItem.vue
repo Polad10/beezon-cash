@@ -92,13 +92,10 @@ function orderStatusEligibleForBonus(orderStatus: OrderStatus) {
 						<span
 							v-if="bonusApplied"
 							class="font-semibold text-2xl leading-none mr-2 line-through decoration-2 opacity-50"
-							>{{ order.original_price }}</span
+							>{{ getOriginalFinalPrice(order) }}</span
 						>
 						<span class="font-semibold text-2xl leading-none"
-							>{{
-								order.status >= OrderStatus.ReadyForDeliveryInTbilisi ? order.current_price.add(order.partner_cost) : 0
-							}}
-							₾</span
+							>{{ order.status >= OrderStatus.ReadyForDeliveryInTbilisi ? getFinalPrice(order) : 0 }} ₾</span
 						>
 					</div>
 				</div>
