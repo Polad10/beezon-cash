@@ -499,7 +499,7 @@ function openMapOption(mapOption: MapOption) {
 									<div class="text-sm font-medium">
 										<div class="flex flex-row justify-between">
 											<p>Доставка до Тбилиси</p>
-											<p>{{ selectedOrder.original_price }} ₾</p>
+											<p>{{ selectedOrder.original_price.minus(selectedOrder.additional_cost) }} ₾</p>
 										</div>
 										<div class="flex flex-row justify-between">
 											<p>Доставка по Грузии</p>
