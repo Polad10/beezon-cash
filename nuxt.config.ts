@@ -50,18 +50,7 @@ export default defineNuxtConfig({
 		},
 	},
 
-	modules: ['@kgierke/nuxt-basic-auth', 'nuxt-mongoose', '@sentry/nuxt/module'],
-
-	basicAuth: {
-		enabled: true,
-		users: [
-			{
-				username: process.env.ADMIN_USERNAME!,
-				password: process.env.ADMIN_PASSWORD!,
-			},
-		],
-		allowedRoutes: ['/neworder', '/geruorder', '/client', '/api/public', '/api/client'],
-	},
+	modules: ['nuxt-mongoose', '@sentry/nuxt/module'],
 
 	vue: {
 		compilerOptions: {
@@ -82,5 +71,13 @@ export default defineNuxtConfig({
 
 	sourcemap: {
 		client: 'hidden',
+	},
+
+	nitro: {
+		routeRules: {
+			'/api/**': {
+				proxy: `${process.env.BEEZON_API_URL}/api/**`,
+			},
+		},
 	},
 })
