@@ -36,7 +36,7 @@ const orders = (
 ).data
 
 const ordersGeRu = (
-	await useFetch<OrderGeRu[]>('/api/admin/geru/orders?startDate', {
+	await useFetch<OrderGeRu[]>('/api/admin/geru/orders', {
 		query: { startDate: ordersGeRuStartDate },
 		watch: [ordersGeRuStartDate],
 	})

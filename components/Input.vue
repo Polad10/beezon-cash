@@ -14,6 +14,15 @@ const props = defineProps<{
 	required?: boolean
 }>()
 
+function onEnter(e: KeyboardEvent) {
+	const input = e.target as HTMLInputElement
+	const inForm = !!input.closest('form')
+
+	if (!inForm) {
+		input.blur()
+	}
+}
+
 const model = defineModel()
 </script>
 
@@ -31,7 +40,7 @@ const model = defineModel()
 			v-model="model"
 			v-bind="$attrs"
 			enterkeyhint="done"
-			@keydown.enter=";($event.target as HTMLInputElement).blur()"
+			@keydown.enter="onEnter"
 		/>
 	</label>
 </template>
