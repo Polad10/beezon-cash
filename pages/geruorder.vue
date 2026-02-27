@@ -6,7 +6,7 @@ import DescriptionInput from '~/components/new-order-form/DescriptionInput.vue'
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 import { ErrorName } from '~/enums/exceptions/ErrorName'
 import { TelegramEntityErrorType } from '~/enums/exceptions/TelegramEntityErrorType'
-import axios from 'axios'
+import axios, { HttpStatusCode } from 'axios'
 
 const userOrderCookie = useCookie<UserGeRuOrderRequest | null>('user-geruorder-cookie', { maxAge: 365 * 24 * 60 * 60 })
 
@@ -68,19 +68,22 @@ async function registerOrder() {
 			userOrderCookie.value = userOrderRequest
 			modalRef.value?.close()
 		} catch (ex) {
-			const errorResponseData = getErrorResponseData(ex)
+			if (axios.isAxiosError(ex) && ex.response?.status === HttpStatusCode.BadRequest) {
+				const responseData = ex.response.data
 
-			if (
-				errorResponseData?.errorName == ErrorName.TelegramEntityError &&
-				errorResponseData?.errorType == TelegramEntityErrorType.EntityNotFound
-			) {
-				errorMessage.value = 'Указанный ник в Telegram не найден'
-				return showToast(showErrorToast)
+				if (
+					responseData?.errorName == ErrorName.TelegramEntityError &&
+					responseData?.errorType == TelegramEntityErrorType.EntityNotFound
+				) {
+					errorMessage.value = 'Указанный ник в Telegram не найден'
+					return showToast(showErrorToast)
+				}
 			}
 
-			logError(ex)
 			errorMessage.value = 'Что-то пошло не так. Пожалуйста, попробуйте чуть позже.'
 			showToast(showErrorToast)
+
+			logError(ex)
 		} finally {
 			loading.value = false
 		}

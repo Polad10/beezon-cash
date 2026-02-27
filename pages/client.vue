@@ -99,16 +99,14 @@ async function retrieveMe() {
 			user.value = me
 			orders.value = ordersData
 		}
-	} catch (err) {
-		const statusCode = getErrorResponseStatusCode(err)
-
-		if (statusCode == HttpStatusCode.NotFound) {
+	} catch (ex) {
+		if (axios.isAxiosError(ex) && ex.response?.status === HttpStatusCode.NotFound) {
 			// user is just not found
 			return
 		}
 
-		logError(err)
-		throw err
+		logError(ex)
+		throw ex
 	}
 }
 

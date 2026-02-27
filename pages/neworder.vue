@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import axios from 'axios'
+import axios, { HttpStatusCode } from 'axios'
 import type { City } from '~/models/City'
 import { DeliveryProvider, type OrderTrackRequest } from '~/models/OrderTrack'
 import { OrderType } from '~/models/OrderTypeMapping'
@@ -86,19 +86,22 @@ async function registerOrder() {
 			userOrderCookie.value = userOrderRequest
 			modalRef.value?.close()
 		} catch (ex) {
-			const errorResponseData = getErrorResponseData(ex)
+			if (axios.isAxiosError(ex) && ex.response?.status === HttpStatusCode.BadRequest) {
+				const responseData = ex.response.data
 
-			if (
-				errorResponseData?.errorName == ErrorName.TelegramEntityError &&
-				errorResponseData?.errorType == TelegramEntityErrorType.EntityNotFound
-			) {
-				errorMessage.value = 'Указанный ник в Telegram не найден'
-				return showToast(showErrorToast)
+				if (
+					responseData?.errorName == ErrorName.TelegramEntityError &&
+					responseData?.errorType == TelegramEntityErrorType.EntityNotFound
+				) {
+					errorMessage.value = 'Указанный ник в Telegram не найден'
+					return showToast(showErrorToast)
+				}
 			}
 
-			logError(ex)
 			errorMessage.value = 'Что-то пошло не так. Пожалуйста, попробуйте чуть позже.'
 			showToast(showErrorToast)
+
+			logError(ex)
 		} finally {
 			loading.value = false
 		}
