@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios'
 import * as Sentry from '@sentry/nuxt'
 
 export function logError(err: unknown) {
