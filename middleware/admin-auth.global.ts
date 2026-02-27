@@ -1,6 +1,5 @@
 import { HttpStatusCode } from 'axios'
 import { defineNuxtRouteMiddleware, navigateTo } from 'nuxt/app'
-import { LogLevel } from '~/models/LogLevel'
 
 export default defineNuxtRouteMiddleware(async (to) => {
 	if (!to.path.startsWith('/admin') || to.path === '/admin/login') return
@@ -14,13 +13,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
 			return navigateTo('/admin/login', { replace: true })
 		}
 
-		const error = ex as Error
-
-		const logExtra = {
-			cause: error.cause,
-			stack: error.stack,
-		}
-
-		log('', LogLevel.ERROR, error.message, logExtra)
+		logError(ex)
 	}
 })
