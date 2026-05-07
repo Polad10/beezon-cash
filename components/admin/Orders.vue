@@ -21,14 +21,19 @@ import Decimal from 'decimal.js'
 import type { User } from '~/models/User'
 import StatusDropdown from './StatusDropdown.vue'
 import PaymentMethodDropdown from './PaymentMethodDropdown.vue'
+import Dropdown from '../Dropdown.vue'
+import { DateType } from '~/enums/DateType'
 
 const props = defineProps<{
 	allOrders: Array<Order>
 	allUsers: Array<User>
-	startDate: string
 }>()
 
-const emit = defineEmits(['order-deleted', 'start-date-updated'])
+const emit = defineEmits(['order-deleted', 'date-filter-apply', 'date-filter-reset'])
+
+const startDate = defineModel<string>('startDate')
+const endDate = defineModel<string>('endDate')
+const dateType = defineModel<DateType>('dateType')
 
 let fuseOrders = computed(() => {
 	return new Fuse(props.allOrders, fuseOrdersOptions)
@@ -47,7 +52,6 @@ const sendNotification = ref(false)
 const selectedOrderStatusToSet = ref<OrderStatus | null>(null)
 const selectedOrders = ref<Order[]>([])
 const allOrdersSelected = ref(false)
-const startDate = ref(props.startDate)
 
 const errorMessage = ref('')
 const showErrorToast = ref(false)
@@ -59,12 +63,8 @@ watch(
 			processOrderValues(order)
 		})
 	},
-	{ immediate: true }
+	{ immediate: true },
 )
-
-watch(startDate, (newStartDate) => {
-	emit('start-date-updated', newStartDate)
-})
 
 const orders = computed(() => {
 	let result = []
@@ -281,10 +281,27 @@ async function updatePaymentMethod(order: Order, newPaymentMethod: PaymentMethod
 						Filters
 						<ion-icon name="options-outline" class="text-base"></ion-icon>
 					</div>
-					<div tabindex="0" class="dropdown-content rounded-box z-[1] p-4 shadow bg-white w-64">
-						<div class="flex flex-row items-center gap-2">
-							<span class="text-sm">Start date</span>
-							<Input type="date" class="input-sm" v-model="startDate" />
+					<div tabindex="0" class="dropdown-content rounded-box z-[1] p-4 shadow bg-white w-96">
+						<div class="flex flex-col gap-2">
+							<Dropdown
+								class="select-sm"
+								placeholder="Choose date type"
+								:options="[
+									{ key: DateType.Creation, displayValue: 'Creation date' },
+									{ key: DateType.Delivery, displayValue: 'Delivery date' },
+									{ key: DateType.Payment, displayValue: 'Payment date' },
+								]"
+								v-model="dateType"
+							/>
+							<div class="flex flex-row items-center gap-2">
+								<Input type="date" class="input-sm" v-model="startDate" />
+								<span class="text-sm">to</span>
+								<Input type="date" class="input-sm" v-model="endDate" />
+							</div>
+							<div class="flex flex-row justify-end gap-2 mt-2">
+								<button class="btn btn-sm btn-outline" @click="() => emit('date-filter-reset')">Reset</button>
+								<button class="btn btn-sm btn-success" @click="() => emit('date-filter-apply')">Apply</button>
+							</div>
 						</div>
 					</div>
 				</div>

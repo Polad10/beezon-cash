@@ -10,6 +10,7 @@ import type { OrderGeRu } from '~/models/OrderGeRu'
 import type { MessageGeRu } from '~/models/MessageGeRu'
 import Settings from '~/components/admin/Settings.vue'
 import type { Setting } from '~/models/Setting'
+import { DateType } from '~/enums/DateType'
 
 enum ActiveTab {
 	Users,
@@ -22,25 +23,27 @@ enum ActiveTab {
 }
 
 const ordersStartDate = ref(getDefaultOrdersStartDate())
+const ordersEndDate = ref('')
+const ordersDateType = ref<DateType>(DateType.Creation)
+
 const ordersGeRuStartDate = ref(getDefaultOrdersStartDate())
+const ordersGeRuEndDate = ref('')
+const ordersGeRuDateType = ref<DateType>(DateType.Creation)
+
 const transactionsStartDate = ref(getDefaultTransactionsStartDate())
 const transactionsEndDate = ref('')
 
 const users = (await useFetch<User[]>('/api/admin/users')).data
 
-const orders = (
-	await useFetch<Order[]>('/api/admin/orders', {
-		query: { startDate: ordersStartDate },
-		watch: [ordersStartDate],
-	})
-).data
+const { data: orders, refresh: refreshOrders } = await useFetch<Order[]>('/api/admin/orders', {
+	query: { startDate: ordersStartDate, endDate: ordersEndDate, dateType: ordersDateType },
+	watch: false,
+})
 
-const ordersGeRu = (
-	await useFetch<OrderGeRu[]>('/api/admin/geru/orders', {
-		query: { startDate: ordersGeRuStartDate },
-		watch: [ordersGeRuStartDate],
-	})
-).data
+const { data: ordersGeRu, refresh: refreshOrdersGeRu } = await useFetch<OrderGeRu[]>('/api/admin/geru/orders', {
+	query: { startDate: ordersGeRuStartDate, endDate: ordersGeRuEndDate, dateType: ordersGeRuDateType },
+	watch: false,
+})
 
 const messages = (await useFetch<Message[]>('/api/admin/messages')).data
 const messagesGeRu = (await useFetch<MessageGeRu[]>('/api/admin/geru/messages')).data
@@ -84,12 +87,20 @@ function getDefaultTransactionsStartDate() {
 	return date.toISOString().split('T')[0]
 }
 
-function updateOrdersStartDate(newStartDate: string) {
-	ordersStartDate.value = newStartDate
+async function resetOrdersDateFilter() {
+	ordersStartDate.value = getDefaultOrdersStartDate()
+	ordersEndDate.value = ''
+	ordersDateType.value = DateType.Creation
+
+	await refreshOrders()
 }
 
-function updateOrdersGeRuStartDate(newStartDate: string) {
-	ordersGeRuStartDate.value = newStartDate
+async function resetOrdersGeRuDateFilter() {
+	ordersGeRuStartDate.value = getDefaultOrdersStartDate()
+	ordersGeRuEndDate.value = ''
+	ordersGeRuDateType.value = DateType.Creation
+
+	await refreshOrdersGeRu()
 }
 
 function updateTransactionsStartDate(newStartDate: string) {
@@ -224,8 +235,11 @@ async function handleSettingsUpdated(updatedSetting: Setting) {
 					v-if="activeTab === ActiveTab.Orders"
 					:all-orders="orders!"
 					:all-users="users!"
-					:start-date="ordersStartDate"
-					@start-date-updated="updateOrdersStartDate"
+					v-model:start-date="ordersStartDate"
+					v-model:end-date="ordersEndDate"
+					v-model:date-type="ordersDateType"
+					@date-filter-apply="refreshOrders"
+					@date-filter-reset="resetOrdersDateFilter"
 					@order-deleted="deleteOrder"
 				/>
 			</KeepAlive>
@@ -235,8 +249,11 @@ async function handleSettingsUpdated(updatedSetting: Setting) {
 					v-if="activeTab === ActiveTab.OrdersGeRu"
 					:all-orders="ordersGeRu!"
 					:all-users="users!"
-					:start-date="ordersGeRuStartDate"
-					@start-date-updated="updateOrdersGeRuStartDate"
+					v-model:start-date="ordersGeRuStartDate"
+					v-model:end-date="ordersGeRuEndDate"
+					v-model:date-type="ordersGeRuDateType"
+					@date-filter-apply="refreshOrdersGeRu"
+					@date-filter-reset="resetOrdersGeRuDateFilter"
 					@order-deleted="deleteGeRuOrder"
 				/>
 			</KeepAlive>
