@@ -1,34 +1,39 @@
 export const OrderStatusGeRu = {
-  New: 'New',
-  InvoiceCreated: 'InvoiceCreated',
-  DrivingInRf: 'DrivingInRf',
-  Delivered: 'Delivered',
+	New: 'New',
+	InvoiceCreated: 'InvoiceCreated',
+	TakenByCourier: 'TakenByCourier',
+	DrivingInRf: 'DrivingInRf',
+	Delivered: 'Delivered',
 } as const
 
 export type OrderStatusGeRu = (typeof OrderStatusGeRu)[keyof typeof OrderStatusGeRu]
 
 export function toAdminDisplayString(orderStatus: OrderStatusGeRu) {
-  switch (orderStatus) {
-    case OrderStatusGeRu.New:
-      return 'Создан'
-    case OrderStatusGeRu.InvoiceCreated:
-      return 'Создана накладная'
-    case OrderStatusGeRu.DrivingInRf:
-      return 'Поехало внутри РФ'
-    case OrderStatusGeRu.Delivered:
-      return 'Доставлен'
-  }
+	switch (orderStatus) {
+		case OrderStatusGeRu.New:
+			return 'Создан'
+		case OrderStatusGeRu.InvoiceCreated:
+			return 'Создана накладная'
+		case OrderStatusGeRu.TakenByCourier:
+			return 'Забрал курьер'
+		case OrderStatusGeRu.DrivingInRf:
+			return 'Поехало внутри РФ'
+		case OrderStatusGeRu.Delivered:
+			return 'Доставлен'
+	}
 }
 
 export function toAdminColorCode(orderStatus: OrderStatusGeRu) {
-  switch (orderStatus) {
-    case OrderStatusGeRu.New:
-      return '#ECECEC'
-    case OrderStatusGeRu.InvoiceCreated:
-      return '#B9C4FF'
-    case OrderStatusGeRu.DrivingInRf:
-      return '#FFD6B9'
-    case OrderStatusGeRu.Delivered:
-      return '#C3C3C3'
-  }
+	switch (orderStatus) {
+		case OrderStatusGeRu.New:
+			return '#ECECEC'
+		case OrderStatusGeRu.InvoiceCreated:
+			return '#B9C4FF'
+		case OrderStatusGeRu.TakenByCourier:
+			return '#D8B4FE'
+		case OrderStatusGeRu.DrivingInRf:
+			return '#FFD6B9'
+		case OrderStatusGeRu.Delivered:
+			return '#C3C3C3'
+	}
 }
