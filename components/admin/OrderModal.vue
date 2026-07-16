@@ -41,6 +41,8 @@ const boxberryTrackNumber = ref('')
 const post5TrackNumber = ref('')
 const dpdTrackNumber = ref('')
 const aptekaRuTrackNumber = ref('')
+const lamodaTrackNumber = ref('')
+const yandexMarketTrackNumber = ref('')
 const paymentMethod = ref<PaymentMethod | null>(null)
 const exchangeRate = ref('')
 const sendNotification = ref(false)
@@ -93,6 +95,10 @@ function open(order: Order | undefined) {
 			order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.DPD)?.track_number || ''
 		aptekaRuTrackNumber.value =
 			order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.AptekaRu)?.track_number || ''
+		lamodaTrackNumber.value =
+			order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.Lamoda)?.track_number || ''
+		yandexMarketTrackNumber.value =
+			order.order_tracks.find((track) => track.delivery_provider === DeliveryProvider.YandexMarket)?.track_number || ''
 		sendNotification.value = false
 	}
 
@@ -120,6 +126,8 @@ function resetFieldValues() {
 	post5TrackNumber.value = ''
 	dpdTrackNumber.value = ''
 	aptekaRuTrackNumber.value = ''
+	lamodaTrackNumber.value = ''
+	yandexMarketTrackNumber.value = ''
 	paymentMethod.value = null
 	sendNotification.value = false
 }
@@ -250,9 +258,9 @@ function submit() {
 			})
 		}
 
-		if (deliveryProviders.value.includes(DeliveryProvider.Wilbderries)) {
+		if (deliveryProviders.value.includes(DeliveryProvider.Wildberries)) {
 			orderRequest.order_tracks.push({
-				delivery_provider: DeliveryProvider.Wilbderries,
+				delivery_provider: DeliveryProvider.Wildberries,
 			})
 		}
 
@@ -301,6 +309,20 @@ function submit() {
 			orderRequest.order_tracks.push({
 				delivery_provider: DeliveryProvider.AptekaRu,
 				track_number: aptekaRuTrackNumber.value,
+			})
+		}
+
+		if (lamodaTrackNumber.value) {
+			orderRequest.order_tracks.push({
+				delivery_provider: DeliveryProvider.Lamoda,
+				track_number: lamodaTrackNumber.value,
+			})
+		}
+
+		if (yandexMarketTrackNumber.value) {
+			orderRequest.order_tracks.push({
+				delivery_provider: DeliveryProvider.YandexMarket,
+				track_number: yandexMarketTrackNumber.value,
 			})
 		}
 
@@ -362,7 +384,7 @@ function validateForm() {
 <template>
 	<div>
 		<dialog class="modal" ref="modalRef">
-			<div class="modal-box w-3/4 max-w-7xl">
+			<div class="modal-box w-[95%] max-w-[1650px]">
 				<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="close">✕</button>
 				<p class="text-2xl text-center">{{ title }}</p>
 				<div class="divider"></div>
@@ -498,6 +520,18 @@ function validateForm() {
 							placeholder="123456789"
 							v-model="aptekaRuTrackNumber"
 						/>
+						<Input
+							type="text"
+							:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.Lamoda)}`"
+							placeholder="123456789"
+							v-model="lamodaTrackNumber"
+						/>
+						<Input
+							type="text"
+							:label="`Track number ${deliveryProviderToDisplayString(DeliveryProvider.YandexMarket)}`"
+							placeholder="123456789"
+							v-model="yandexMarketTrackNumber"
+						/>
 					</div>
 					<div class="flex flex-row gap-2">
 						<label class="label cursor-pointer justify-normal gap-2">
@@ -513,10 +547,10 @@ function validateForm() {
 							<input
 								type="checkbox"
 								class="checkbox checkbox-sm"
-								:value="DeliveryProvider.Wilbderries"
+								:value="DeliveryProvider.Wildberries"
 								v-model="deliveryProviders"
 							/>
-							<span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Wilbderries) }}</span>
+							<span class="label-text">{{ deliveryProviderToDisplayString(DeliveryProvider.Wildberries) }}</span>
 						</label>
 						<label class="label cursor-pointer justify-normal gap-2">
 							<input

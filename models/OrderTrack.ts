@@ -12,7 +12,7 @@ export interface OrderTrackRequest {
 
 export enum DeliveryProvider {
 	Ozon,
-	Wilbderries,
+	Wildberries,
 	CDEK,
 	PostRussia,
 	Boxberry,
@@ -20,13 +20,15 @@ export enum DeliveryProvider {
 	DPD,
 	Cold,
 	AptekaRu,
+	Lamoda,
+	YandexMarket,
 }
 
 export function toDisplayString(deliveryProvider: DeliveryProvider) {
 	switch (deliveryProvider) {
 		case DeliveryProvider.Ozon:
 			return 'Ozon'
-		case DeliveryProvider.Wilbderries:
+		case DeliveryProvider.Wildberries:
 			return 'Wildberries'
 		case DeliveryProvider.CDEK:
 			return 'CDEK'
@@ -42,5 +44,9 @@ export function toDisplayString(deliveryProvider: DeliveryProvider) {
 			return 'Доставка в холоде'
 		case DeliveryProvider.AptekaRu:
 			return 'Аптека.ру'
+		case DeliveryProvider.Lamoda:
+			return 'Lamoda'
+		case DeliveryProvider.YandexMarket:
+			return 'YandexMarket'
 	}
 }

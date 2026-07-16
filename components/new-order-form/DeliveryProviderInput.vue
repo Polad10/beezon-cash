@@ -23,6 +23,8 @@ const providersRequiringTrackNumber = [
 	DeliveryProvider.Boxberry,
 	DeliveryProvider.DPD,
 	DeliveryProvider.AptekaRu,
+	DeliveryProvider.Lamoda,
+	DeliveryProvider.YandexMarket,
 ]
 
 // Computed property to check if current provider requires track number
@@ -42,7 +44,7 @@ const trackNumberLabel = computed(() => {
 
 const deliveryProviderOptions = [
 	DeliveryProvider.Ozon,
-	DeliveryProvider.Wilbderries,
+	DeliveryProvider.Wildberries,
 	DeliveryProvider.CDEK,
 	DeliveryProvider.PostRussia,
 	DeliveryProvider.POST5,
@@ -50,6 +52,8 @@ const deliveryProviderOptions = [
 	DeliveryProvider.DPD,
 	DeliveryProvider.Cold,
 	DeliveryProvider.AptekaRu,
+	DeliveryProvider.Lamoda,
+	DeliveryProvider.YandexMarket,
 ]
 
 function validate(): boolean {
