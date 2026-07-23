@@ -14,7 +14,10 @@ import DescriptionInput from '~/components/new-order-form/DescriptionInput.vue'
 import DataProcessAgreement from '~/components/DataProcessAgreement.vue'
 import PrivacyPolicyAgreement from '~/components/PrivacyPolicyAgreement.vue'
 
-const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie', { maxAge: 365 * 24 * 60 * 60 })
+const userOrderCookie = useCookie<UserOrderRequest | null>('user-order-cookie', {
+	maxAge: 365 * 24 * 60 * 60,
+	path: '/neworder',
+})
 
 const modalRef = ref<HTMLDialogElement | null>(null)
 const dataProcessAgreementRef = ref<typeof DataProcessAgreement | null>(null)

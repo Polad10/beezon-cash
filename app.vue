@@ -1,4 +1,16 @@
 <script setup lang="ts">
+// One-time cleanup: these order-form cookies were originally saved without an
+// explicit path, so browsers defaulted them to site-wide (Path=/) and they were
+// sent on every request. They've since been scoped to their own page's path;
+// this removes the old site-wide copies so they stop piling onto every request.
+onMounted(() => {
+	const legacyOrderCookieNames = ['user-order-cookie', 'user-geruorder-cookie', 'user-geeuorder-cookie']
+
+	for (const name of legacyOrderCookieNames) {
+		document.cookie = `${name}=; Path=/; Max-Age=0`
+	}
+})
+
 useHead({
 	link: [
 		{

@@ -6,8 +6,12 @@ import type { Transaction } from '~/models/Transaction'
 import axios from 'axios'
 import OrdersGeRu from '~/components/admin/OrdersGeRu.vue'
 import MessagesGeRu from '~/components/admin/MessagesGeRu.vue'
+import OrdersGeEu from '~/components/admin/OrdersGeEu.vue'
+import MessagesGeEu from '~/components/admin/MessagesGeEu.vue'
 import type { OrderGeRu } from '~/models/OrderGeRu'
 import type { MessageGeRu } from '~/models/MessageGeRu'
+import type { OrderGeEu } from '~/models/OrderGeEu'
+import type { MessageGeEu } from '~/models/MessageGeEu'
 import Settings from '~/components/admin/Settings.vue'
 import type { Setting } from '~/models/Setting'
 import { DateType } from '~/enums/DateType'
@@ -16,8 +20,10 @@ enum ActiveTab {
 	Users,
 	Orders,
 	OrdersGeRu,
+	OrdersGeEu,
 	Messages,
 	MessagesGeRu,
+	MessagesGeEu,
 	Analytics,
 	Settings,
 }
@@ -29,6 +35,10 @@ const ordersDateType = ref<DateType>(DateType.Creation)
 const ordersGeRuStartDate = ref(getDefaultOrdersStartDate())
 const ordersGeRuEndDate = ref('')
 const ordersGeRuDateType = ref<DateType>(DateType.Creation)
+
+const ordersGeEuStartDate = ref(getDefaultOrdersStartDate())
+const ordersGeEuEndDate = ref('')
+const ordersGeEuDateType = ref<DateType>(DateType.Creation)
 
 const transactionsStartDate = ref(getDefaultTransactionsStartDate())
 const transactionsEndDate = ref('')
@@ -45,8 +55,14 @@ const { data: ordersGeRu, refresh: refreshOrdersGeRu } = await useFetch<OrderGeR
 	watch: false,
 })
 
+const { data: ordersGeEu, refresh: refreshOrdersGeEu } = await useFetch<OrderGeEu[]>('/api/admin/geeu/orders', {
+	query: { startDate: ordersGeEuStartDate, endDate: ordersGeEuEndDate, dateType: ordersGeEuDateType },
+	watch: false,
+})
+
 const messages = (await useFetch<Message[]>('/api/admin/messages')).data
 const messagesGeRu = (await useFetch<MessageGeRu[]>('/api/admin/geru/messages')).data
+const messagesGeEu = (await useFetch<MessageGeEu[]>('/api/admin/geeu/messages')).data
 
 const transactions = (
 	await useFetch<Transaction[]>('/api/admin/transactions', {
@@ -103,6 +119,14 @@ async function resetOrdersGeRuDateFilter() {
 	await refreshOrdersGeRu()
 }
 
+async function resetOrdersGeEuDateFilter() {
+	ordersGeEuStartDate.value = getDefaultOrdersStartDate()
+	ordersGeEuEndDate.value = ''
+	ordersGeEuDateType.value = DateType.Creation
+
+	await refreshOrdersGeEu()
+}
+
 function updateTransactionsStartDate(newStartDate: string) {
 	transactionsStartDate.value = newStartDate
 }
@@ -150,6 +174,17 @@ async function deleteGeRuOrder(order: OrderGeRu) {
 	}
 }
 
+async function deleteGeEuOrder(order: OrderGeEu) {
+	try {
+		await axios.delete(`/api/admin/geeu/orders/${order.id}`)
+		ordersGeEu.value = ordersGeEu.value?.filter((o) => o.id !== order.id)!
+	} catch (ex) {
+		logError(ex)
+		errorMessage.value = 'Something went wrong. Please try again later.'
+		showToast(showErrorToast)
+	}
+}
+
 async function deleteMessage(message: Message) {
 	try {
 		await axios.delete(`/api/admin/messages/${message.id}`)
@@ -165,6 +200,17 @@ async function deleteGeRuMessage(message: MessageGeRu) {
 	try {
 		await axios.delete(`/api/admin/geru/messages/${message.id}`)
 		messagesGeRu.value = messagesGeRu.value?.filter((m) => m.id !== message.id)!
+	} catch (ex) {
+		logError(ex)
+		errorMessage.value = 'Something went wrong. Please try again later.'
+		showToast(showErrorToast)
+	}
+}
+
+async function deleteGeEuMessage(message: MessageGeEu) {
+	try {
+		await axios.delete(`/api/admin/geeu/messages/${message.id}`)
+		messagesGeEu.value = messagesGeEu.value?.filter((m) => m.id !== message.id)!
 	} catch (ex) {
 		logError(ex)
 		errorMessage.value = 'Something went wrong. Please try again later.'
@@ -202,6 +248,11 @@ async function handleSettingsUpdated(updatedSetting: Setting) {
 						</button>
 					</li>
 					<li>
+						<button :class="{ active: activeTab == ActiveTab.OrdersGeEu }" @click="setActiveTab(ActiveTab.OrdersGeEu)">
+							Orders &nbsp;&nbsp; GE - EU
+						</button>
+					</li>
+					<li>
 						<button :class="{ active: activeTab == ActiveTab.Messages }" @click="setActiveTab(ActiveTab.Messages)">
 							Messages &nbsp;&nbsp; RU - GE
 						</button>
@@ -212,6 +263,14 @@ async function handleSettingsUpdated(updatedSetting: Setting) {
 							@click="setActiveTab(ActiveTab.MessagesGeRu)"
 						>
 							Messages &nbsp;&nbsp; GE - RU
+						</button>
+					</li>
+					<li>
+						<button
+							:class="{ active: activeTab == ActiveTab.MessagesGeEu }"
+							@click="setActiveTab(ActiveTab.MessagesGeEu)"
+						>
+							Messages &nbsp;&nbsp; GE - EU
 						</button>
 					</li>
 					<li>
@@ -259,6 +318,20 @@ async function handleSettingsUpdated(updatedSetting: Setting) {
 			</KeepAlive>
 
 			<KeepAlive>
+				<OrdersGeEu
+					v-if="activeTab === ActiveTab.OrdersGeEu"
+					:all-orders="ordersGeEu!"
+					:all-users="users!"
+					v-model:start-date="ordersGeEuStartDate"
+					v-model:end-date="ordersGeEuEndDate"
+					v-model:date-type="ordersGeEuDateType"
+					@date-filter-apply="refreshOrdersGeEu"
+					@date-filter-reset="resetOrdersGeEuDateFilter"
+					@order-deleted="deleteGeEuOrder"
+				/>
+			</KeepAlive>
+
+			<KeepAlive>
 				<AdminMessages v-if="activeTab === ActiveTab.Messages" :messages="messages!" @message-deleted="deleteMessage" />
 			</KeepAlive>
 
@@ -267,6 +340,14 @@ async function handleSettingsUpdated(updatedSetting: Setting) {
 					v-if="activeTab === ActiveTab.MessagesGeRu"
 					:messages="messagesGeRu!"
 					@message-deleted="deleteGeRuMessage"
+				/>
+			</KeepAlive>
+
+			<KeepAlive>
+				<MessagesGeEu
+					v-if="activeTab === ActiveTab.MessagesGeEu"
+					:messages="messagesGeEu!"
+					@message-deleted="deleteGeEuMessage"
 				/>
 			</KeepAlive>
 

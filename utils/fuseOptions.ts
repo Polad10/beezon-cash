@@ -1,5 +1,6 @@
 import type { Order } from '~/models/Order'
 import type { OrderGeRu } from '~/models/OrderGeRu'
+import type { OrderGeEu } from '~/models/OrderGeEu'
 import type { User } from '~/models/User'
 
 export const fuseUsersOptions = {
@@ -48,6 +49,19 @@ export const fuseGeRuOrdersOptions = {
 		'description',
 		'cdek_track_nr',
 		{ name: 'full_name', getFn: (order: OrderGeRu) => `${order.user?.first_name} ${order.user?.last_name}` },
+	],
+	threshold: 0.1,
+}
+
+export const fuseGeEuOrdersOptions = {
+	keys: [
+		'user.tg_username',
+		'user.last_name',
+		'user.first_name',
+		'code',
+		'description',
+		'track_nr',
+		{ name: 'full_name', getFn: (order: OrderGeEu) => `${order.user?.first_name} ${order.user?.last_name}` },
 	],
 	threshold: 0.1,
 }

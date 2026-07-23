@@ -1,0 +1,406 @@
+<script lang="ts" setup>
+import Decimal from 'decimal.js'
+import Fuse from 'fuse.js'
+import { OrderStatusGeEu, toAdminColorCode, toAdminDisplayString } from '~/enums/OrderStatusGeEu'
+import {
+	PaymentMethod,
+	toAdminDisplayString as paymentMethodToAdminDisplayString,
+	toAdminColorCode as paymentMethodToAdminColorCode,
+} from '~/enums/PaymentMethod'
+import ConfirmActionModal from '~/components/admin/ConfirmActionModal.vue'
+import ConfirmDeleteModal from '~/components/admin/ConfirmDeleteModal.vue'
+import type { OrderGeEu, OrderGeEuBatchPatchRequest, OrderGeEuPatchRequest } from '~/models/OrderGeEu'
+import type { User } from '~/models/User'
+import StatusGeEuDropdown from './StatusGeEuDropdown.vue'
+import PaymentMethodDropdown from './PaymentMethodDropdown.vue'
+import NewOrderGeEuModal from './NewOrderGeEuModal.vue'
+import EditOrderGeEuModal from './EditOrderGeEuModal.vue'
+import axios from 'axios'
+import Dropdown from '../Dropdown.vue'
+import { DateType } from '~/enums/DateType'
+
+const props = defineProps<{
+	allOrders: Array<OrderGeEu>
+	allUsers: Array<User>
+	startDate: string
+}>()
+
+const emit = defineEmits(['order-deleted', 'date-filter-apply', 'date-filter-reset'])
+
+const startDate = defineModel<string>('startDate')
+const endDate = defineModel<string>('endDate')
+const dateType = defineModel<DateType>('dateType')
+
+let fuseOrders = computed(() => {
+	return new Fuse(props.allOrders, fuseGeEuOrdersOptions)
+})
+
+const newOrderModalRef = ref<typeof NewOrderGeEuModal | null>(null)
+const editOrderModalRef = ref<typeof EditOrderGeEuModal | null>(null)
+const confirmActionModalRef = ref<typeof ConfirmActionModal | null>(null)
+const confirmDeleteModalRef = ref<typeof ConfirmDeleteModal | null>(null)
+
+const rowsPerPage = 100
+const currentPageNr = ref(1)
+const orderSearch = ref('')
+const orderStatusFilter = ref(new Set<OrderStatusGeEu>())
+const sendNotification = ref(false)
+const selectedOrderStatusToSet = ref<OrderStatusGeEu | null>(null)
+const selectedOrders = ref<OrderGeEu[]>([])
+const allOrdersSelected = ref(false)
+
+const errorMessage = ref('')
+const showErrorToast = ref(false)
+
+watch(
+	() => props.allOrders,
+	() => {
+		props.allOrders.forEach((order) => {
+			processOrderValues(order)
+		})
+	},
+	{ immediate: true },
+)
+
+const orders = computed(() => {
+	let result = []
+
+	// search
+	if (!orderSearch.value) {
+		sortOrders()
+		result = [...props.allOrders]
+	} else {
+		result = fuseOrders.value.search(orderSearch.value).map((result) => result.item)
+	}
+
+	// filter by order status
+	if (orderStatusFilter.value.size > 0) {
+		result = result.filter((order) => orderStatusFilter.value.has(order.status))
+	}
+
+	return result
+})
+
+const pageNr = computed(() => {
+	currentPageNr.value = Math.min(currentPageNr.value, maxPageNr.value)
+	return currentPageNr.value
+})
+
+const maxPageNr = computed(() => {
+	return Math.max(Math.ceil(orders.value!.length / rowsPerPage), 1)
+})
+
+const pageOrders = computed(() => {
+	return orders.value?.slice((pageNr.value - 1) * rowsPerPage, pageNr.value * rowsPerPage)
+})
+
+function setPageNr(newPageNr: number) {
+	currentPageNr.value = newPageNr
+}
+
+function sortOrders() {
+	props.allOrders.sort((a, b) => b.code - a.code)
+}
+
+function openConfirmModal() {
+	confirmActionModalRef.value?.open()
+}
+
+function handleOrderCreated(order: OrderGeEu) {
+	processOrderValues(order)
+	props.allOrders.push(order)
+}
+
+function handleOrderEdited(order: OrderGeEu) {
+	const localOrder = props.allOrders.find((o) => o.id === order.id)
+
+	if (localOrder) {
+		processOrderValues(order)
+		Object.assign(localOrder, order)
+	}
+}
+
+async function deleteOrder(order: OrderGeEu) {
+	emit('order-deleted', order)
+}
+
+function processOrderValues(order: OrderGeEu) {
+	order.original_price = new Decimal(order.original_price)
+	order.current_price = new Decimal(order.current_price)
+	order.weight = new Decimal(order.weight)
+	order.created_at = new Date(order.created_at)
+	order.payment_date = order.payment_date ? new Date(order.payment_date) : null
+	order.delivered_at = order.delivered_at ? new Date(order.delivered_at) : null
+	order.user = props.allUsers.find((u) => u.id === order.user_id)
+}
+
+async function updateOrderStatusForSelection() {
+	try {
+		const body: OrderGeEuBatchPatchRequest = {
+			patches: selectedOrders.value.map((order) => ({
+				id: order.id,
+				status: selectedOrderStatusToSet.value!,
+			})),
+			send_notification: sendNotification.value,
+		}
+
+		const updatedOrders = (await axios.patch('/api/admin/geeu/orders', body)).data
+
+		for (const order of updatedOrders) {
+			selectedOrders.value.find((o) => o.id === order.id)!.status = order.status
+		}
+	} catch (ex) {
+		logError(ex)
+		errorMessage.value = 'Something went wrong. Please try again later.'
+		showToast(showErrorToast)
+	} finally {
+		confirmActionModalRef.value?.close()
+	}
+}
+
+function handleOrderStatusUpdateClosed() {
+	selectedOrderStatusToSet.value = null
+}
+
+function exportToCSV() {
+	const bom = '﻿'
+	const headers = [
+		'Номер заказа',
+		'Фамилия',
+		'Имя',
+		'Вес без округления',
+		'Начальная сумма',
+		'Конечная сумма',
+		'Дата завершения заказа',
+		'Способ оплаты',
+		'Дата оплаты',
+	]
+	const rows: string[] = []
+
+	for (const order of orders.value) {
+		const row = [
+			order.code,
+			order.user?.last_name,
+			order.user?.first_name,
+			order.weight,
+			order.original_price,
+			order.current_price,
+			order.delivered_at?.toLocaleDateString(),
+			paymentMethodToAdminDisplayString(order.payment_method),
+			order.payment_date?.toLocaleDateString(),
+		].join(',')
+		rows.push(row)
+	}
+
+	const data = [headers, rows.join('\n')].join('\n')
+	const blob = new Blob([bom + data], { type: 'text/csv' })
+
+	const url = URL.createObjectURL(blob)
+	const a = document.createElement('a')
+	a.href = url
+	a.download = 'orders.csv'
+
+	a.click()
+}
+
+function toggleAllOrdersSelected() {
+	selectedOrders.value = allOrdersSelected.value ? [...orders.value] : []
+}
+
+async function updateOrderStatus(order: OrderGeEu, newOrderStatus: OrderStatusGeEu) {
+	try {
+		const body: OrderGeEuPatchRequest = { status: newOrderStatus, send_notification: sendNotification.value }
+		const updatedOrder = (await axios.patch(`/api/admin/geeu/orders/${order.id}`, body)).data
+		order.status = updatedOrder.status
+	} catch (ex) {
+		logError(ex)
+		errorMessage.value = 'Something went wrong. Please try again later.'
+		showToast(showErrorToast)
+	}
+}
+
+async function updatePaymentMethod(order: OrderGeEu, newPaymentMethod: PaymentMethod) {
+	try {
+		const body: OrderGeEuPatchRequest = { payment_method: newPaymentMethod, send_notification: sendNotification.value }
+		const updatedOrder = (await axios.patch(`/api/admin/geeu/orders/${order.id}`, body)).data
+		order.payment_method = updatedOrder.payment_method
+	} catch (ex) {
+		logError(ex)
+		errorMessage.value = 'Something went wrong. Please try again later.'
+		showToast(showErrorToast)
+	}
+}
+</script>
+
+<template>
+	<div class="flex flex-col grow">
+		<div class="flex flex-row min-h-12 mr-3 justify-between items-center">
+			<span class="text-2xl font-bold">Orders &nbsp;&nbsp; GE - EU</span>
+			<div class="flex flex-row gap-5">
+				<label class="label cursor-pointer gap-2 p-0">
+					<input type="checkbox" class="checkbox checkbox-sm" v-model="sendNotification" />
+					<span class="label-text">Send notification</span>
+				</label>
+				<StatusGeEuDropdown
+					class="select-sm"
+					placeholder="Change status"
+					form-control-class="w-fit"
+					v-model="selectedOrderStatusToSet"
+					:disabled="selectedOrders.length == 0"
+					@change="openConfirmModal"
+				/>
+				<button class="btn btn-sm" @click="exportToCSV">
+					Export CSV
+					<ion-icon name="download-outline" class="text-base"></ion-icon>
+				</button>
+				<div class="dropdown dropdown-end">
+					<div tabindex="0" role="button" class="btn btn-sm mb-1">
+						{{ orderStatusFilter.size > 0 ? `Selected ${orderStatusFilter.size}` : 'All stages' }}
+						<ion-icon name="filter-outline" class="text-base"></ion-icon>
+					</div>
+					<ul tabindex="0" class="menu dropdown-content rounded-box z-[1] p-2 shadow w-52 bg-white">
+						<li v-for="status in Object.values(OrderStatusGeEu)">
+							<label class="label cursor-pointer">
+								<span class="label-text">{{ toAdminDisplayString(status) }}</span>
+								<input type="checkbox" class="checkbox checkbox-sm" :value="status" v-model="orderStatusFilter" />
+							</label>
+						</li>
+					</ul>
+				</div>
+				<div class="dropdown dropdown-end">
+					<div tabindex="0" role="button" class="btn btn-sm mb-1">
+						Filters
+						<ion-icon name="options-outline" class="text-base"></ion-icon>
+					</div>
+					<div tabindex="0" class="dropdown-content rounded-box z-[1] p-4 shadow bg-white w-96">
+						<div class="flex flex-col gap-2">
+							<Dropdown
+								class="select-sm"
+								placeholder="Choose date type"
+								:options="[
+									{ key: DateType.Creation, displayValue: 'Creation date' },
+									{ key: DateType.Delivery, displayValue: 'Delivery date' },
+									{ key: DateType.Payment, displayValue: 'Payment date' },
+								]"
+								v-model="dateType"
+							/>
+							<div class="flex flex-row items-center gap-2">
+								<Input type="date" class="input-sm" v-model="startDate" />
+								<span class="text-sm">to</span>
+								<Input type="date" class="input-sm" v-model="endDate" />
+							</div>
+							<div class="flex flex-row justify-end gap-2 mt-2">
+								<button class="btn btn-sm btn-outline" @click="() => emit('date-filter-reset')">Reset</button>
+								<button class="btn btn-sm btn-success" @click="() => emit('date-filter-apply')">Apply</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<label
+					class="input input-sm input-bordered focus-within:outline-0 focus-within:border-gray-500 flex items-center"
+				>
+					<input type="text" class="grow" placeholder="Search" v-model="orderSearch" />
+					<ion-icon name="search-outline"></ion-icon>
+				</label>
+				<button class="btn btn-sm btn-outline" @click="newOrderModalRef?.open()">Add order</button>
+			</div>
+		</div>
+		<div class="flex flex-col bg-white mr-3 mb-5 grow">
+			<table class="table table-sm">
+				<thead>
+					<tr class="bg-base-200">
+						<th>
+							<label class="label cursor-pointer">
+								<input
+									type="checkbox"
+									class="checkbox checkbox-sm"
+									v-model="allOrdersSelected"
+									@change="toggleAllOrdersSelected"
+								/>
+							</label>
+						</th>
+						<th>ORDER CODE</th>
+						<th>STATUS</th>
+						<th>USER</th>
+						<th>TELEGRAM</th>
+						<th>WEIGHT</th>
+						<th>PRICE</th>
+						<th>TRACK NUMBER</th>
+						<th>PAID WITH</th>
+						<th>CREATION DATE</th>
+						<th>PAYMENT DATE</th>
+						<th>DELIVERY DATE</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="order in pageOrders" :key="order.id">
+						<td>
+							<label class="label cursor-pointer">
+								<input type="checkbox" class="checkbox checkbox-sm" :value="order" v-model="selectedOrders" />
+							</label>
+						</td>
+						<td>{{ order.code }}</td>
+						<td>
+							<StatusGeEuDropdown
+								:model-value="order.status"
+								class="select-sm"
+								:class="[`bg-[${toAdminColorCode(order.status)}]`, 'focus:bg-white', 'focus:text-black']"
+								form-control-class="w-fit"
+								@update:model-value="(val: OrderStatusGeEu) => updateOrderStatus(order, val)"
+							/>
+						</td>
+						<td>{{ order.user?.first_name }} {{ order.user?.last_name }}</td>
+						<td>{{ order.user?.tg_username }}</td>
+						<td>{{ order.weight }}</td>
+						<td>{{ order.current_price }}</td>
+						<td>{{ order.track_nr }}</td>
+						<td>
+							<PaymentMethodDropdown
+								:model-value="order.payment_method"
+								class="select-sm"
+								:class="[
+									`bg-[${paymentMethodToAdminColorCode(order.payment_method)}]`,
+									'focus:bg-white',
+									'focus:text-black',
+								]"
+								form-control-class="w-fit"
+								@update:model-value="(val: PaymentMethod) => updatePaymentMethod(order, val)"
+							/>
+						</td>
+						<td>{{ order.created_at.toLocaleDateString() }}</td>
+						<td>{{ order.payment_date?.toLocaleDateString() }}</td>
+						<td>{{ order.delivered_at?.toLocaleDateString() }}</td>
+						<td>
+							<div class="flex flex-row gap-2">
+								<button class="btn btn-sm text-gray-500 btn-square btn-outline" @click="editOrderModalRef?.open(order)">
+									<ion-icon name="pencil"></ion-icon>
+								</button>
+								<button
+									class="btn btn-sm text-gray-500 btn-square btn-outline"
+									@click="confirmDeleteModalRef?.open(() => deleteOrder(order))"
+								>
+									<ion-icon name="trash"></ion-icon>
+								</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<AdminPagination :page-nr="pageNr" :max-page-nr="maxPageNr" @page-nr-changed="setPageNr" />
+		<NewOrderGeEuModal ref="newOrderModalRef" @order-created="handleOrderCreated" :users="allUsers" />
+		<EditOrderGeEuModal ref="editOrderModalRef" @order-edited="handleOrderEdited" :users="allUsers" />
+		<AdminConfirmActionModal
+			ref="confirmActionModalRef"
+			@confirmed="updateOrderStatusForSelection"
+			@closed="handleOrderStatusUpdateClosed"
+		>
+			<p>
+				New status: <b>{{ toAdminDisplayString(selectedOrderStatusToSet!) }}</b>
+			</p>
+		</AdminConfirmActionModal>
+		<AdminConfirmDeleteModal ref="confirmDeleteModalRef" />
+		<Toast v-if="showErrorToast" class="alert-error" icon-name="close-circle-outline" :message="errorMessage" />
+	</div>
+</template>

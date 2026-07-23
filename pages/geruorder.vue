@@ -8,7 +8,10 @@ import { ErrorName } from '~/enums/exceptions/ErrorName'
 import { TelegramEntityErrorType } from '~/enums/exceptions/TelegramEntityErrorType'
 import axios, { HttpStatusCode } from 'axios'
 
-const userOrderCookie = useCookie<UserGeRuOrderRequest | null>('user-geruorder-cookie', { maxAge: 365 * 24 * 60 * 60 })
+const userOrderCookie = useCookie<UserGeRuOrderRequest | null>('user-geruorder-cookie', {
+	maxAge: 365 * 24 * 60 * 60,
+	path: '/geruorder',
+})
 
 const modalRef = ref<HTMLDialogElement | null>(null)
 const dataProcessAgreementRef = ref<typeof DataProcessAgreement | null>(null)

@@ -25,3 +25,15 @@ export interface UserGeRuOrderRequest {
   description: string
   hint_price: string
 }
+
+export interface UserGeEuOrderRequest {
+  first_name: string
+  last_name: string
+  phone_nr: string
+  tg_username: string
+  receiver_name: string
+  receiver_phone_nr: string
+  receiver_address: string
+  description: string
+  hint_price: string
+}
